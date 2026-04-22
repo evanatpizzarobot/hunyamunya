@@ -3,21 +3,53 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-base: #0a0a0b;
+  --fg: #ece9e2;
+  --accent: #c9a36b;
+  --accent-cool: #5a7ca8;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--bg-base);
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--fg);
+  background: transparent;
+  min-height: 100vh;
+}
+
+/*
+ * Ambient gradient background for sub-pages (everything except home with an
+ * active campaign image). Two radial washes drift slowly on their own axes,
+ * producing a very minimal nocturnal warmth without demanding attention.
+ * Respects prefers-reduced-motion: when reduced motion is requested, the
+ * gradients stay still.
+ */
+.ambient-gradient {
+  background-color: #0a0a0b;
+  background-image:
+    radial-gradient(60% 45% at 18% 22%, rgba(201, 163, 107, 0.12), transparent 65%),
+    radial-gradient(55% 40% at 82% 78%, rgba(90, 124, 168, 0.10), transparent 70%),
+    radial-gradient(70% 55% at 50% 100%, rgba(10, 10, 11, 0.9), transparent 60%);
+  background-size: 180% 180%, 180% 180%, 100% 100%;
+  background-position: 0% 0%, 100% 100%, 50% 50%;
+  animation: ambient-drift 60s ease-in-out infinite alternate;
+}
+
+@keyframes ambient-drift {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 50%;
+  }
+  100% {
+    background-position: 12% 18%, 88% 82%, 50% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-gradient {
+    animation: none;
+  }
 }
 
 @layer utilities {

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
+import { AmbientBackground } from "@/components/AmbientBackground";
 import { orgSchema, LABEL_NAME, SITE_URL } from "@/lib/jsonld";
 
 const geistSans = localFont({
@@ -43,8 +44,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#0a0a0a" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 text-neutral-100`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-neutral-100`}
       >
+        <AmbientBackground />
         <SEO jsonLd={[orgSchema()]} />
         <Header />
         <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>

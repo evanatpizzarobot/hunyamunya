@@ -1,10 +1,36 @@
 # Homepage campaign config. Spec §3.4.
-# Set `active` to null to show the fallback. When `active` is set, the homepage
-# hero renders from it.
 #
-# Placeholder: no active campaign yet. First real campaign will be Rykard album 2026.
+# When `active` is set, the homepage hero area renders from it AND the
+# <AmbientBackground> full-site fixed layer swaps from the animated
+# gradient to the campaign's hero_media.src image with a dark overlay.
+# Set `active` to null to show the gradient on every page.
+#
+# Current campaign is Rykard NCO. Evan will drop the Gemini-generated
+# hero image at site/public/campaigns/rykard-nco-hero.jpg; until then
+# the img element 404s silently and the gradient shows through.
 
-active: null
+active:
+  id: rykard-nco-2025
+  type: release
+  artist: rykard
+  release: hmr010-nco
+  headline: "RYKARD — NCO 12\" Vinyl"
+  tagline: "Out Now. 15-Year Anniversary Edition."
+  hero_media:
+    type: image
+    src: /campaigns/rykard-nco-hero.jpg
+  cta_primary:
+    label: "Listen & buy"
+    href: "/catalog/hmr010-nco"
+  cta_secondary:
+    label: "About Rykard"
+    href: "/artists/rykard"
+  proof_points:
+    - "HMR010"
+    - "15-Year Anniversary"
+    - "Limited Pressing"
+  active_from: 2025-12-12
+  active_until: null
 
 fallback:
   headline: "Hunya Munya Records"

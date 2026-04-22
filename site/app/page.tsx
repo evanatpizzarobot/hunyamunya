@@ -1,23 +1,76 @@
 import Link from "next/link";
-import { getAllArtists, getAllNews, getAllReleases } from "@/lib/content";
+import { getAllArtists, getAllNews, getAllReleases, getCurrentCampaign } from "@/lib/content";
 import { LABEL_NAME } from "@/lib/jsonld";
+import { HomeHeroBackground } from "@/components/HomeHeroBackground";
 
 export default function Home() {
   const artists = getAllArtists();
   const releases = getAllReleases();
   const news = getAllNews().slice(0, 3);
   const activeArtists = artists.filter((a) => a.data.tier === "anchor" || a.data.tier === "active");
+  const campaign = getCurrentCampaign();
+  const activeCampaign = campaign.active ?? null;
 
   return (
     <>
-      <section className="py-12">
-        <p className="font-mono text-xs uppercase tracking-wider text-neutral-500">
-          LA based boutique label &amp; publisher · Electronic · Ambient · Chillout · since 2002
-        </p>
-        <h1 className="mt-2 max-w-3xl font-serif text-4xl leading-tight text-neutral-50 md:text-5xl">
-          {LABEL_NAME}
-        </h1>
-        <p className="mt-6 max-w-2xl text-lg text-neutral-300">
+      <HomeHeroBackground campaign={campaign} />
+
+      {/* Hero: when a campaign is active, lead with the campaign headline over the
+          full-bleed background image. When inactive, lead with the label name. */}
+      <section className="flex min-h-[60vh] flex-col justify-end py-10 md:min-h-[70vh] md:py-14 [text-shadow:0_2px_8px_rgba(0,0,0,0.55)]">
+        {activeCampaign ? (
+          <>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
+              {activeCampaign.type === "release" ? "Out Now" : activeCampaign.type.replace("-", " ")}
+            </p>
+            <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-white md:text-6xl">
+              {activeCampaign.headline}
+            </h1>
+            {activeCampaign.tagline ? (
+              <p className="mt-3 max-w-2xl text-lg text-neutral-200">{activeCampaign.tagline}</p>
+            ) : null}
+            {activeCampaign.proof_points?.length ? (
+              <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-xs font-mono uppercase tracking-wider text-neutral-300">
+                {activeCampaign.proof_points.map((pt) => (
+                  <li key={pt} className="before:mr-2 before:text-neutral-500 before:content-['·'] first:before:hidden">
+                    {pt}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <div className="mt-7 flex flex-wrap gap-3">
+              {activeCampaign.cta_primary ? (
+                <Link
+                  href={activeCampaign.cta_primary.href}
+                  className="border border-neutral-100 bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-white"
+                >
+                  {activeCampaign.cta_primary.label}
+                </Link>
+              ) : null}
+              {activeCampaign.cta_secondary ? (
+                <Link
+                  href={activeCampaign.cta_secondary.href}
+                  className="border border-neutral-400 px-5 py-2 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-200 hover:text-white"
+                >
+                  {activeCampaign.cta_secondary.label}
+                </Link>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
+              LA based boutique label &amp; publisher · Electronic · Ambient · Chillout · since 2002
+            </p>
+            <h1 className="mt-3 max-w-3xl font-serif text-5xl leading-tight text-white md:text-6xl">
+              {LABEL_NAME}
+            </h1>
+          </>
+        )}
+      </section>
+
+      <section className="mt-2 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
+        <p className="max-w-2xl text-lg text-neutral-300">
           LA based boutique label and publisher since 2002. Crafting Electronic, Ambient, and Chillout for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide. Artists include{" "}
           <Link href="/artists/rykard" className="text-neutral-100 underline underline-offset-4 hover:text-white">
             Rykard
@@ -51,7 +104,7 @@ export default function Home() {
       </section>
 
       {activeArtists.length ? (
-        <section className="mt-8 border-t border-neutral-800 pt-8">
+        <section className="mt-8 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
           <h2 className="font-serif text-2xl text-neutral-100">Now</h2>
           <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {activeArtists.map(({ data }) => (
@@ -71,7 +124,7 @@ export default function Home() {
         </section>
       ) : null}
 
-      <section className="mt-12 border-t border-neutral-800 pt-8">
+      <section className="mt-8 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
         <h2 className="font-serif text-2xl text-neutral-100">Latest</h2>
         <ul className="mt-4 space-y-3">
           {news.map((n) => (
@@ -90,7 +143,7 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="mt-12 border-t border-neutral-800 pt-8">
+      <section className="mt-8 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
         <p className="font-serif text-xl text-neutral-100">
           24 years. {releases.length} releases.{" "}
           <Link href="/catalog" className="underline underline-offset-4">

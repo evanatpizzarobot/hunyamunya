@@ -15,7 +15,7 @@ const nav = [
 
 export function Header() {
   return (
-    <header className="border-b border-neutral-800">
+    <header className="relative z-10 border-b border-neutral-900/70 bg-neutral-950/70 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 md:flex-row md:items-center md:justify-between">
         <Link href="/" aria-label={LABEL_NAME} className="inline-block">
           <img
