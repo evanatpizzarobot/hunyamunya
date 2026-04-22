@@ -71,6 +71,7 @@ const ARTIST_PORTRAIT_OVERRIDES: Record<string, string> = {
   //   leevey: no image found in the 114 rehosted files; Evan to upload.
   //   "nosmo-kris-b": no image found; Evan to upload.
   // HMDIGITAL-era stubs: no known portraits in the WP export; Evan to upload.
+  "cassino-laben": "/media/legacy/2025/08/Cassino-Laben.jpg",
 };
 
 // Per-release rich enrichments keyed by release slug. Holds tracklists,
