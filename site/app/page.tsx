@@ -29,15 +29,6 @@ export default function Home() {
             {activeCampaign.tagline ? (
               <p className="mt-3 max-w-2xl text-lg text-neutral-200">{activeCampaign.tagline}</p>
             ) : null}
-            {activeCampaign.proof_points?.length ? (
-              <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-xs font-mono uppercase tracking-wider text-neutral-300">
-                {activeCampaign.proof_points.map((pt) => (
-                  <li key={pt} className="before:mr-2 before:text-neutral-500 before:content-['·'] first:before:hidden">
-                    {pt}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
             <div className="mt-7 flex flex-wrap gap-3">
               {activeCampaign.cta_primary ? (
                 <Link
@@ -114,9 +105,6 @@ export default function Home() {
                   className="block border border-neutral-800 p-4 transition-colors hover:border-neutral-600 hover:bg-neutral-900"
                 >
                   <p className="font-serif text-lg text-neutral-50">{data.name}</p>
-                  <p className="mt-1 text-xs uppercase tracking-wider text-neutral-500">
-                    {data.tier === "anchor" ? "Anchor artist" : "Active"}
-                  </p>
                 </Link>
               </li>
             ))}
