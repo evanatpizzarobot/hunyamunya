@@ -28,7 +28,7 @@ export function Header() {
           />
         </Link>
         <nav aria-label="Primary">
-          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-neutral-300">
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-base text-neutral-300 md:gap-x-7 md:text-lg">
             {nav.map((item) => (
               <li key={item.href}>
                 <Link
@@ -48,7 +48,7 @@ export function Header() {
                 aria-label="Shop (opens in new tab)"
               >
                 Shop
-                <span aria-hidden="true" className="ml-1 text-xs text-neutral-500">
+                <span aria-hidden="true" className="ml-1 text-sm text-neutral-500">
                   &#8599;
                 </span>
               </a>
