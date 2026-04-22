@@ -3,7 +3,7 @@
 // normalize every WXR item, dump to site/migration/raw.json for auditing.
 // MDX emission is a later step.
 
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { XMLParser } from "fast-xml-parser";
 import matter from "gray-matter";
@@ -25,6 +25,17 @@ const PAGE_ID_ARTISTS_PARENT = 12;
 const PAGE_IDS_RELEASE_SEEDS = new Set([14, 16, 79]);
 const PAGE_ID_PRESS = 247;
 const PAGE_ID_SHOP = 445;
+
+// Items Evan has already decided on. Do not re-emit these to content/_review/
+// on subsequent runs. Keyed by post_id. Values are short resolution notes for
+// the migration report.
+const RESOLVED_REVIEW_FLAGS: Record<number, string> = {
+  14: "Legacy CF7 contact form embed. Deleted; /releases → /catalog already in .htaccess.",
+  16: "Release list body; content already in the release seed data. Deleted; /releases-2 → /catalog already in .htaccess.",
+  504: "Catnip & Claws: emitted at content/artists/catnip-claws.mdx with legacy_slug preserved; redirect from /artists/catnip-claws-2 is in .htaccess.",
+  932: "Draft post with empty body; deliberately skipped from publication.",
+  1052: "Duplicate of canonical /artists/tim-fretwell. Deleted; 301 from /?page_id=1052 and /tim-fretwell to /artists/tim-fretwell.",
+};
 
 type Postmeta = { key: string; value: string };
 type Category = { domain: string; nicename: string; label: string };
@@ -289,7 +300,44 @@ function extractChannelMeta(channel: Record<string, unknown>): ChannelMeta {
   };
 }
 
+function assertTargetsEmptyOrForced(): void {
+  if (process.argv.includes("--force")) return;
+  const targets = [ARTISTS_DIR, NEWS_DIR, RELEASES_DIR, PAGES_DIR, REVIEW_DIR];
+  const occupied: string[] = [];
+  for (const dir of targets) {
+    let entries: string[];
+    try {
+      entries = readdirSync(dir);
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code === "ENOENT") continue;
+      throw e;
+    }
+    const nonGitkeep = entries.filter((e) => e !== ".gitkeep");
+    if (nonGitkeep.length > 0) {
+      occupied.push(`  ${dir} (${nonGitkeep.length} items)`);
+    }
+  }
+  if (!occupied.length) return;
+
+  console.error(
+    [
+      "ABORT: wp-import wholesale overwrites content directories. The following",
+      "contain unsaved work that would be destroyed:",
+      "",
+      ...occupied,
+      "",
+      "If this is intentional (fresh migration pass), re-run with --force:",
+      "  npm run import:wp -- --force",
+      "",
+      "See site/migration/README.md for the one-shot policy.",
+    ].join("\n"),
+  );
+  process.exit(2);
+}
+
 async function main() {
+  assertTargetsEmptyOrForced();
+
   console.log("Reading", XML_PATH);
   const xml = readFileSync(XML_PATH, "utf8");
 
@@ -568,6 +616,7 @@ function emitPages(classified: ClassifiedItem[], stats: EmitStats): void {
       writeFileSync(resolve(PAGES_DIR, "shop.mdx"), matter.stringify(body, front));
       stats.pages++;
     } else if (item.class === "misc_page") {
+      if (RESOLVED_REVIEW_FLAGS[item.post_id]) continue;
       const filename = `misc-page-${item.post_id}-${item.post_name || "unnamed"}.mdx`;
       const front: Record<string, unknown> = {
         post_id: item.post_id,
@@ -583,6 +632,7 @@ function emitPages(classified: ClassifiedItem[], stats: EmitStats): void {
       writeFileSync(resolve(REVIEW_DIR, filename), matter.stringify(body, front));
       stats.review_files++;
     } else if (item.class === "release_seed_page" && item.review_flags.includes("mis_titled_page")) {
+      if (RESOLVED_REVIEW_FLAGS[item.post_id]) continue;
       // Mis-titled pages 14 (Contact) and 16 (Releases): content is already captured
       // via the release seed data, but preserve the body in _review for Evan to skim.
       const filename = `page-${item.post_id}-${item.post_name || "unnamed"}.mdx`;
@@ -645,16 +695,22 @@ function writeReport(
   if (!reviewFlags.length) {
     lines.push(`None.`);
   } else {
-    lines.push(`| post_id | reason | title |`);
-    lines.push(`|---|---|---|`);
+    lines.push(`| post_id | reason | title | status |`);
+    lines.push(`|---|---|---|---|`);
     for (const f of reviewFlags) {
-      lines.push(`| ${f.post_id} | \`${f.reason}\` | ${f.title.replace(/\|/g, "\\|")} |`);
+      const status = RESOLVED_REVIEW_FLAGS[f.post_id] ? "resolved" : "open";
+      lines.push(`| ${f.post_id} | \`${f.reason}\` | ${f.title.replace(/\|/g, "\\|")} | ${status} |`);
     }
     lines.push(``);
     lines.push(`### Notes`);
     lines.push(``);
     for (const f of reviewFlags) {
-      lines.push(`- **id ${f.post_id} — ${f.reason}:** ${f.note}`);
+      const resolution = RESOLVED_REVIEW_FLAGS[f.post_id];
+      if (resolution) {
+        lines.push(`- **id ${f.post_id} — \`${f.reason}\` (resolved):** ${resolution}`);
+      } else {
+        lines.push(`- **id ${f.post_id} — \`${f.reason}\`:** ${f.note}`);
+      }
     }
   }
   lines.push(``);

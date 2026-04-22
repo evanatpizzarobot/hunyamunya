@@ -38,6 +38,55 @@ Format: `## YYYY-MM-DD — short title`, then context, decision, rationale, spec
 
 ---
 
+## 2026-04-22 — SEO Phase 1 spec arrived; URL pattern for releases changes
+
+**Context:** Cowork issued `docs/specs/seo-audit-phase-1.md`. §2 "Phase A — bake-in" is load-bearing for the MDX rendering layer (route implementations) and must ship with v1, not be retrofitted.
+
+**Key structural deltas from the main rebuild spec:**
+1. **Release URL pattern is `/catalog/{catno-slug}`**, not `/catalog/{slug}`. Example: `/catalog/hmr001-arrive-the-radio-beacon`. This is canonical and signals "numbered release on a real label" to crawlers. Release pages without a catalog number (digital-only inferred from news) use just `{slug}`.
+2. **News URL pattern is `/news/{yyyy}/{slug}`** with year in the path, not `/news/{slug}`.
+3. **Required frontmatter additions** (to be rolled into `lib/schema.ts` Zod schemas when route work starts): `seoTitle`, `metaDescription`, `ogImage` (top-level, not nested under `seo`). Artist schema gains: `yearsActive`, `shortBio`, `fullBio`, `externalLinks`, `press`. The existing `seo.*` nested block can coexist or migrate.
+4. **JSON-LD factories:** build `lib/jsonld.ts` (new file — `lib/schema.ts` is already Zod) with typed factories for Organization (MusicLabel), MusicGroup, MusicAlbum, Article, BreadcrumbList. Compose into a shared `<SEO>` component.
+5. **Sitemap** at `/sitemap.xml` generated from MDX union with `<lastmod>` from frontmatter `updatedAt` (fall back to date). Single sitemap until >1000 URLs.
+6. **robots.txt:** allow-all, sitemap pointer, no AI scraper blocks.
+7. **Lighthouse CI** added to the deploy workflow, fail build if any page scores <90 on Perf/A11y/SEO.
+
+**Rationale:** retrofitting SEO primitives onto a built site costs 10× what baking them in does. Phase A items are "cheap now, expensive later."
+
+**Spec sections affected:** main rebuild-v1 §2 (URL structure, router shape), §3 (frontmatter schemas gain SEO fields), §10 (SEO + schema — superseded/extended). Hosting addendum is unaffected.
+
+**Open items for Evan** (from SEO spec §7, for when they come up):
+- Analytics: Plausible vs GA4 (SEO spec recommends Plausible). STILL OPEN.
+- Discogs label ID: for schema sameAs. STILL OPEN.
+- Social handles: Instagram / Facebook / Bandcamp for footer + Organization schema. STILL OPEN.
+- About page: Evan to draft, or accept a first draft from Cowork. STILL OPEN.
+- YouTube channel: exists? STILL OPEN.
+- 23-year anniversary angle for launch copy. STILL OPEN.
+
+---
+
+## 2026-04-22 — Three _review files resolved (deletes + redirects)
+
+Evan's decisions on the three `site/content/_review/` files emitted by the first wp-import run:
+
+1. **`misc-page-1052-tim-fretwell.mdx`** (orphan page, post_id 1052, parent=0, slug `tim-fretwell`). Inspect body first; if it duplicates the canonical `/artists/tim-fretwell`, delete and add a 301 from `/?page_id=1052` to `/artists/tim-fretwell`. If unique content, merge into the canonical artist page's frontmatter/body, then delete + 301. Either way: does not survive as its own file.
+
+2. **`page-14-releases.mdx`** (page id 14, mis-titled "Contact" at slug `/releases`). Delete. Body is the legacy CF7 form embed; not useful as content. No extra 301 needed (`.htaccess` already maps `/releases` → `/catalog`). Grep the form embed first for any field names or copy that should mirror onto the new `/contact` route; likely nothing worth keeping, but 30 seconds to check.
+
+3. **`page-16-releases-2.mdx`** (page id 16, titled "Releases" at slug `/releases-2`). Delete. Content already extracted into the release seed list. No extra 301 needed (`.htaccess` already maps `/releases-2` → `/catalog`).
+
+**Inspection results (for the record):**
+- **1052 tim-fretwell orphan:** duplicate of canonical `/artists/tim-fretwell`. Same image, same YouTube embed, same bio text (canonical has better editorial polish). No merge needed; straight delete + 301. Adding two redirect rules to redirects-build: `/?page_id=1052` → `/artists/tim-fretwell` and `/tim-fretwell` (bare top-level slug) → `/artists/tim-fretwell`.
+- **14 Contact form:** only substantive copy on the page is the line "If your submitting a demo, please include contact info, and a direct link. Thank you." The rest is the CF7 shortcode. Saving the subheading copy here for when `/contact` is built: suggested cleaned version is "If you're submitting a demo, please include contact info and a direct link. Thank you." No 301 needed beyond the existing `/releases` → `/catalog` rule.
+- **16 Releases:** body is the HMR001-HMR010 + CD list already transcribed into the release seed data. Nothing to salvage.
+
+**wp-import follow-ups from this decision:**
+- Stop emitting these three items to `content/_review/`. Once Evan's decision is encoded, further wp-import runs shouldn't resurrect them.
+- Add a `--force` safety to wp-import: if any target content dir is non-empty and `--force` isn't passed, bail with a clear error. Cheap insurance against accidentally nuking manual edits.
+- Document the one-shot policy in `site/migration/README.md`: wp-import wholesale rewrites content dirs by design, further edits after the migration review phase are direct-to-MDX.
+
+---
+
 ## 2026-04-22 — Cloudflare out, NetActuate Apache in (supersedes earlier CF decisions)
 
 **Context:** Cowork issued `docs/specs/hosting-addendum.md` mid-scaffold. It supersedes §1, §8.3, §8.6, §9, and §13 of the main site spec. The new site replaces the existing WordPress install on the same cPanel account at the same IP (162.223.15.199), so DNS, MX, SPF, DMARC, and Google Workspace email are all untouched.
