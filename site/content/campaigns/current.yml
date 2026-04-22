@@ -1,0 +1,14 @@
+# Homepage campaign config. Spec §3.4.
+# Set `active` to null to show the fallback. When `active` is set, the homepage
+# hero renders from it.
+#
+# Placeholder: no active campaign yet. First real campaign will be Rykard album 2026.
+
+active: null
+
+fallback:
+  headline: "Hunya Munya Records"
+  tagline: "Ambient and electronic music since 2003."
+  hero_media:
+    type: image
+    src: /placeholder-hero.jpg

@@ -1,0 +1,12 @@
+{
+  "name": "hunyamunya",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Hunya Munya Records monorepo. /site for the Next.js rebuild, /beacon for the SEO tool.",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}

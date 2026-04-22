@@ -1,0 +1,3 @@
+# Press quotes rotator source. Spec §4.
+# Seeded empty for now; wp-import.ts will populate from press pages + per-release quotes.
+quotes: []
