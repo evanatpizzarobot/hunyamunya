@@ -61,6 +61,55 @@ const ARTIST_ENRICHMENTS: Record<string, ArtistEnrichment> = {
   },
 };
 
+// Manual portrait overrides for artists whose WP body had no extractable image
+// (Leevey, Nosmo & Kris B) or who are HMDIGITAL-era stubs with no body at all.
+// Paths point at files under site/public/media/legacy/ that media-rehost already
+// downloaded from the WP export. Leaving a slug out of this map means the
+// HMR-logo fallback card renders.
+const ARTIST_PORTRAIT_OVERRIDES: Record<string, string> = {
+  // WP-migrated artists whose bio body didn't include a portrait:
+  //   leevey: no image found in the 114 rehosted files; Evan to upload.
+  //   "nosmo-kris-b": no image found; Evan to upload.
+  // HMDIGITAL-era stubs: no known portraits in the WP export; Evan to upload.
+};
+
+// Release cover art keyed by release slug. Paths resolve against files already
+// sitting in site/public/media/legacy/ (pulled during media-rehost). For the
+// HMR vinyl series we prefer the 2025/08 batch Evan re-uploaded to the live
+// WP site during the NCO campaign since those look like the curated "front
+// cover" versions; for releases without a 2025 version we fall back to the
+// original 2010-2018 uploads. HMDIGITAL001-018 covers aren't in the WP export
+// (separate Discogs label); Discogs enrichment pass will pull those later.
+const RELEASE_COVER_ART: Record<string, string> = {
+  // HMR vinyl
+  twilight: "/media/legacy/2025/08/D-Bajema-Twilight.jpg",
+  "5b": "/media/legacy/2025/08/BlueRoomProject-5B.jpg",
+  "ten-feet-from-heaven": "/media/legacy/2025/08/Evan-Marcus-10FtFromHeaven.jpg",
+  circular: "/media/legacy/2010/04/Snake_Sedrick_vinyl.jpg",
+  "revitalized-ep": "/media/legacy/2010/04/Darius_Kohanim_vinyl.jpg",
+  flicker: "/media/legacy/2025/08/Boom-Jinx-Flicker.jpg",
+  "chasing-memories": "/media/legacy/2025/08/Distant-Fragment-Chasing-Memories.jpg",
+  "time-code": "/media/legacy/2025/08/Huge-A-Timecode.jpg",
+  "what-i-feel": "/media/legacy/2010/04/hmr09_fuzy.jpg",
+  nco: "/media/legacy/2025/11/Rykard-NCO-Front-Back-Web-Final.jpg",
+  // CD albums (HMB catalog)
+  "arrive-the-radio-beacon": "/media/legacy/2010/04/845350021837.jpg",
+  "the-orange-album": "/media/legacy/2013/06/Evan-Marcus-Orange-Album.jpg",
+  luminosity: "/media/legacy/2016/08/Rykard-Cover.jpg",
+  "night-towers": "/media/legacy/2018/04/Rykard-Night-e1522987844826.jpeg",
+  "re-rel": "/media/legacy/2020/03/REREL-with-text.png",
+  // Rykard digital / EPs
+  "halcyon-days-ep": "/media/legacy/2011/07/CatnipandClaws-Cover.jpg",
+  "explorers-vol-1": "/media/legacy/2019/03/Rykard-Explorers-Coming-Soon.jpg",
+  "explorers-vol-2": "/media/legacy/2019/11/rykard-explorers-vol2-edit.jpg",
+  "explorers-vol-3": "/media/legacy/2020/09/explorers-vol3-1000x1000.jpg",
+  "explorers-vol-4": "/media/legacy/2023/07/Vol-4-Cover-scaled.jpg",
+  // Rykard one-off digitals (Ictis, Artificial Sunshine, Lansallos, Red Venom):
+  // no cover art in the WP export. Enrichment pass can pull these from
+  // Bandcamp/Discogs/Spotify when Evan has time.
+  // HMDIGITAL001-018: no cover art in the WP export. Enrichment pass pending.
+};
+
 type Postmeta = { key: string; value: string };
 type Category = { domain: string; nicename: string; label: string };
 
@@ -664,6 +713,13 @@ function buildArtistFrontmatter(item: RawItem, rewrittenBody: string): Record<st
     if (enrichment.yearsActive) front.yearsActive = enrichment.yearsActive;
   }
 
+  // Portrait override wins over auto-extracted body image when set.
+  const portraitOverride = ARTIST_PORTRAIT_OVERRIDES[slug];
+  if (portraitOverride) {
+    front.hero_image = portraitOverride;
+    front.portrait = portraitOverride;
+  }
+
   return front;
 }
 
@@ -765,6 +821,12 @@ function emitArtistStubs(stats: EmitStats): void {
     };
     if (enriched.yearsActive) front.yearsActive = enriched.yearsActive;
     if (enriched.shortBio) front.shortBio = enriched.shortBio;
+
+    const portraitOverride = ARTIST_PORTRAIT_OVERRIDES[stub.slug];
+    if (portraitOverride) {
+      front.hero_image = portraitOverride;
+      front.portrait = portraitOverride;
+    }
 
     const parsed = artistSchema.safeParse(front);
     if (!parsed.success) {
@@ -935,6 +997,8 @@ function buildReleaseFrontmatter(seed: ReleaseSeed): Record<string, unknown> {
   if (seed.release_date) front.release_date = seed.release_date;
   if (seed.artists_additional?.length) front.artists_additional = seed.artists_additional;
   if (seed.discogs_id) front.buy = { discogs: `https://www.discogs.com/release/${seed.discogs_id}` };
+  const cover = RELEASE_COVER_ART[seed.slug];
+  if (cover) front.cover_image = cover;
   return front;
 }
 
@@ -970,7 +1034,10 @@ function emitReleases(stats: EmitStats): void {
   }
 }
 
-function buildNewsFrontmatter(item: RawItem): {
+function buildNewsFrontmatter(
+  item: RawItem,
+  rewrittenBody: string,
+): {
   frontmatter: Record<string, unknown>;
   date: string;
 } {
@@ -982,6 +1049,7 @@ function buildNewsFrontmatter(item: RawItem): {
 
   const aioTitle = pmValue(item, "_aioseop_title").trim();
   const aioDesc = pmValue(item, "_aioseop_description").trim();
+  const heroImage = extractFirstMediaImage(rewrittenBody);
 
   const front: Record<string, unknown> = {
     slug: item.post_name,
@@ -992,6 +1060,7 @@ function buildNewsFrontmatter(item: RawItem): {
   const excerpt = item.excerpt.trim();
   if (excerpt) front.excerpt = excerpt;
   if (tags.length) front.tags = tags;
+  if (heroImage) front.hero_image = heroImage;
   if (aioTitle) front.seoTitle = aioTitle;
   if (aioDesc) front.metaDescription = aioDesc;
 
@@ -1004,12 +1073,13 @@ function emitNews(classified: ClassifiedItem[], stats: EmitStats): void {
   const news = classified.filter((c) => c.class === "news");
 
   for (const item of news) {
-    const { frontmatter, date } = buildNewsFrontmatter(item);
+    const body = rewriteBody(item.content);
+    const { frontmatter, date } = buildNewsFrontmatter(item, body);
 
     if (!date) {
       // No parseable date means we can't name the file. Send to review.
       const reviewPath = resolve(REVIEW_DIR, `news-nodate-${item.post_name || item.post_id}.mdx`);
-      writeFileSync(reviewPath, `> News post has no parseable post_date. Resolve manually.\n\n` + matter.stringify(rewriteBody(item.content), frontmatter));
+      writeFileSync(reviewPath, `> News post has no parseable post_date. Resolve manually.\n\n` + matter.stringify(body, frontmatter));
       stats.review_files++;
       stats.news_skipped++;
       continue;
@@ -1024,14 +1094,13 @@ function emitNews(classified: ClassifiedItem[], stats: EmitStats): void {
       writeFileSync(
         reviewPath,
         `> News frontmatter failed schema validation. Fix and move back to content/news/.\n>\n> Errors:\n${errText}\n\n` +
-          matter.stringify(rewriteBody(item.content), frontmatter),
+          matter.stringify(body, frontmatter),
       );
       stats.review_files++;
       stats.news_skipped++;
       continue;
     }
 
-    const body = rewriteBody(item.content);
     const outPath = resolve(NEWS_DIR, `${date}-${parsed.data.slug}.mdx`);
     writeFileSync(outPath, matter.stringify(body, parsed.data));
     stats.news++;

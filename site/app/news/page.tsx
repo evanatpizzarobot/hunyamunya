@@ -29,18 +29,41 @@ export default function NewsIndex() {
       <header className="mb-10">
         <h1 className="font-serif text-4xl text-neutral-50">News</h1>
       </header>
-      <ul className="space-y-4">
+      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {news.map((n) => (
           <li key={n.urlPath}>
             <Link
               href={n.urlPath}
-              className="block border border-neutral-800 p-4 transition-colors hover:border-neutral-600 hover:bg-neutral-900"
+              className="group flex h-full flex-col overflow-hidden border border-neutral-800 transition-colors hover:border-neutral-500"
             >
-              <p className="font-mono text-xs uppercase tracking-wider text-neutral-500">{n.data.date}</p>
-              <p className="mt-1 font-serif text-xl text-neutral-50">{n.data.title}</p>
-              {n.data.excerpt ? (
-                <p className="mt-2 text-sm text-neutral-300">{n.data.excerpt}</p>
-              ) : null}
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-950">
+                {n.data.hero_image ? (
+                  <img
+                    src={n.data.hero_image}
+                    alt=""
+                    className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <img
+                      src="/logo.gif"
+                      alt=""
+                      aria-hidden="true"
+                      className="h-1/2 w-auto opacity-25"
+                    />
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-1 flex-col p-4">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">{n.data.date}</p>
+                <p className="mt-1 font-serif text-lg leading-snug text-neutral-50 group-hover:text-white">
+                  {n.data.title}
+                </p>
+                {n.data.excerpt ? (
+                  <p className="mt-2 line-clamp-3 text-sm text-neutral-300">{n.data.excerpt}</p>
+                ) : null}
+              </div>
             </Link>
           </li>
         ))}

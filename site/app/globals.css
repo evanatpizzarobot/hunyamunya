@@ -21,28 +21,44 @@ body {
 
 /*
  * Ambient gradient background for sub-pages (everything except home with an
- * active campaign image). Two radial washes drift slowly on their own axes,
- * producing a very minimal nocturnal warmth without demanding attention.
- * Respects prefers-reduced-motion: when reduced motion is requested, the
- * gradients stay still.
+ * active campaign image). Three radial washes + a film-grain noise overlay
+ * drift slowly on their own axes. Warm brass, deep nocturnal blue, and a
+ * teal accent produce the label's nocturnal-music-room mood without
+ * demanding attention. Grain texture keeps flat dark from feeling digital.
+ *
+ * Respects prefers-reduced-motion: animation disabled, grain still visible.
  */
 .ambient-gradient {
-  background-color: #0a0a0b;
+  background-color: #07070a;
   background-image:
-    radial-gradient(60% 45% at 18% 22%, rgba(201, 163, 107, 0.12), transparent 65%),
-    radial-gradient(55% 40% at 82% 78%, rgba(90, 124, 168, 0.10), transparent 70%),
-    radial-gradient(70% 55% at 50% 100%, rgba(10, 10, 11, 0.9), transparent 60%);
-  background-size: 180% 180%, 180% 180%, 100% 100%;
-  background-position: 0% 0%, 100% 100%, 50% 50%;
-  animation: ambient-drift 60s ease-in-out infinite alternate;
+    radial-gradient(65% 50% at 15% 20%, rgba(201, 163, 107, 0.22), transparent 62%),
+    radial-gradient(58% 44% at 85% 75%, rgba(72, 103, 158, 0.26), transparent 68%),
+    radial-gradient(50% 40% at 55% 95%, rgba(90, 158, 155, 0.14), transparent 70%),
+    radial-gradient(80% 60% at 50% 110%, rgba(5, 5, 8, 0.95), transparent 55%);
+  background-size: 200% 200%, 200% 200%, 180% 180%, 100% 120%;
+  background-position: 0% 0%, 100% 100%, 50% 0%, 50% 100%;
+  animation: ambient-drift 70s ease-in-out infinite alternate;
+}
+
+.ambient-gradient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  /* SVG fractal noise generates a seamless grain; inlined so there's no
+     extra request. fBm type + stitchTiles keeps it tileable at any size. */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
 }
 
 @keyframes ambient-drift {
   0% {
-    background-position: 0% 0%, 100% 100%, 50% 50%;
+    background-position: 0% 0%, 100% 100%, 50% 0%, 50% 100%;
   }
   100% {
-    background-position: 12% 18%, 88% 82%, 50% 50%;
+    background-position: 18% 25%, 82% 75%, 65% 15%, 50% 100%;
   }
 }
 

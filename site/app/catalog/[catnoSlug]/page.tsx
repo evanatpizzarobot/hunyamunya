@@ -65,30 +65,42 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
         ]}
       />
       <article>
-        <header className="mb-8">
-          <p className="font-mono text-xs uppercase tracking-wider text-neutral-500">
-            {r.data.catalog_number ? `${r.data.catalog_number} · ${r.year}` : `${r.year}`} ·{" "}
-            {r.data.format.join(", ")}
-          </p>
-          <h1 className="font-serif text-5xl text-neutral-50">{r.data.title}</h1>
-          <p className="mt-2 text-lg text-neutral-300">
-            {resolvedArtists.map((a, i) => (
-              <span key={a.slug}>
-                {i > 0 ? <span className="text-neutral-500"> &amp; </span> : null}
-                {a.exists ? (
-                  <Link href={`/artists/${a.slug}`} className="underline-offset-4 hover:underline">
-                    {a.name}
-                  </Link>
-                ) : (
-                  <span>{a.name}</span>
-                )}
-              </span>
-            ))}
-          </p>
-          {r.data.status === "draft" ? (
-            <p className="mt-3 inline-block border border-amber-700 bg-amber-950 px-2 py-0.5 text-xs uppercase tracking-wider text-amber-200">
-              Draft: awaiting confirmation
+        <header className="mb-10 grid gap-8 md:grid-cols-[minmax(0,1fr)_320px] md:items-start lg:grid-cols-[minmax(0,1fr)_380px]">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-wider text-neutral-500">
+              {r.data.catalog_number ? `${r.data.catalog_number} · ${r.year}` : `${r.year}`} ·{" "}
+              {r.data.format.join(", ")}
             </p>
+            <h1 className="mt-2 font-serif text-4xl text-neutral-50 md:text-5xl">{r.data.title}</h1>
+            <p className="mt-3 text-lg text-neutral-300">
+              {resolvedArtists.map((a, i) => (
+                <span key={a.slug}>
+                  {i > 0 ? <span className="text-neutral-500"> &amp; </span> : null}
+                  {a.exists ? (
+                    <Link href={`/artists/${a.slug}`} className="underline-offset-4 hover:underline">
+                      {a.name}
+                    </Link>
+                  ) : (
+                    <span>{a.name}</span>
+                  )}
+                </span>
+              ))}
+            </p>
+            {r.data.status === "draft" ? (
+              <p className="mt-4 inline-block border border-amber-700 bg-amber-950 px-2 py-0.5 text-xs uppercase tracking-wider text-amber-200">
+                Draft: awaiting confirmation
+              </p>
+            ) : null}
+          </div>
+          {r.data.cover_image ? (
+            <figure className="order-first overflow-hidden border border-neutral-800 md:order-last">
+              <img
+                src={r.data.cover_image}
+                alt={`${r.data.title} cover`}
+                className="h-full w-full object-cover"
+                loading="eager"
+              />
+            </figure>
           ) : null}
         </header>
 
