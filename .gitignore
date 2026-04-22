@@ -29,6 +29,7 @@ site/migration/classified.json
 site/migration/report.md
 site/migration/dead-links.md
 site/migration/media-manifest.json
+site/migration/media-rehost.log
 
 # OS
 .DS_Store
