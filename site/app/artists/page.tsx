@@ -29,9 +29,6 @@ export default function ArtistsIndex() {
       />
       <header className="mb-10">
         <h1 className="font-serif text-4xl text-neutral-50">Artists</h1>
-        <p className="mt-2 max-w-2xl text-neutral-400">
-          The Hunya Munya Records roster. Every artist who has released on the label stays on the site.
-        </p>
       </header>
       <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {artists.map(({ data }) => {
