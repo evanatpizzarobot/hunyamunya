@@ -540,7 +540,7 @@ const RELEASE_SEEDS: ReleaseSeed[] = [
   { slug: "running-after-time-ep", title: "Running After Time EP", catalog_number: "HMDIGITAL010", artist: "cassino-laben", year: 2006, format: ["digital"], note: "2×File, MP3 320. EP." },
   { slug: "jetlag-ep", title: "Jetlag EP", catalog_number: "HMDIGITAL011", artist: "daniel-gregory", year: 2007, format: ["digital"], note: "2×File, MP3 320. EP." },
   { slug: "the-music-speaks", title: "The Music Speaks", catalog_number: "HMDIGITAL012", artist: "dj-thee-o", year: 2007, format: ["digital"], note: "3×File, MP3 320" },
-  { slug: "long-night", title: "Long Night", catalog_number: "HMDIGITAL013", artist: "curtis", artists_additional: ["dakota"], year: 2007, format: ["digital"], note: "2×File, MP3 320" },
+  { slug: "long-night", title: "Long Night", catalog_number: "HMDIGITAL013", artist: "curtis-dakota", year: 2007, format: ["digital"], note: "2×File, MP3 320" },
   { slug: "komodose-ep", title: "Komodose EP", catalog_number: "HMDIGITAL014", artist: "darius-kohanim", year: 2007, format: ["digital"], note: "EP. Discogs shows two versions; enrichment pass pending." },
   { slug: "international-soundscapes-ep", title: "International Soundscapes EP", catalog_number: "HMDIGITAL015", artist: "various-artists", year: 2008, format: ["cd"], note: "CDr compilation. Tracklist + artist credits pending enrichment." },
   { slug: "running-after-time-remix-ep", title: "Running After Time Remix EP", catalog_number: "HMDIGITAL016", artist: "cassino-laben", year: 2008, format: ["digital"], note: "Remix EP, companion to HMDIGITAL010. Discogs shows two versions; enrichment pass pending." },
@@ -568,8 +568,7 @@ const STUB_ARTISTS: StubArtist[] = [
   { slug: "cassino-laben", name: "Cassino & Labèn", yearsActive: "2006-2008", contextNote: "Duo. *Running After Time EP* (HMDIGITAL010, 2006) and the *Running After Time Remix EP* (HMDIGITAL016, 2008) on Hunya Munya Digital." },
   { slug: "daniel-gregory", name: "Daniel Gregory", yearsActive: "2007", contextNote: "Released *Jetlag EP* (HMDIGITAL011) in 2007." },
   { slug: "dj-thee-o", name: "DJ Thee-O", yearsActive: "2007", contextNote: "Released *The Music Speaks* (HMDIGITAL012) in 2007." },
-  { slug: "curtis", name: "Curtis", yearsActive: "2007", contextNote: "Collaborated with Dakota on *Long Night* (HMDIGITAL013) in 2007." },
-  { slug: "dakota", name: "Dakota", yearsActive: "2007", contextNote: "Collaborated with Curtis on *Long Night* (HMDIGITAL013) in 2007." },
+  { slug: "curtis-dakota", name: "Curtis & Dakota", yearsActive: "2007", contextNote: "Duo. *Long Night* (HMDIGITAL013, 2007) on Hunya Munya Digital." },
   { slug: "robert-g-roy", name: "Robert G Roy", yearsActive: "2008", contextNote: "Released *Sense Of Happiness* (HMDIGITAL018) in 2008." },
   { slug: "various-artists", name: "Various Artists", yearsActive: "2008", contextNote: "Credit slot for *International Soundscapes EP* (HMDIGITAL015, 2008) compilation." },
 ];
