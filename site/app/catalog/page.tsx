@@ -10,7 +10,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Catalog"),
     description:
-      "The complete release catalog of Hunya Munya Records: vinyl, CD, and digital releases since 2003 across ambient, electronic, and experimental music.",
+      "The complete release catalog of Hunya Munya Records: limited vinyl, CD, and digital releases since 2002 across Electronic, Ambient, and Chillout music.",
     path: "/catalog",
   });
 }

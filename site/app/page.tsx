@@ -12,14 +12,13 @@ export default function Home() {
     <>
       <section className="py-12">
         <p className="font-mono text-xs uppercase tracking-wider text-neutral-500">
-          Independent ambient electronic label · Los Angeles · since 2003
+          LA based boutique label &amp; publisher · Electronic · Ambient · Chillout · since 2002
         </p>
         <h1 className="mt-2 max-w-3xl font-serif text-4xl leading-tight text-neutral-50 md:text-5xl">
           {LABEL_NAME}
         </h1>
         <p className="mt-6 max-w-2xl text-lg text-neutral-300">
-          Hunya Munya Records is an independent ambient electronic music label based in Los Angeles. Since 2003,
-          we&rsquo;ve released vinyl records and digital albums from artists including{" "}
+          LA based boutique label and publisher since 2002. Crafting Electronic, Ambient, and Chillout for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide. Artists include{" "}
           <Link href="/artists/rykard" className="text-neutral-100 underline underline-offset-4 hover:text-white">
             Rykard
           </Link>
@@ -82,7 +81,7 @@ export default function Home() {
 
       <section className="mt-12 border-t border-neutral-800 pt-8">
         <p className="font-serif text-xl text-neutral-100">
-          23 years. {releases.length} releases.{" "}
+          24 years. {releases.length} releases.{" "}
           <Link href="/catalog" className="underline underline-offset-4">
             Explore the catalog.
           </Link>

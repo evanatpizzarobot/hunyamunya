@@ -17,7 +17,7 @@ export function orgSchema() {
     url: SITE_URL,
     logo: `${SITE_URL}/logo.png`, // 900x600, transparent PNG sourced from hm_transparent.gif
     email: "contact@hunyamunyarecords.com",
-    foundingDate: "2003",
+    foundingDate: "2002",
     foundingLocation: {
       "@type": "Place",
       name: "Los Angeles, CA, USA",

@@ -9,7 +9,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Artists"),
     description:
-      "The full Hunya Munya Records roster — active and archival artists across ambient, electronic, and experimental music since 2003.",
+      "The full Hunya Munya Records roster — active and archival artists crafting Electronic, Ambient, and Chillout music since 2002.",
     path: "/artists",
   });
 }

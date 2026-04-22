@@ -7,7 +7,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("About"),
     description:
-      "Hunya Munya Records is an independent ambient electronic music label founded in Los Angeles in 2003.",
+      "Hunya Munya Records is an LA-based boutique record label and publisher founded in Los Angeles in 2002, working across Electronic, Ambient, and Chillout for Radio, Film, and TV, plus limited Vinyl and CD releases worldwide.",
     path: "/about",
   });
 }
@@ -26,7 +26,7 @@ export default function AboutPage() {
       <article className="prose prose-invert prose-neutral max-w-3xl">
         <h1 className="font-serif text-4xl text-neutral-50">About</h1>
         <p className="text-neutral-300">
-          {LABEL_NAME} is an independent ambient electronic music label based in Los Angeles. Founded in 2003, the catalog spans vinyl and digital releases across ambient, electronic, and experimental music. Rykard&rsquo;s <em>Arrive the Radio Beacon</em> anchors the early catalog; a deep roster of roughly two dozen artists has contributed to the label&rsquo;s twenty-plus-year archive.
+          {LABEL_NAME} is an LA-based boutique record label and publisher, founded in 2002. We craft Electronic, Ambient, and Chillout music for Radio, Film, and TV, and release collectible limited Vinyl and CDs worldwide. The catalog spans two decades across vinyl, CD, and digital, with Rykard&rsquo;s <em>Arrive the Radio Beacon</em> anchoring the early era; a deep roster of roughly three dozen artists has contributed to the label&rsquo;s archive.
         </p>
         <p className="text-neutral-500 text-sm">
           This page is a placeholder. A longer label history, origin story, and musical identity essay are planned for launch.

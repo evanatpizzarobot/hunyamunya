@@ -38,7 +38,27 @@ Format: `## YYYY-MM-DD — short title`, then context, decision, rationale, spec
 
 ---
 
-## 2026-04-22 — HMDIGITAL sublabel catalog (Discogs 79509) added; /catalog sub-routes per format
+## 2026-04-22 — Founding year corrected from 2003 to 2002; positioning tightened
+
+**Context:** Evan's revised footer tagline uses "since 2002." Earlier spec docs (seo-audit-phase-1.md §1.1, hosting-addendum implicit, home anchor copy) said 2003, which was Cowork's assumption from early context. Evan's tagline is authoritative.
+
+**Decision:** the label founding year is **2002**, not 2003. All visible copy and Organization JSON-LD use 2002. Spec documents (`seo-audit-phase-1.md`, `hosting-addendum.md`) are preserved verbatim with their original 2003 mention as historical record; code and content use 2002 going forward.
+
+**Positioning (Evan's footer tagline is the canonical phrasing):** "LA based boutique label & publisher since 2002. Crafting Electronic, Ambient & Chillout for Radio/Film/TV. Plus collectible limited Vinyl & CDs worldwide."
+
+**Derived keyword adjustments** (supersedes SEO spec §1.1):
+- "ambient electronic record label" remains a Tier 2 target.
+- Add "LA boutique record label", "electronic music publisher Los Angeles", "ambient chillout licensing", "collectible vinyl label Los Angeles" to the Tier 2-3 target list for follow-on SEO work.
+- "Radio/Film/TV" positioning opens a sync-licensing angle that wasn't in the original Cowork brief — likely relevant for future /sync or /licensing page copy.
+
+**Spec sections affected:**
+- Home hero eyebrow and anchor paragraph: updated.
+- Home catalog-entry block: "24 years" (was 23).
+- /about hero paragraph and meta description.
+- /artists, /catalog, /catalog/{format}, root layout, campaigns/current.yml: all meta and default taglines updated.
+- Organization JSON-LD: `foundingDate: "2002"`.
+
+**Not swept:** artist bio MDX bodies that reference 2003 — those are dates in the artists' own histories, not the label's founding year (e.g., "Noel Sanger has been releasing since 2003"). Left alone.
 
 **Context:** Cowork shipped `docs/specs/digital-catalog-discogs.md` listing 18 releases from the Hunya Munya Digital sublabel (HMDIGITAL001-018, 2005-2008) scraped from Discogs label 79509. This is net-new catalog; the parent Hunya Munya Records label (vinyl/CD) is on a different Discogs ID.
 

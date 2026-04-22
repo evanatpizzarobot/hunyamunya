@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <footer className="mt-16 border-t border-neutral-800 bg-neutral-950">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:items-start md:justify-between">
-        <div className="md:max-w-xs">
+        <div className="md:max-w-md">
           <Link href="/" aria-label={LABEL_NAME} className="inline-block">
             <img
               src="/logo.gif"
@@ -16,8 +16,9 @@ export function Footer() {
               loading="lazy"
             />
           </Link>
-          <p className="mt-3 text-sm text-neutral-400">An independent record label since 2003.</p>
-          <p className="text-sm text-neutral-400">Los Angeles, CA, USA</p>
+          <p className="mt-4 text-sm leading-relaxed text-neutral-400">
+            LA based boutique label &amp; publisher since 2002. Crafting Electronic, Ambient &amp; Chillout for Radio/Film/TV. Plus collectible limited Vinyl &amp; CDs worldwide.
+          </p>
         </div>
         <nav aria-label="Footer">
           <ul className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-neutral-400">
