@@ -85,6 +85,9 @@ export const track = z.object({
   duration: z.string().optional(),
   credits: z.string().optional(),
   isrc: z.string().optional(),
+  // Vinyl side marker (A / B / C / D) when applicable. Display helper uses it
+  // to group tracks on multi-disc releases; on CD/digital it stays unset.
+  side: z.string().max(2).optional(),
 });
 
 export const proofPoint = z.object({
@@ -123,9 +126,19 @@ export const releaseSchema = z.object({
       artwork: z.string().optional(),
       photography: z.string().optional(),
       liner_notes: z.string().optional(),
+      pressing: z.string().optional(),
+      sleeve: z.string().optional(),
     })
     .partial()
     .optional(),
+  // Vinyl + pressing metadata
+  edition: z.string().optional(),
+  rpm: z.number().int().optional(),
+  // Shopify integration (per content-drafts §1.3)
+  shopify_handle: z.string().optional(),
+  shopify_product_id: z.number().int().optional(),
+  price_usd: z.number().optional(),
+  sold_out: z.boolean().default(false),
   cover_image: mediaUrl.optional(),
   gallery: z.array(mediaUrl).default([]),
   embeds: z

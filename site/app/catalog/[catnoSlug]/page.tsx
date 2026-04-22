@@ -7,11 +7,59 @@ import {
   getArtistBySlug,
   getReleaseByCatnoSlug,
 } from "@/lib/content";
+import type { Release } from "@/lib/schema";
 import { buildMetadata, releaseTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd, releaseJsonLd } from "@/lib/jsonld";
 
 type Params = { catnoSlug: string };
+
+function Tracklist({ tracks }: { tracks: Release["tracklist"] }) {
+  const hasSides = tracks.some((t) => t.side);
+  if (!hasSides) {
+    return (
+      <ol className="mt-4 text-sm">
+        {tracks.map((t) => (
+          <li key={t.number} className="flex gap-4 border-b border-neutral-900 py-2">
+            <span className="font-mono w-8 text-neutral-500">{t.number}.</span>
+            <span className="flex-1 text-neutral-100">{t.title}</span>
+            {t.duration ? <span className="font-mono text-neutral-500">{t.duration}</span> : null}
+          </li>
+        ))}
+      </ol>
+    );
+  }
+  const bySide = new Map<string, typeof tracks>();
+  for (const t of tracks) {
+    const key = t.side ?? "";
+    if (!bySide.has(key)) bySide.set(key, []);
+    bySide.get(key)!.push(t);
+  }
+  return (
+    <div className="mt-4 space-y-5 text-sm">
+      {Array.from(bySide.entries()).map(([side, items]) => (
+        <div key={side}>
+          {side ? (
+            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+              Side {side}
+            </p>
+          ) : null}
+          <ol className="mt-2">
+            {items.map((t) => (
+              <li key={`${side}-${t.number}`} className="flex gap-4 border-b border-neutral-900 py-2">
+                <span className="font-mono w-8 text-neutral-500">{t.number}.</span>
+                <span className="flex-1 text-neutral-100">{t.title}</span>
+                {t.duration ? (
+                  <span className="font-mono text-neutral-500">{t.duration}</span>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function generateStaticParams(): Params[] {
   return getAllReleases().map((r) => ({ catnoSlug: r.catnoSlug }));
@@ -86,11 +134,33 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
                 </span>
               ))}
             </p>
-            {r.data.status === "draft" ? (
-              <p className="mt-4 inline-block border border-amber-700 bg-amber-950 px-2 py-0.5 text-xs uppercase tracking-wider text-amber-200">
-                Draft: awaiting confirmation
-              </p>
-            ) : null}
+            <div className="mt-4 flex flex-wrap gap-2 text-xs">
+              {r.data.status === "draft" ? (
+                <span className="inline-block border border-amber-700 bg-amber-950 px-2 py-0.5 uppercase tracking-wider text-amber-200">
+                  Draft: actively being worked on
+                </span>
+              ) : null}
+              {r.data.sold_out || r.data.status === "oop" ? (
+                <span className="inline-block border border-rose-800 bg-rose-950 px-2 py-0.5 uppercase tracking-wider text-rose-200">
+                  Sold out
+                </span>
+              ) : null}
+              {r.data.edition ? (
+                <span className="inline-block border border-neutral-700 bg-neutral-900 px-2 py-0.5 uppercase tracking-wider text-neutral-300">
+                  {r.data.edition}
+                </span>
+              ) : null}
+              {r.data.rpm ? (
+                <span className="inline-block border border-neutral-700 bg-neutral-900 px-2 py-0.5 uppercase tracking-wider text-neutral-300">
+                  {r.data.rpm} RPM
+                </span>
+              ) : null}
+              {typeof r.data.price_usd === "number" && !r.data.sold_out && r.data.status !== "oop" ? (
+                <span className="inline-block border border-neutral-700 bg-neutral-900 px-2 py-0.5 uppercase tracking-wider text-neutral-300">
+                  ${r.data.price_usd.toFixed(2)} USD
+                </span>
+              ) : null}
+            </div>
           </div>
           {r.data.cover_image ? (
             <figure className="order-first overflow-hidden border border-neutral-800 md:order-last">
@@ -111,15 +181,43 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
         {r.data.tracklist.length > 0 ? (
           <section className="mt-12 border-t border-neutral-800 pt-8">
             <h2 className="font-serif text-2xl text-neutral-100">Tracklist</h2>
-            <ol className="mt-4 space-y-1 text-sm">
-              {r.data.tracklist.map((t) => (
-                <li key={t.number} className="flex gap-4 border-b border-neutral-900 py-1">
-                  <span className="font-mono w-8 text-neutral-500">{t.number}.</span>
-                  <span className="flex-1 text-neutral-100">{t.title}</span>
-                  {t.duration ? <span className="font-mono text-neutral-500">{t.duration}</span> : null}
+            <Tracklist tracks={r.data.tracklist} />
+          </section>
+        ) : null}
+
+        {r.data.credits && Object.values(r.data.credits).some(Boolean) ? (
+          <section className="mt-12 border-t border-neutral-800 pt-8">
+            <h2 className="font-serif text-2xl text-neutral-100">Credits</h2>
+            <dl className="mt-4 grid gap-x-8 gap-y-2 text-sm sm:grid-cols-[auto_1fr] max-w-2xl">
+              {Object.entries(r.data.credits)
+                .filter(([, v]) => Boolean(v))
+                .map(([k, v]) => (
+                  <div key={k} className="contents">
+                    <dt className="font-mono text-xs uppercase tracking-wider text-neutral-500">
+                      {k.replace(/_/g, " ")}
+                    </dt>
+                    <dd className="text-neutral-200">{v}</dd>
+                  </div>
+                ))}
+            </dl>
+          </section>
+        ) : null}
+
+        {r.data.gallery.length > 0 ? (
+          <section className="mt-12 border-t border-neutral-800 pt-8">
+            <h2 className="font-serif text-2xl text-neutral-100">Gallery</h2>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {r.data.gallery.map((src) => (
+                <li key={src} className="overflow-hidden border border-neutral-800 bg-neutral-950">
+                  <img
+                    src={src}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
                 </li>
               ))}
-            </ol>
+            </ul>
           </section>
         ) : null}
 

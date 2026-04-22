@@ -54,10 +54,10 @@ const ARTIST_ENRICHMENTS: Record<string, ArtistEnrichment> = {
   rykard: {
     genres: ["Ambient", "Electronic", "Experimental"],
     shortBio:
-      "Rykard is an anchor artist on Hunya Munya Records, best known for the album 'Arrive the Radio Beacon' and the track 'North Cormorant Obscurity.' A new album lands in 2026.",
+      "Rykard (Rick Wearing) is an anchor artist on Hunya Munya Records. A UK-based ambient electronic project from Preston, Lancashire, behind the album 'Arrive the Radio Beacon' and the track 'North Cormorant Obscurity' (25M+ streams). A new album lands in 2026.",
     seoTitle: "Rykard · Hunya Munya Records",
     metaDescription:
-      "Rykard on Hunya Munya Records. Ambient electronic project behind the album 'Arrive the Radio Beacon' and the track 'North Cormorant Obscurity.' New album coming 2026.",
+      "Rykard on Hunya Munya Records. UK-based ambient electronic project behind 'Arrive the Radio Beacon' and 'North Cormorant Obscurity' (25M+ streams), with support from BBC Radio, KCRW, and CBC. New album coming 2026.",
   },
 };
 
@@ -73,6 +73,146 @@ const ARTIST_PORTRAIT_OVERRIDES: Record<string, string> = {
   // HMDIGITAL-era stubs: no known portraits in the WP export; Evan to upload.
 };
 
+// Per-release rich enrichments keyed by release slug. Holds tracklists,
+// credits, shop metadata, galleries, and override body copy that go beyond
+// what the seed list can express. Source for the current entries:
+// docs/specs/shopify-catalog-enrichment.md (Cowork, 2026-04-22), which pulled
+// each product from the hunyamunya.myshopify.com Storefront JSON.
+type ReleaseEnrichment = Partial<{
+  release_date: string;
+  cover_image: string;
+  gallery: string[];
+  tracklist: Array<{ number: number; title: string; duration?: string; side?: string }>;
+  credits: Partial<{
+    producer: string;
+    mastering: string;
+    artwork: string;
+    photography: string;
+    liner_notes: string;
+    pressing: string;
+    sleeve: string;
+  }>;
+  edition: string;
+  rpm: number;
+  shopify_handle: string;
+  shopify_product_id: number;
+  price_usd: number;
+  sold_out: boolean;
+  status: "draft" | "published" | "archived" | "oop";
+  body: string;
+}>;
+
+const RELEASE_ENRICHMENTS: Record<string, ReleaseEnrichment> = {
+  nco: {
+    status: "published",
+    release_date: "2025-12-12",
+    cover_image: "/media/releases/hmr010-nco-cover.jpg",
+    gallery: [
+      "/media/releases/hmr010-nco-back.jpg",
+      "/media/releases/hmr010-nco-shop-1.jpg",
+      "/media/releases/hmr010-nco-shop-2.jpg",
+      "/media/releases/hmr010-nco-vinyl-a.png",
+      "/media/releases/hmr010-nco-vinyl-b.png",
+    ],
+    tracklist: [
+      { number: 1, title: "North Cormorant Obscurity", duration: "3:20", side: "A" },
+      { number: 2, title: "Troup Head", duration: "5:33", side: "B" },
+    ],
+    credits: {
+      mastering: "Mastered in Los Angeles",
+      pressing: "Vinyl Ceremony",
+      sleeve: "Full-color matte, two sticker designs included with every copy",
+    },
+    edition: "500 copies + 75 white-label promos",
+    rpm: 45,
+    shopify_handle: "rykard-nco-12-vinyl",
+    shopify_product_id: 9020555002075,
+    price_usd: 29.99,
+    body:
+      "HMR010 is the 15-year vinyl reissue of Rykard's \"North Cormorant Obscurity,\" the underground ambient electronic track from the 2010 debut album *Arrive the Radio Beacon* that went on to surpass 25 million streams. The A-side carries \"North Cormorant Obscurity\" (3:20) in its definitive form; the B-side carries \"Troup Head\" (5:33), a companion piece from the same era making its first vinyl appearance.\n\nPressed by Vinyl Ceremony. Mastered in Los Angeles. 500 copies total, plus 75 white-label promo pressings. Full-color matte sleeve, two randomly assigned sticker designs included with every copy, 45 RPM for headroom. This is the pressing the track has been waiting for since 2010.",
+  },
+  "night-towers": {
+    status: "published",
+    release_date: "2018-04-17",
+    cover_image: "/media/releases/rykard-night-towers-cover.jpg",
+    tracklist: [
+      { number: 1, title: "Capital" },
+      { number: 2, title: "Elevate" },
+      { number: 3, title: "The Girl in Glass" },
+      { number: 4, title: "FDR Cruise" },
+      { number: 5, title: "Nawlins" },
+      { number: 6, title: "Lyra" },
+      { number: 7, title: "Mole People" },
+      { number: 8, title: "Night Towers" },
+      { number: 9, title: "City Star" },
+      { number: 10, title: "Beatific" },
+      { number: 11, title: "MarcusMania" },
+    ],
+    credits: { mastering: "Justin Moreh", artwork: "Paul Harris" },
+    edition: "Digipak CD",
+    shopify_handle: "rykard-night-towers-digipak-cd",
+    shopify_product_id: 9284617896155,
+    price_usd: 19.99,
+    body:
+      "*Night Towers* (2018) is Rykard's third full-length on Hunya Munya Records. Eleven tracks that move further into cinematic, patient ambient electronic territory while keeping the melodic instincts that define the project. Mastered by Justin Moreh. Artwork by Paul Harris.",
+  },
+  luminosity: {
+    status: "published",
+    release_date: "2016-09-17",
+    cover_image: "/media/releases/rykard-luminosity-cover.jpg",
+    tracklist: [
+      { number: 1, title: "Lansallos" },
+      { number: 2, title: "Imara" },
+      { number: 3, title: "Glasson Stars" },
+      { number: 4, title: "Meet New Life" },
+      { number: 5, title: "Fryar's Villa" },
+      { number: 6, title: "Gradwell Collection" },
+      { number: 7, title: "Lucid Dream" },
+      { number: 8, title: "The Woollen Woods" },
+      { number: 9, title: "Loculus" },
+      { number: 10, title: "Spook Lights" },
+      { number: 11, title: "Artificial Sunshine" },
+      { number: 12, title: "Ictis" },
+      { number: 13, title: "Shards" },
+      { number: 14, title: "Red Tide" },
+    ],
+    credits: { mastering: "Justin Moreh", artwork: "Barry Wearing" },
+    edition: "Digipak CD",
+    shopify_handle: "rykard-luminosity-digipak-cd",
+    shopify_product_id: 9284495638747,
+    price_usd: 19.99,
+    body:
+      "*Luminosity* (2016) is Rykard's second full-length on Hunya Munya Records. Fourteen tracks of ambient electronica that range from glassy, headphone-first compositions to the more overt rhythmic turn of \"Ictis\" (a nod to Boards of Canada and 808 State). Mastered by Justin Moreh. Artwork by Barry Wearing.",
+  },
+  "arrive-the-radio-beacon": {
+    status: "oop",
+    release_date: "2010-03-10",
+    cover_image: "/media/releases/rykard-arrive-the-radio-beacon-cover.jpg",
+    tracklist: [
+      { number: 1, title: "Psirens" },
+      { number: 2, title: "Down with Ginny" },
+      { number: 3, title: "The Rock Hewn" },
+      { number: 4, title: "Monolithic" },
+      { number: 5, title: "Marine Sulphur Queen" },
+      { number: 6, title: "Peter and Clark's Big Idea" },
+      { number: 7, title: "Faustian Pact" },
+      { number: 8, title: "North Cormorant Obscurity" },
+      { number: 9, title: "Out of the Orchid Way" },
+      { number: 10, title: "Sky at Walton" },
+      { number: 11, title: "Winnat's Pass" },
+      { number: 12, title: "Cross the Lades Marsh" },
+      { number: 13, title: "The Transmission Fields" },
+      { number: 14, title: "Bowland Glider Outro Mix" },
+    ],
+    edition: "Original 2010 CD pressing",
+    shopify_handle: "rykard-arrive-the-radio-beacon-2010-original-sealed-cd-pressing",
+    shopify_product_id: 9284493050075,
+    sold_out: true,
+    body:
+      "*Arrive the Radio Beacon* (2010) is Rykard's debut full-length on Hunya Munya Records. A fourteen-track set that introduced the project to an international audience and produced the underground anthem \"North Cormorant Obscurity,\" which has since surpassed 25 million streams. The 2010 original CD pressing is what we have left; we're currently determining the best way to release these final original pressings.",
+  },
+};
+
 // Release cover art keyed by release slug. Paths resolve against files already
 // sitting in site/public/media/legacy/ (pulled during media-rehost). For the
 // HMR vinyl series we prefer the 2025/08 batch Evan re-uploaded to the live
@@ -80,6 +220,8 @@ const ARTIST_PORTRAIT_OVERRIDES: Record<string, string> = {
 // cover" versions; for releases without a 2025 version we fall back to the
 // original 2010-2018 uploads. HMDIGITAL001-018 covers aren't in the WP export
 // (separate Discogs label); Discogs enrichment pass will pull those later.
+// Entries that also appear in RELEASE_ENRICHMENTS are superseded by the
+// cover_image in the enrichment map (which points at the curated Shopify art).
 const RELEASE_COVER_ART: Record<string, string> = {
   // HMR vinyl
   twilight: "/media/legacy/2025/08/D-Bajema-Twilight.jpg",
@@ -598,10 +740,13 @@ const RELEASE_SEEDS: ReleaseSeed[] = [
   // may turn them up on other storefronts). Explorers Vol. 2 is confirmed 2020
   // (CD EP Single on Discogs, catno HMB-005b) so re-filed here with the catno.
   { slug: "halcyon-days-ep", title: "Halcyon Days EP", catalog_number: "HMB002", artist: "catnip-claws", year: 2011, format: ["digital"], note: "2xFile MP3 320 EP. Shares HMB002 catno with Evan Marcus' The Orange Album per Discogs.", discogs_id: "3687228" },
-  { slug: "ictis", title: "Ictis", artist: "rykard", year: 2016, format: ["digital"] },
-  { slug: "artificial-sunshine", title: "Artificial Sunshine", artist: "rykard", year: 2016, format: ["digital"] },
-  { slug: "lansallos", title: "Lansallos", artist: "rykard", year: 2017, format: ["digital"] },
-  { slug: "red-venom", title: "Red Venom", artist: "rykard", year: 2020, format: ["digital"] },
+  // Ictis, Artificial Sunshine, Lansallos were pre-album promo singles for
+  // Luminosity (2016), not standalone releases; they're tracks 12, 11, and 1
+  // on that album's tracklist. Removed from the catalog per Evan 2026-04-22:
+  // "users can click Luminosity and see the full tracklist." Their news posts
+  // remain as announcement history.
+  // Red Venom (2020) is a YouTube-only promo, not confirmed as a standalone
+  // release. Removed for now; restore if Evan wants it as a single.
   { slug: "explorers-vol-1", title: "Explorers Vol. 1", artist: "rykard", release_date: "2019-07-12", year: 2019, format: ["digital"], discogs_id: "14184268" },
   { slug: "explorers-vol-2", title: "Explorers Vol. 2", catalog_number: "HMB005b", artist: "rykard", year: 2020, format: ["cd", "digital"], note: "CD EP Single + digital.", discogs_id: "14895581" },
   { slug: "explorers-vol-3", title: "Explorers Vol. 3", artist: "rykard", release_date: "2020-12-20", year: 2020, format: ["digital"] },
@@ -996,9 +1141,34 @@ function buildReleaseFrontmatter(seed: ReleaseSeed): Record<string, unknown> {
   if (seed.catalog_number) front.catalog_number = seed.catalog_number;
   if (seed.release_date) front.release_date = seed.release_date;
   if (seed.artists_additional?.length) front.artists_additional = seed.artists_additional;
-  if (seed.discogs_id) front.buy = { discogs: `https://www.discogs.com/release/${seed.discogs_id}` };
-  const cover = RELEASE_COVER_ART[seed.slug];
-  if (cover) front.cover_image = cover;
+  const buy: Record<string, string> = {};
+  if (seed.discogs_id) buy.discogs = `https://www.discogs.com/release/${seed.discogs_id}`;
+
+  // Default cover from the RELEASE_COVER_ART map (legacy WP uploads).
+  const legacyCover = RELEASE_COVER_ART[seed.slug];
+  if (legacyCover) front.cover_image = legacyCover;
+
+  // Enrichments (Shopify data) override defaults when present.
+  const enrichment = RELEASE_ENRICHMENTS[seed.slug];
+  if (enrichment) {
+    if (enrichment.release_date) front.release_date = enrichment.release_date;
+    if (enrichment.cover_image) front.cover_image = enrichment.cover_image;
+    if (enrichment.gallery?.length) front.gallery = enrichment.gallery;
+    if (enrichment.tracklist?.length) front.tracklist = enrichment.tracklist;
+    if (enrichment.credits) front.credits = enrichment.credits;
+    if (enrichment.edition) front.edition = enrichment.edition;
+    if (enrichment.rpm) front.rpm = enrichment.rpm;
+    if (enrichment.shopify_handle) {
+      front.shopify_handle = enrichment.shopify_handle;
+      buy.shopify = `https://hunyamunya.myshopify.com/products/${enrichment.shopify_handle}`;
+    }
+    if (enrichment.shopify_product_id) front.shopify_product_id = enrichment.shopify_product_id;
+    if (typeof enrichment.price_usd === "number") front.price_usd = enrichment.price_usd;
+    if (enrichment.sold_out) front.sold_out = enrichment.sold_out;
+    if (enrichment.status) front.status = enrichment.status;
+  }
+
+  if (Object.keys(buy).length) front.buy = buy;
   return front;
 }
 
@@ -1023,8 +1193,12 @@ function emitReleases(stats: EmitStats): void {
       continue;
     }
 
-    const body =
-      seed.note
+    // Prefer curated Shopify copy when available; otherwise show the draft
+    // placeholder with the /discography seed note.
+    const enrichmentBody = RELEASE_ENRICHMENTS[seed.slug]?.body;
+    const body = enrichmentBody
+      ? enrichmentBody.trimEnd() + "\n"
+      : seed.note
         ? `> Seed notes from /discography page: ${seed.note}\n\nStatus: **draft**. Confirm release date, tracklist, cover, credits, press quotes, and buy links before publishing.\n`
         : `Status: **draft**. Confirm release date, tracklist, cover, credits, press quotes, and buy links before publishing.\n`;
 
