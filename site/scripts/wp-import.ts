@@ -203,6 +203,19 @@ function rewriteBody(content: string): string {
   out = out.replace(/<!--[\s\S]*?-->/g, "");
   // Strip script tags for safety (dry-run §4 "sanitize scripts").
   out = out.replace(/<script[\s\S]*?<\/script>/gi, "");
+  // Strip inline style="..." attributes. MDX renders HTML as JSX, which expects
+  // `style` as an object literal, not a string. WP themes bake in dimensions
+  // we don't want on the new site anyway; design tokens and CSS handle sizing.
+  out = out.replace(/\s+style\s*=\s*"[^"]*"/gi, "");
+  out = out.replace(/\s+style\s*=\s*'[^']*'/gi, "");
+  // Normalize void elements to self-closing (MDX/JSX requires <br/>, not <br>).
+  // Covers the common ones we've seen in WP content.
+  out = out.replace(
+    /<(br|hr|img|input|area|base|col|embed|link|meta|param|source|track|wbr)((?:\s+[^>\/]+)?)(?<!\/)>/gi,
+    "<$1$2 />",
+  );
+  // Rename `class` to `className` so JSX doesn't warn (and to match React).
+  out = out.replace(/\s+class\s*=/gi, " className=");
   // Rewrite WP uploads URLs to site-relative /media/legacy/ paths with size suffixes stripped.
   out = out.replace(
     /https?:\/\/(?:www\.)?hunyamunyarecords\.com\/wp-content\/uploads\/([^\s)"'<>\]]+)/g,
@@ -523,17 +536,11 @@ function buildArtistFrontmatter(item: RawItem): Record<string, unknown> {
   const { slug, legacy_slug } = slugForArtist(item);
   const tier = slug === "rykard" ? "anchor" : "archived";
 
-  const seo: Record<string, unknown> = {};
-  const seoTitle = pmValue(item, "_aioseop_title").trim();
-  const seoDesc = pmValue(item, "_aioseop_description").trim();
-  if (seoTitle) seo.title = seoTitle;
-  if (seoDesc) seo.description = seoDesc;
+  const aioTitle = pmValue(item, "_aioseop_title").trim();
+  const aioDesc = pmValue(item, "_aioseop_description").trim();
   const noindex = pmValue(item, "_aioseop_noindex").trim();
   const nofollow = pmValue(item, "_aioseop_nofollow").trim();
   const sitemapExclude = pmValue(item, "_aioseop_sitemap_exclude").trim();
-  if (noindex === "on" || noindex === "1") seo.index = false;
-  if (nofollow === "on" || nofollow === "1") seo.follow = false;
-  if (sitemapExclude === "on" || sitemapExclude === "1") seo.in_sitemap = false;
 
   const menuLabel = pmValue(item, "_aioseop_menulabel").trim();
 
@@ -545,6 +552,14 @@ function buildArtistFrontmatter(item: RawItem): Record<string, unknown> {
   };
   if (legacy_slug) front.legacy_slug = legacy_slug;
   if (menuLabel && menuLabel !== item.title) front.menu_label = menuLabel;
+  if (aioTitle) front.seoTitle = aioTitle;
+  if (aioDesc) front.metaDescription = aioDesc;
+
+  // Only emit a nested `seo` block for non-default robots flags (index/follow/sitemap).
+  const seo: Record<string, unknown> = {};
+  if (noindex === "on" || noindex === "1") seo.index = false;
+  if (nofollow === "on" || nofollow === "1") seo.follow = false;
+  if (sitemapExclude === "on" || sitemapExclude === "1") seo.in_sitemap = false;
   if (Object.keys(seo).length) front.seo = seo;
 
   return front;
@@ -782,11 +797,8 @@ function buildNewsFrontmatter(item: RawItem): {
     .map((c) => c.nicename)
     .filter(Boolean);
 
-  const seo: Record<string, unknown> = {};
-  const seoTitle = pmValue(item, "_aioseop_title").trim();
-  const seoDesc = pmValue(item, "_aioseop_description").trim();
-  if (seoTitle) seo.title = seoTitle;
-  if (seoDesc) seo.description = seoDesc;
+  const aioTitle = pmValue(item, "_aioseop_title").trim();
+  const aioDesc = pmValue(item, "_aioseop_description").trim();
 
   const front: Record<string, unknown> = {
     slug: item.post_name,
@@ -797,7 +809,8 @@ function buildNewsFrontmatter(item: RawItem): {
   const excerpt = item.excerpt.trim();
   if (excerpt) front.excerpt = excerpt;
   if (tags.length) front.tags = tags;
-  if (Object.keys(seo).length) front.seo = seo;
+  if (aioTitle) front.seoTitle = aioTitle;
+  if (aioDesc) front.metaDescription = aioDesc;
 
   return { frontmatter: front, date };
 }

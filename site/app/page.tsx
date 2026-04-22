@@ -1,101 +1,93 @@
-import Image from "next/image";
+import Link from "next/link";
+import { getAllArtists, getAllNews, getAllReleases } from "@/lib/content";
+import { LABEL_NAME } from "@/lib/jsonld";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const artists = getAllArtists();
+  const releases = getAllReleases();
+  const news = getAllNews().slice(0, 3);
+  const activeArtists = artists.filter((a) => a.data.tier === "anchor" || a.data.tier === "active");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  return (
+    <>
+      <section className="py-12">
+        <p className="font-mono text-xs uppercase tracking-wider text-neutral-500">
+          Independent ambient electronic label · Los Angeles · since 2003
+        </p>
+        <h1 className="mt-2 max-w-3xl font-serif text-4xl leading-tight text-neutral-50 md:text-5xl">
+          {LABEL_NAME}
+        </h1>
+        <p className="mt-6 max-w-2xl text-lg text-neutral-300">
+          Hunya Munya Records is an independent ambient electronic music label based in Los Angeles. Since 2003,
+          we&rsquo;ve released vinyl records and digital albums from artists including{" "}
+          <Link href="/artists/rykard" className="text-neutral-100 underline underline-offset-4 hover:text-white">
+            Rykard
+          </Link>
+          , Blue Room Project, Dirk Bajema, and Yenn — working across ambient, electronic, and experimental music.
+          Browse the{" "}
+          <Link href="/catalog" className="text-neutral-100 underline underline-offset-4 hover:text-white">
+            full catalog
+          </Link>
+          , meet the{" "}
+          <Link href="/artists" className="text-neutral-100 underline underline-offset-4 hover:text-white">
+            roster
+          </Link>
+          , or read about the{" "}
+          <Link href="/about" className="text-neutral-100 underline underline-offset-4 hover:text-white">
+            label
+          </Link>
+          .
+        </p>
+      </section>
+
+      {activeArtists.length ? (
+        <section className="mt-8 border-t border-neutral-800 pt-8">
+          <h2 className="font-serif text-2xl text-neutral-100">Now</h2>
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {activeArtists.map(({ data }) => (
+              <li key={data.slug}>
+                <Link
+                  href={`/artists/${data.slug}`}
+                  className="block border border-neutral-800 p-4 transition-colors hover:border-neutral-600 hover:bg-neutral-900"
+                >
+                  <p className="font-serif text-lg text-neutral-50">{data.name}</p>
+                  <p className="mt-1 text-xs uppercase tracking-wider text-neutral-500">
+                    {data.tier === "anchor" ? "Anchor artist" : "Active"}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section className="mt-12 border-t border-neutral-800 pt-8">
+        <h2 className="font-serif text-2xl text-neutral-100">Latest</h2>
+        <ul className="mt-4 space-y-3">
+          {news.map((n) => (
+            <li key={n.urlPath}>
+              <Link href={n.urlPath} className="block text-neutral-300 hover:text-neutral-50">
+                <span className="font-mono text-xs uppercase tracking-wider text-neutral-500">{n.data.date} · </span>
+                <span className="font-serif">{n.data.title}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4">
+          <Link href="/news" className="text-sm text-neutral-400 underline-offset-4 hover:text-neutral-50 hover:underline">
+            All news →
+          </Link>
+        </p>
+      </section>
+
+      <section className="mt-12 border-t border-neutral-800 pt-8">
+        <p className="font-serif text-xl text-neutral-100">
+          23 years. {releases.length} releases.{" "}
+          <Link href="/catalog" className="underline underline-offset-4">
+            Explore the catalog.
+          </Link>
+        </p>
+      </section>
+    </>
   );
 }

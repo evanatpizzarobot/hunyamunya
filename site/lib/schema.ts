@@ -30,9 +30,11 @@ export const artistSchema = z.object({
   status: z.enum(["active", "archived"]).default("archived"),
   tier: z.enum(["anchor", "active", "archived"]).default("archived"),
   genres: z.array(z.string()).default([]),
-  bio_short: z.string().optional(),
+  // SEO-spec §2.11 canonical bio fields. shortBio drives cards + meta fallback.
+  shortBio: z.string().optional(),
   bio_long: z.string().optional(),
   hometown: z.string().optional(),
+  yearsActive: z.string().optional(),
   years_on_label: z.tuple([z.number().int(), z.number().int()]).optional(),
   links: z
     .object({
@@ -59,6 +61,11 @@ export const artistSchema = z.object({
     .optional(),
   menu_label: z.string().optional(),
   legacy_slug: z.string().optional(),
+  // SEO-spec §2.2 top-level fields. Prefer these; nested `seo` block is legacy
+  // and kept for the initial migrated output until we deprecate it.
+  seoTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  ogImage: mediaUrl.optional(),
   seo: seoBlock,
 });
 export type Artist = z.infer<typeof artistSchema>;
@@ -138,6 +145,10 @@ export const releaseSchema = z.object({
   proof_points: z.array(proofPoint).default([]),
   related_news: z.array(z.string()).default([]),
   legacy_slug: z.string().optional(),
+  // SEO-spec §2.2 top-level fields.
+  seoTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  ogImage: mediaUrl.optional(),
   seo: seoBlock,
 });
 export type Release = z.infer<typeof releaseSchema>;
@@ -153,6 +164,10 @@ export const newsSchema = z.object({
   related_releases: z.array(z.string()).default([]),
   related_artists: z.array(z.string()).default([]),
   legacy_slug: z.string().optional(),
+  // SEO-spec §2.2 top-level fields.
+  seoTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+  ogImage: mediaUrl.optional(),
   seo: seoBlock,
 });
 export type News = z.infer<typeof newsSchema>;
