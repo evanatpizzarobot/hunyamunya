@@ -19,35 +19,47 @@ export default function Home() {
           full-bleed background image. When inactive, lead with the label name. */}
       <section className="flex min-h-[60vh] flex-col justify-end py-10 md:min-h-[70vh] md:py-14 [text-shadow:0_2px_8px_rgba(0,0,0,0.55)]">
         {activeCampaign ? (
-          <>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
-              {activeCampaign.type === "release" ? "Out Now" : activeCampaign.type.replace("-", " ")}
-            </p>
-            <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-white md:text-6xl">
-              {activeCampaign.headline}
-            </h1>
-            {activeCampaign.tagline ? (
-              <p className="mt-3 max-w-2xl text-lg text-neutral-200">{activeCampaign.tagline}</p>
-            ) : null}
-            <div className="mt-7 flex flex-wrap gap-3">
-              {activeCampaign.cta_primary ? (
-                <Link
-                  href={activeCampaign.cta_primary.href}
-                  className="border border-neutral-100 bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-white"
-                >
-                  {activeCampaign.cta_primary.label}
-                </Link>
+          <div className="grid items-end gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,520px)] md:gap-12">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
+                {activeCampaign.type === "release" ? "Out Now" : activeCampaign.type.replace("-", " ")}
+              </p>
+              <h1 className="mt-3 font-serif text-4xl leading-tight text-white md:text-6xl">
+                {activeCampaign.headline}
+              </h1>
+              {activeCampaign.tagline ? (
+                <p className="mt-3 text-lg text-neutral-200">{activeCampaign.tagline}</p>
               ) : null}
-              {activeCampaign.cta_secondary ? (
-                <Link
-                  href={activeCampaign.cta_secondary.href}
-                  className="border border-neutral-400 px-5 py-2 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-200 hover:text-white"
-                >
-                  {activeCampaign.cta_secondary.label}
-                </Link>
-              ) : null}
+              <div className="mt-7 flex flex-wrap gap-3">
+                {activeCampaign.cta_primary ? (
+                  <Link
+                    href={activeCampaign.cta_primary.href}
+                    className="border border-neutral-100 bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-white"
+                  >
+                    {activeCampaign.cta_primary.label}
+                  </Link>
+                ) : null}
+                {activeCampaign.cta_secondary ? (
+                  <Link
+                    href={activeCampaign.cta_secondary.href}
+                    className="border border-neutral-400 px-5 py-2 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-200 hover:text-white"
+                  >
+                    {activeCampaign.cta_secondary.label}
+                  </Link>
+                ) : null}
+              </div>
             </div>
-          </>
+            <figure className="[text-shadow:none]">
+              <img
+                src="/campaigns/rykard-nco-spread.jpg"
+                alt="Rykard — NCO 12&quot; Vinyl, front and back cover spread"
+                width={1024}
+                height={511}
+                className="block w-full border border-neutral-800/80 shadow-2xl"
+                loading="eager"
+              />
+            </figure>
+          </div>
         ) : (
           <>
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
