@@ -3,7 +3,7 @@
 // normalize every WXR item, dump to site/migration/raw.json for auditing.
 // MDX emission is a later step.
 
-import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { XMLParser } from "fast-xml-parser";
 import matter from "gray-matter";
@@ -441,6 +441,7 @@ async function main() {
   const stats: EmitStats = {
     artists: 0,
     artists_skipped: 0,
+    artist_stubs: 0,
     news: 0,
     news_skipped: 0,
     releases: 0,
@@ -449,6 +450,7 @@ async function main() {
     review_files: 0,
   };
   emitArtists(classified, stats);
+  emitArtistStubs(stats);
   emitNews(classified, stats);
   emitReleases(stats);
   emitPages(classified, stats);
@@ -458,6 +460,7 @@ async function main() {
   console.log("");
   console.log("Emitted artists:", stats.artists);
   if (stats.artists_skipped) console.log("Artists skipped (schema fail):", stats.artists_skipped);
+  if (stats.artist_stubs) console.log("Emitted stub artists (digital-era):", stats.artist_stubs);
   console.log("Emitted news:", stats.news);
   if (stats.news_skipped) console.log("News skipped:", stats.news_skipped);
   console.log("Emitted releases (draft):", stats.releases);
@@ -470,6 +473,7 @@ async function main() {
 type EmitStats = {
   artists: number;
   artists_skipped: number;
+  artist_stubs: number;
   news: number;
   news_skipped: number;
   releases: number;
@@ -522,6 +526,53 @@ const RELEASE_SEEDS: ReleaseSeed[] = [
   { slug: "explorers-vol-2", title: "Explorers Vol. 2", artist: "rykard", year: 2019, format: ["digital"] },
   { slug: "explorers-vol-3", title: "Explorers Vol. 3", artist: "rykard", release_date: "2020-12-20", year: 2020, format: ["digital"] },
   { slug: "explorers-vol-4", title: "Explorers Vol. 4", artist: "rykard", release_date: "2023-07-07", year: 2023, format: ["digital"] },
+  // HMDIGITAL sublabel (Discogs label 79509) per docs/specs/digital-catalog-discogs.md.
+  // All MP3 320 kbps File releases except HMDIGITAL015 and 018 which are physical CDr.
+  { slug: "ever-after", title: "Ever After", catalog_number: "HMDIGITAL001", artist: "jairus-miller", year: 2005, format: ["digital"], note: "1×File, MP3 320" },
+  { slug: "inn", title: "Inn", catalog_number: "HMDIGITAL002", artist: "darius-kohanim", year: 2005, format: ["digital"], note: "1×File, MP3 320" },
+  { slug: "burton", title: "Burton", catalog_number: "HMDIGITAL003", artist: "darius-kohanim", year: 2005, format: ["digital"], note: "1×File, MP3 320" },
+  { slug: "dune-in-erf-minor", title: "Dune In Erf Minor", catalog_number: "HMDIGITAL004", artist: "habersham", artists_additional: ["darius-kohanim"], year: 2005, format: ["digital"], note: "1×File, MP3 320" },
+  { slug: "doolesitlike", title: "Doolesitlike", catalog_number: "HMDIGITAL005", artist: "habersham", artists_additional: ["darius-kohanim"], year: 2005, format: ["digital"], note: "1×File, MP3 320" },
+  { slug: "life-goes-on", title: "Life Goes On", catalog_number: "HMDIGITAL006", artist: "evan-marcus", year: 2005, format: ["digital"], note: "2×File, MP3 320" },
+  { slug: "still-here", title: "Still Here", catalog_number: "HMDIGITAL007", artist: "joel-armstrong", artists_additional: ["gobo"], year: 2006, format: ["digital"], note: "1×File, MP3 320" },
+  { slug: "ift", title: "IFT", catalog_number: "HMDIGITAL008", artist: "underground-systems", year: 2006, format: ["digital"], note: "3×File, MP3 320" },
+  { slug: "distant-fragment-ep", title: "Distant Fragment EP", catalog_number: "HMDIGITAL009", artist: "distant-fragment", year: 2006, format: ["digital"], note: "2×File, MP3 320. EP." },
+  { slug: "running-after-time-ep", title: "Running After Time EP", catalog_number: "HMDIGITAL010", artist: "cassino", artists_additional: ["laben"], year: 2006, format: ["digital"], note: "2×File, MP3 320. EP." },
+  { slug: "jetlag-ep", title: "Jetlag EP", catalog_number: "HMDIGITAL011", artist: "daniel-gregory", year: 2007, format: ["digital"], note: "2×File, MP3 320. EP." },
+  { slug: "the-music-speaks", title: "The Music Speaks", catalog_number: "HMDIGITAL012", artist: "dj-thee-o", year: 2007, format: ["digital"], note: "3×File, MP3 320" },
+  { slug: "long-night", title: "Long Night", catalog_number: "HMDIGITAL013", artist: "curtis", artists_additional: ["dakota"], year: 2007, format: ["digital"], note: "2×File, MP3 320" },
+  { slug: "komodose-ep", title: "Komodose EP", catalog_number: "HMDIGITAL014", artist: "darius-kohanim", year: 2007, format: ["digital"], note: "EP. Discogs shows two versions; enrichment pass pending." },
+  { slug: "international-soundscapes-ep", title: "International Soundscapes EP", catalog_number: "HMDIGITAL015", artist: "various-artists", year: 2008, format: ["cd"], note: "CDr compilation. Tracklist + artist credits pending enrichment." },
+  { slug: "running-after-time-remix-ep", title: "Running After Time Remix EP", catalog_number: "HMDIGITAL016", artist: "cassino", artists_additional: ["laben"], year: 2008, format: ["digital"], note: "Remix EP, companion to HMDIGITAL010. Discogs shows two versions; enrichment pass pending." },
+  { slug: "the-reminisce-ep", title: "The Reminisce EP", catalog_number: "HMDIGITAL017", artist: "darius-kohanim", year: 2008, format: ["digital"], note: "8×File, MP3 320. EP, largest digital release." },
+  { slug: "sense-of-happiness", title: "Sense Of Happiness", catalog_number: "HMDIGITAL018", artist: "robert-g-roy", year: 2008, format: ["cd"], note: "CDr single." },
+];
+
+// Stub artist pages for HMDIGITAL-era contributors who aren't in the WP export.
+// These are emitted AFTER the WP-migrated artists so they never overwrite
+// canonical pages. Each stub gets tier=archived and a one-line context note;
+// Evan fills in bios over time.
+type StubArtist = {
+  slug: string;
+  name: string;
+  yearsActive?: string;
+  shortBio?: string;
+  contextNote: string;
+};
+
+const STUB_ARTISTS: StubArtist[] = [
+  { slug: "jairus-miller", name: "Jairus Miller", yearsActive: "2005", contextNote: "Released *Ever After* (HMDIGITAL001) on Hunya Munya Digital in 2005." },
+  { slug: "joel-armstrong", name: "Joel Armstrong", yearsActive: "2006", contextNote: "Collaborated with Gobo on *Still Here* (HMDIGITAL007) in 2006." },
+  { slug: "gobo", name: "Gobo", yearsActive: "2006", contextNote: "Collaborated with Joel Armstrong on *Still Here* (HMDIGITAL007) in 2006." },
+  { slug: "underground-systems", name: "Underground Systems", yearsActive: "2006", contextNote: "Released *IFT* (HMDIGITAL008) in 2006." },
+  { slug: "cassino", name: "Cassino", yearsActive: "2006-2008", contextNote: "Collaborator on *Running After Time EP* (HMDIGITAL010, 2006) and its Remix EP (HMDIGITAL016, 2008) with Labèn." },
+  { slug: "laben", name: "Labèn", yearsActive: "2006-2008", contextNote: "Collaborator on *Running After Time EP* (HMDIGITAL010, 2006) and its Remix EP (HMDIGITAL016, 2008) with Cassino." },
+  { slug: "daniel-gregory", name: "Daniel Gregory", yearsActive: "2007", contextNote: "Released *Jetlag EP* (HMDIGITAL011) in 2007." },
+  { slug: "dj-thee-o", name: "DJ Thee-O", yearsActive: "2007", contextNote: "Released *The Music Speaks* (HMDIGITAL012) in 2007." },
+  { slug: "curtis", name: "Curtis", yearsActive: "2007", contextNote: "Collaborated with Dakota on *Long Night* (HMDIGITAL013) in 2007." },
+  { slug: "dakota", name: "Dakota", yearsActive: "2007", contextNote: "Collaborated with Curtis on *Long Night* (HMDIGITAL013) in 2007." },
+  { slug: "robert-g-roy", name: "Robert G Roy", yearsActive: "2008", contextNote: "Released *Sense Of Happiness* (HMDIGITAL018) in 2008." },
+  { slug: "various-artists", name: "Various Artists", yearsActive: "2008", contextNote: "Credit slot for *International Soundscapes EP* (HMDIGITAL015, 2008) compilation." },
 ];
 
 const AUTHOR_DISPLAY_NAME = "Evan Rippertoe";
@@ -595,6 +646,87 @@ function emitArtists(classified: ClassifiedItem[], stats: EmitStats): void {
     const outPath = resolve(ARTISTS_DIR, `${slug}.mdx`);
     writeFileSync(outPath, matter.stringify(body, parsed.data));
     stats.artists++;
+  }
+}
+
+function releaseAppearsFor(slug: string, seed: ReleaseSeed): boolean {
+  if (seed.artist === slug) return true;
+  if (seed.artists_additional?.includes(slug)) return true;
+  return false;
+}
+
+function autoEnrichStub(stub: StubArtist): {
+  yearsActive: string;
+  shortBio: string;
+  seoTitle: string;
+  metaDescription: string;
+  releases: ReleaseSeed[];
+} {
+  const releases = RELEASE_SEEDS.filter((r) => releaseAppearsFor(stub.slug, r)).sort(
+    (a, b) => a.year - b.year,
+  );
+  const years = releases.map((r) => r.year);
+  const minYear = years.length ? Math.min(...years) : undefined;
+  const maxYear = years.length ? Math.max(...years) : undefined;
+  const yearsActive = stub.yearsActive
+    ?? (minYear !== undefined && maxYear !== undefined
+      ? (minYear === maxYear ? `${minYear}` : `${minYear}-${maxYear}`)
+      : "");
+
+  const n = releases.length;
+  const releaseWord = n === 1 ? "release" : "releases";
+  const yearPhrase = n === 0
+    ? ""
+    : minYear === maxYear
+      ? ` in ${minYear}`
+      : ` between ${minYear} and ${maxYear}`;
+  const shortBio = stub.shortBio
+    ?? (n > 0
+      ? `${stub.name} released ${n} ${releaseWord} on Hunya Munya Records${yearPhrase}.`
+      : stub.contextNote);
+
+  const seoTitle = `${stub.name} — Hunya Munya Records`;
+  const metaDescription =
+    n > 0
+      ? `${stub.name} on Hunya Munya Records — ${n} ${releaseWord}${yearPhrase} across ambient and electronic music.`
+      : `${stub.name} on Hunya Munya Records.`;
+
+  return { yearsActive, shortBio, seoTitle, metaDescription, releases };
+}
+
+function emitArtistStubs(stats: EmitStats): void {
+  mkdirSync(ARTISTS_DIR, { recursive: true });
+
+  for (const stub of STUB_ARTISTS) {
+    const outPath = resolve(ARTISTS_DIR, `${stub.slug}.mdx`);
+    // Never overwrite a canonical artist page from the WP migration.
+    if (existsSync(outPath)) continue;
+
+    const enriched = autoEnrichStub(stub);
+
+    const front: Record<string, unknown> = {
+      slug: stub.slug,
+      name: stub.name,
+      status: "archived",
+      tier: "archived",
+      seoTitle: enriched.seoTitle,
+      metaDescription: enriched.metaDescription,
+    };
+    if (enriched.yearsActive) front.yearsActive = enriched.yearsActive;
+    if (enriched.shortBio) front.shortBio = enriched.shortBio;
+
+    const parsed = artistSchema.safeParse(front);
+    if (!parsed.success) {
+      const errText = parsed.error.issues
+        .map((i) => `  - ${i.path.join(".") || "(root)"}: ${i.message}`)
+        .join("\n");
+      throw new Error(`Artist stub "${stub.slug}" failed schema:\n${errText}`);
+    }
+
+    const body =
+      `${stub.contextNote}\n\n> Full bio pending. Enrichment pass will populate bio, external links, and press quotes.\n`;
+    writeFileSync(outPath, matter.stringify(body, parsed.data));
+    stats.artist_stubs++;
   }
 }
 

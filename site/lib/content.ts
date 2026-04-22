@@ -19,6 +19,12 @@ import {
   releaseSchema,
 } from "./schema";
 
+export type NormalizedArtistRef = {
+  slug: string;
+  name?: string;
+  role: "primary" | "featured" | "remixer" | "producer";
+};
+
 const CONTENT_ROOT = resolve(process.cwd(), "content");
 const ARTISTS_DIR = join(CONTENT_ROOT, "artists");
 const RELEASES_DIR = join(CONTENT_ROOT, "releases");
@@ -32,6 +38,9 @@ export type ReleaseDoc = Loaded<Release> & {
   year: number;
   catnoSlug: string;
   urlPath: string;
+  // All artists on the release, primary first, then additional. Derived from
+  // either the `artists` array (preferred) or from `artist` + `artists_additional`.
+  resolvedArtists: NormalizedArtistRef[];
 };
 export type NewsDoc = Loaded<News> & {
   year: number;
@@ -90,6 +99,19 @@ function releaseYearFromPath(path: string): number {
   return m ? parseInt(m[1], 10) : 0;
 }
 
+function resolveReleaseArtists(data: Release): NormalizedArtistRef[] {
+  // Prefer the new `artists` array shape when present.
+  if (data.artists && data.artists.length > 0) {
+    return data.artists.map((a) => ({ slug: a.slug, name: a.name, role: a.role }));
+  }
+  // Fall back to single-artist + artists_additional.
+  const refs: NormalizedArtistRef[] = [{ slug: data.artist, role: "primary" }];
+  for (const slug of data.artists_additional) {
+    if (slug && slug !== data.artist) refs.push({ slug, role: "primary" });
+  }
+  return refs;
+}
+
 export function getAllReleases(): ReleaseDoc[] {
   return listMdxFiles(RELEASES_DIR).map((name) => {
     const path = join(RELEASES_DIR, name);
@@ -100,6 +122,7 @@ export function getAllReleases(): ReleaseDoc[] {
       year: releaseYearFromPath(path),
       catnoSlug,
       urlPath: `/catalog/${catnoSlug}`,
+      resolvedArtists: resolveReleaseArtists(loaded.data),
     };
   });
 }
@@ -110,7 +133,7 @@ export function getReleaseByCatnoSlug(catnoSlug: string): ReleaseDoc | null {
 }
 
 export function getReleasesByArtistSlug(artistSlug: string): ReleaseDoc[] {
-  return getAllReleases().filter((r) => r.data.artist === artistSlug);
+  return getAllReleases().filter((r) => r.resolvedArtists.some((a) => a.slug === artistSlug));
 }
 
 // ---- News ---------------------------------------------------------------

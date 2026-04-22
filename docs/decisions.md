@@ -38,6 +38,28 @@ Format: `## YYYY-MM-DD — short title`, then context, decision, rationale, spec
 
 ---
 
+## 2026-04-22 — HMDIGITAL sublabel catalog (Discogs 79509) added; /catalog sub-routes per format
+
+**Context:** Cowork shipped `docs/specs/digital-catalog-discogs.md` listing 18 releases from the Hunya Munya Digital sublabel (HMDIGITAL001-018, 2005-2008) scraped from Discogs label 79509. This is net-new catalog; the parent Hunya Munya Records label (vinyl/CD) is on a different Discogs ID.
+
+**Decisions applied:**
+1. **Architecture:** catalog format landings live under `/catalog/{format}` — `/catalog/digital`, `/catalog/vinyl`, `/catalog/cd`. Not top-level, not query-string only. Next.js App Router resolves literal segments before dynamic, so these sibling routes coexist with `/catalog/{catnoSlug}` (release pages) without collision.
+2. **Dedupe premise in Cowork spec §5.1 step 5 was wrong.** The 9 "digital-only drafts" from the WP migration (Catnip & Claws Halcyon 2011, Rykard Ictis/Artificial Sunshine/Lansallos/Red Venom 2016-2020, Rykard Explorers Vol. 1-4 2019-2023) are post-HMDIGITAL-era work. They don't overlap with HMDIGITAL001-018 (all 2005-2008, different artists). Preserved both sets. Total catalog: 14 (HMR vinyl + CD) + 9 (Rykard digital) + 18 (HMDIGITAL) = 41 releases.
+3. **HMDIGITAL015 (Various Artists compilation) and HMDIGITAL018 (Robert G Roy): classified as `format: ["cd"]`** per Cowork's §6.3 default (physical CDr, not pure digital file).
+4. **Duo artists:** Cassino & Labèn, Curtis & Dakota, Habersham & Darius Kohanim, Joel Armstrong & Gobo — both members get individual stub artist pages. Release frontmatter: `artist: "<first-slug>"`, `artists_additional: ["<second-slug>"]`.
+5. **Disambiguator cleanup from Discogs:** strip `(3)` suffix from "Gobo", `*` from "DJ Thee-O" and "Curtis & Dakota".
+6. **Every digital-era artist gets at least a stub artist page** per Cowork §2.2 default and per Evan's prior archive-preservation rule. Existing artists (Habersham, Darius Kohanim, Evan Marcus, Distant Fragment) retain their current pages; only new names get new stubs.
+
+**Open items from Cowork §6 (still awaiting Evan):**
+- HMDIGITAL006 "Evan Marcus" — is this Evan himself or a different artist?
+- Masters availability for HMDIGITAL releases (determines whether Bandcamp links are viable).
+- Discogs API token for the enrichment pass (cover art, tracklists, durations).
+- Scrape of the parent Hunya Munya Records Discogs label (different ID) for HMR vinyl/CD enrichment.
+
+**Spec sections affected:** extends main rebuild-v1 §7 (catalog), interacts with SEO spec §2.1 URL structure, adds 15 net-new stub artist pages.
+
+---
+
 ## 2026-04-22 — SEO Phase 1 spec arrived; URL pattern for releases changes
 
 **Context:** Cowork issued `docs/specs/seo-audit-phase-1.md`. §2 "Phase A — bake-in" is load-bearing for the MDX rendering layer (route implementations) and must ship with v1, not be retrofitted.

@@ -21,13 +21,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { catnoSlug } = await params;
   const r = getReleaseByCatnoSlug(catnoSlug);
   if (!r) return {};
-  const artist = getArtistBySlug(r.data.artist);
-  const artistName = artist?.data.name ?? r.data.artist;
-  const title = r.data.seoTitle ?? releaseTitle(r.data.title, artistName, r.data.catalog_number);
+  const displayArtists = r.resolvedArtists
+    .map((a) => a.name ?? getArtistBySlug(a.slug)?.data.name ?? a.slug)
+    .join(" & ");
+  const title = r.data.seoTitle ?? releaseTitle(r.data.title, displayArtists, r.data.catalog_number);
   const description =
     r.data.metaDescription ??
     r.data.seo?.description ??
-    `${r.data.title} by ${artistName}${r.data.catalog_number ? ` (${r.data.catalog_number})` : ""}, released ${r.year} on Hunya Munya Records.`;
+    `${r.data.title} by ${displayArtists}${r.data.catalog_number ? ` (${r.data.catalog_number})` : ""}, released ${r.year} on Hunya Munya Records.`;
   return buildMetadata({
     title,
     description,
@@ -41,7 +42,15 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
   const { catnoSlug } = await params;
   const r = getReleaseByCatnoSlug(catnoSlug);
   if (!r) notFound();
-  const artist = getArtistBySlug(r.data.artist);
+  const resolvedArtists = r.resolvedArtists.map((a) => {
+    const doc = getArtistBySlug(a.slug);
+    return {
+      slug: a.slug,
+      name: a.name ?? doc?.data.name ?? a.slug,
+      exists: Boolean(doc),
+    };
+  });
+  const primaryArtistDoc = getArtistBySlug(r.resolvedArtists[0]?.slug ?? r.data.artist);
 
   return (
     <>
@@ -52,7 +61,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
             { name: "Catalog", path: "/catalog" },
             { name: r.data.title, path: r.urlPath },
           ]),
-          releaseJsonLd(r.data, artist?.data ?? null),
+          releaseJsonLd(r.data, primaryArtistDoc?.data ?? null),
         ]}
       />
       <article>
@@ -63,13 +72,18 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
           </p>
           <h1 className="font-serif text-5xl text-neutral-50">{r.data.title}</h1>
           <p className="mt-2 text-lg text-neutral-300">
-            {artist ? (
-              <Link href={`/artists/${artist.data.slug}`} className="underline-offset-4 hover:underline">
-                {artist.data.name}
-              </Link>
-            ) : (
-              r.data.artist
-            )}
+            {resolvedArtists.map((a, i) => (
+              <span key={a.slug}>
+                {i > 0 ? <span className="text-neutral-500"> &amp; </span> : null}
+                {a.exists ? (
+                  <Link href={`/artists/${a.slug}`} className="underline-offset-4 hover:underline">
+                    {a.name}
+                  </Link>
+                ) : (
+                  <span>{a.name}</span>
+                )}
+              </span>
+            ))}
           </p>
           {r.data.status === "draft" ? (
             <p className="mt-3 inline-block border border-amber-700 bg-amber-950 px-2 py-0.5 text-xs uppercase tracking-wider text-amber-200">

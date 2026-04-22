@@ -94,12 +94,22 @@ export const proofPoint = z.object({
   year_through: z.number().int().min(1900).max(2100).optional(),
 });
 
+// Canonical multi-artist shape (HMDIGITAL addendum §2.3.1). Release frontmatter
+// may use this OR the legacy single-artist + artists_additional pair; the
+// content loader normalizes.
+export const releaseArtistRef = z.object({
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  role: z.enum(["primary", "featured", "remixer", "producer"]).default("primary"),
+});
+
 export const releaseSchema = z.object({
   slug: z.string().min(1),
   title: z.string().min(1),
   catalog_number: z.string().optional(),
   artist: z.string().min(1),
   artists_additional: z.array(z.string()).default([]),
+  artists: z.array(releaseArtistRef).optional(),
   release_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   format: z.array(releaseFormat).default(["digital"]),
   genres: z.array(z.string()).default([]),
