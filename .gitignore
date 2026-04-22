@@ -25,6 +25,7 @@ secrets/
 
 # migration generated artifacts (the WP XML itself IS committed at site/migration/*.xml)
 site/migration/raw.json
+site/migration/classified.json
 site/migration/report.md
 site/migration/dead-links.md
 site/migration/media-manifest.json
