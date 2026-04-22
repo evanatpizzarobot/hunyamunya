@@ -1,0 +1,29 @@
+name: Build & publish deploy branch
+on:
+  push: { branches: [main] }
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm', cache-dependency-path: site/package-lock.json }
+      - working-directory: site
+        run: npm ci
+      - working-directory: site
+        run: npm run build
+      - working-directory: site
+        run: npm run postbuild
+      - name: Publish to deploy branch
+        run: |
+          cd site/out
+          cp ../public/.htaccess .htaccess
+          git init -b deploy
+          git config user.email "ci@hunyamunyarecords.com"
+          git config user.name "HMR CI"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git add -A
+          git commit -m "build: ${{ github.sha }}"
+          git push -f origin deploy

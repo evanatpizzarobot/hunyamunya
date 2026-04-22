@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# site
 
-## Getting Started
+Next.js 14 static export for hunyamunyarecords.com. Deploys to NetActuate cPanel Apache.
 
-First, run the development server:
+See `docs/specs/rebuild-v1.md` (main spec) and `docs/specs/hosting-addendum.md` (hosting overrides) at the repo root.
+
+## Local dev
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build        # Next.js static export → site/out/
+npm run postbuild    # Pagefind index + sitemap (stub)
+```
 
-## Learn More
+On push to `main`, GitHub Actions runs both, copies `public/.htaccess` into `out/`, and force-pushes `out/` to the `deploy` branch for cPanel Git to pull.
 
-To learn more about Next.js, take a look at the following resources:
+## Content
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Lives under `site/content/{artists,releases,news,pages,press,campaigns}`. All MDX frontmatter is validated by the Zod schemas in `lib/schema.ts`. Build fails loudly on schema violations.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Migration scripts
 
-## Deploy on Vercel
+Run from this directory (`/site`):
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Command | Purpose |
+|---|---|
+| `npm run import:wp` | Parse `site/migration/hunyamunyarecords.WordPress.2026-04-22.xml` → MDX under `site/content/` |
+| `npm run rehost:media` | Download WP originals, transcode via `sharp`, write to `site/public/media/legacy/` |
+| `npm run build:redirects` | Populate the BEGIN/END REDIRECTS block in `site/public/.htaccess` |
+| `npm run verify:wp` | HEAD-check external URLs; write `site/migration/dead-links.md` |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+All four are currently stubs; implementations follow per `docs/specs/` sections.

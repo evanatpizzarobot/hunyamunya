@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "postbuild": "echo 'postbuild: no-op. TODO pagefind index + sitemap copy when implemented.'",
     "import:wp": "tsx scripts/wp-import.ts",
     "verify:wp": "tsx scripts/wp-verify.ts",
     "rehost:media": "tsx scripts/media-rehost.ts",

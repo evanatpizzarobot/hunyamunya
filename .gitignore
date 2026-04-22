@@ -23,14 +23,11 @@ build/
 secrets/
 .dev.vars
 
-# migration raw/generated artifacts
-migration/source/
-migration/raw.json
-migration/report.md
-migration/dead-links.md
-
-# cloudflare
-.wrangler/
+# migration generated artifacts (the WP XML itself IS committed at site/migration/*.xml)
+site/migration/raw.json
+site/migration/report.md
+site/migration/dead-links.md
+site/migration/media-manifest.json
 
 # OS
 .DS_Store

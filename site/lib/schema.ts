@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-const r2Url = z.string().refine(
-  (s) => s.startsWith("r2://") || s.startsWith("https://") || s.startsWith("/"),
-  { message: "Image must be r2://, absolute https://, or relative /-path" }
+const mediaUrl = z.string().refine(
+  (s) => s.startsWith("https://") || s.startsWith("/"),
+  { message: "Image must be an absolute https:// URL or a site-relative /-path" }
 );
 
 const pressQuote = z.object({
@@ -16,7 +16,7 @@ const seoBlock = z
   .object({
     title: z.string().optional(),
     description: z.string().optional(),
-    og_image: r2Url.optional(),
+    og_image: mediaUrl.optional(),
     index: z.boolean().default(true),
     follow: z.boolean().default(true),
     in_sitemap: z.boolean().default(true),
@@ -46,8 +46,8 @@ export const artistSchema = z.object({
     })
     .partial()
     .default({}),
-  hero_image: r2Url.optional(),
-  portrait: r2Url.optional(),
+  hero_image: mediaUrl.optional(),
+  portrait: mediaUrl.optional(),
   press_quotes: z.array(pressQuote).default([]),
   featured_release: z.string().optional(),
   palette_override: z
@@ -109,8 +109,8 @@ export const releaseSchema = z.object({
     })
     .partial()
     .optional(),
-  cover_image: r2Url.optional(),
-  gallery: z.array(r2Url).default([]),
+  cover_image: mediaUrl.optional(),
+  gallery: z.array(mediaUrl).default([]),
   embeds: z
     .object({
       bandcamp: z.string().url().optional(),
@@ -148,7 +148,7 @@ export const newsSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   author: z.string().default("Evan Rippertoe"),
   excerpt: z.string().optional(),
-  hero_image: r2Url.optional(),
+  hero_image: mediaUrl.optional(),
   tags: z.array(z.string()).default([]),
   related_releases: z.array(z.string()).default([]),
   related_artists: z.array(z.string()).default([]),
@@ -159,8 +159,8 @@ export type News = z.infer<typeof newsSchema>;
 
 export const heroMedia = z.object({
   type: z.enum(["image", "video", "loop"]),
-  src: r2Url,
-  poster: r2Url.optional(),
+  src: mediaUrl,
+  poster: mediaUrl.optional(),
 });
 
 export const campaignSchema = z.object({

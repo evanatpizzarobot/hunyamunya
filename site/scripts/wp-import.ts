@@ -1,8 +1,12 @@
-// Spec §8.2: Parse WP XML export at migration/source/hunyamunyarecords.WordPress.2026-04-22.xml,
-// classify content per dry-run §1.1, emit MDX under site/content/{artists,releases,news,pages}.
-// Write migration/raw.json, migration/report.md, and flag ambiguous items to content/_review/.
+// Spec: rebuild-v1 §8.2, migration-dry-run §1.1.
+// Parse site/migration/hunyamunyarecords.WordPress.2026-04-22.xml, classify content,
+// emit MDX under site/content/{artists,releases,news,pages}, write site/migration/raw.json
+// and site/migration/report.md. Flag ambiguous items to site/content/_review/.
 //
-// Not yet implemented. See docs/specs/migration-dry-run.md and docs/specs/rebuild-v1.md §8.2.
+// MDX image refs use site-relative paths (/media/legacy/...) per hosting-addendum §3;
+// r2:// is not used.
+//
+// Not yet implemented.
 
 async function main() {
   throw new Error("wp-import not yet implemented. See docs/specs/rebuild-v1.md §8.2.");
