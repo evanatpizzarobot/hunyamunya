@@ -31,6 +31,17 @@ export default function AboutPage() {
         <p className="text-neutral-500 text-sm">
           This page is a placeholder. A longer label history, origin story, and musical identity essay are planned for launch.
         </p>
+        <h2 className="font-serif text-2xl text-neutral-100">Contact</h2>
+        <p className="text-neutral-300">
+          General enquiries, demo submissions, press, sync and licensing:{" "}
+          <a
+            href="mailto:contact@hunyamunyarecords.com"
+            className="text-neutral-100 underline-offset-4 hover:underline"
+          >
+            contact@hunyamunyarecords.com
+          </a>
+          .
+        </p>
       </article>
     </>
   );

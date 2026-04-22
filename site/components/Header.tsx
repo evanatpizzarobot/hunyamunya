@@ -16,9 +16,16 @@ const nav = [
 export function Header() {
   return (
     <header className="border-b border-neutral-800">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 md:flex-row md:items-end md:justify-between">
-        <Link href="/" className="font-serif text-2xl tracking-tight text-neutral-100">
-          {LABEL_NAME}
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 md:flex-row md:items-center md:justify-between">
+        <Link href="/" aria-label={LABEL_NAME} className="inline-block">
+          <img
+            src="/logo.gif"
+            alt={LABEL_NAME}
+            width={900}
+            height={600}
+            className="h-14 w-auto md:h-16"
+            loading="eager"
+          />
         </Link>
         <nav aria-label="Primary">
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-neutral-300">

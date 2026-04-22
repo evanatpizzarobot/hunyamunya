@@ -14,15 +14,8 @@ export function generateMetadata(): Metadata {
   });
 }
 
-const TIER_ORDER = { anchor: 0, active: 1, archived: 2 } as const;
-
 export default function ArtistsIndex() {
-  const artists = getAllArtists().sort((a, b) => {
-    const ta = TIER_ORDER[a.data.tier];
-    const tb = TIER_ORDER[b.data.tier];
-    if (ta !== tb) return ta - tb;
-    return a.data.name.localeCompare(b.data.name);
-  });
+  const artists = getAllArtists().sort((a, b) => a.data.name.localeCompare(b.data.name));
 
   return (
     <>
@@ -40,23 +33,41 @@ export default function ArtistsIndex() {
           The Hunya Munya Records roster. Every artist who has released on the label stays on the site.
         </p>
       </header>
-      <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {artists.map(({ data }) => (
-          <li key={data.slug}>
-            <Link
-              href={`/artists/${data.slug}`}
-              className="group block border border-neutral-800 p-5 transition-colors hover:border-neutral-600 hover:bg-neutral-900"
-            >
-              <p className="font-serif text-xl text-neutral-50">{data.name}</p>
-              <p className="mt-1 text-xs uppercase tracking-wider text-neutral-500">
-                {data.tier === "anchor" ? "Anchor artist" : data.tier === "active" ? "Active" : "Archival"}
-              </p>
-              {data.shortBio ? (
-                <p className="mt-3 text-sm text-neutral-300">{data.shortBio}</p>
-              ) : null}
-            </Link>
-          </li>
-        ))}
+      <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {artists.map(({ data }) => {
+          const img = data.portrait ?? data.hero_image;
+          return (
+            <li key={data.slug}>
+              <Link
+                href={`/artists/${data.slug}`}
+                className="group block overflow-hidden border border-neutral-800 transition-colors hover:border-neutral-600"
+              >
+                <div className="relative aspect-square w-full overflow-hidden bg-neutral-900">
+                  {img ? (
+                    <img
+                      src={img}
+                      alt={data.name}
+                      className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <img
+                        src="/logo.gif"
+                        alt=""
+                        aria-hidden="true"
+                        className="h-1/2 w-auto opacity-40"
+                      />
+                    </div>
+                  )}
+                </div>
+                <p className="p-3 text-center font-serif text-base text-neutral-100 group-hover:text-white">
+                  {data.name}
+                </p>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </>
   );

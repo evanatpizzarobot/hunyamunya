@@ -15,7 +15,8 @@ export function orgSchema() {
     "@id": ORG_ID,
     name: LABEL_NAME,
     url: SITE_URL,
-    logo: `${SITE_URL}/logo.png`,
+    logo: `${SITE_URL}/logo.png`, // 900x600, transparent PNG sourced from hm_transparent.gif
+    email: "contact@hunyamunyarecords.com",
     foundingDate: "2003",
     foundingLocation: {
       "@type": "Place",

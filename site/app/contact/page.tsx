@@ -30,8 +30,8 @@ export default function ContactPage() {
         </p>
         <p className="mt-4 text-neutral-400">
           Email{" "}
-          <a href="mailto:evan@hunyamunyarecords.com" className="text-neutral-100 underline-offset-4 hover:underline">
-            evan@hunyamunyarecords.com
+          <a href="mailto:contact@hunyamunyarecords.com" className="text-neutral-100 underline-offset-4 hover:underline">
+            contact@hunyamunyarecords.com
           </a>
           .
         </p>

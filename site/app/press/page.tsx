@@ -27,8 +27,8 @@ export default function PressPage() {
         <h1 className="font-serif text-4xl text-neutral-50">Press</h1>
         <p className="mt-4 text-neutral-300">
           Press kit and coverage aggregation coming soon. For press inquiries, interviews, and review copies, email{" "}
-          <a href="mailto:evan@hunyamunyarecords.com" className="underline-offset-4 hover:underline">
-            evan@hunyamunyarecords.com
+          <a href="mailto:contact@hunyamunyarecords.com" className="underline-offset-4 hover:underline">
+            contact@hunyamunyarecords.com
           </a>
           .
         </p>

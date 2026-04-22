@@ -583,7 +583,14 @@ function isoDateFromWp(wpDate: string): string {
   return m ? m[1] : "";
 }
 
-function buildArtistFrontmatter(item: RawItem): Record<string, unknown> {
+function extractFirstMediaImage(rewrittenContent: string): string | undefined {
+  // After rewriteBody runs, image URLs are already site-relative /media/legacy/...
+  // Grab the first <img src="/media/legacy/..."> we encounter.
+  const m = rewrittenContent.match(/<img[^>]+src="(\/media\/legacy\/[^"]+)"/i);
+  return m ? m[1] : undefined;
+}
+
+function buildArtistFrontmatter(item: RawItem, rewrittenBody: string): Record<string, unknown> {
   const { slug, legacy_slug } = slugForArtist(item);
   const tier = slug === "rykard" ? "anchor" : "archived";
 
@@ -594,6 +601,7 @@ function buildArtistFrontmatter(item: RawItem): Record<string, unknown> {
   const sitemapExclude = pmValue(item, "_aioseop_sitemap_exclude").trim();
 
   const menuLabel = pmValue(item, "_aioseop_menulabel").trim();
+  const heroImage = extractFirstMediaImage(rewrittenBody);
 
   const front: Record<string, unknown> = {
     slug,
@@ -603,6 +611,10 @@ function buildArtistFrontmatter(item: RawItem): Record<string, unknown> {
   };
   if (legacy_slug) front.legacy_slug = legacy_slug;
   if (menuLabel && menuLabel !== item.title) front.menu_label = menuLabel;
+  if (heroImage) {
+    front.hero_image = heroImage;
+    front.portrait = heroImage;
+  }
   if (aioTitle) front.seoTitle = aioTitle;
   if (aioDesc) front.metaDescription = aioDesc;
 
@@ -623,8 +635,8 @@ function emitArtists(classified: ClassifiedItem[], stats: EmitStats): void {
   const artists = classified.filter((c) => c.class === "artist");
 
   for (const item of artists) {
-    const frontmatter = buildArtistFrontmatter(item);
     const body = rewriteBody(item.content);
+    const frontmatter = buildArtistFrontmatter(item, body);
 
     const parsed = artistSchema.safeParse(frontmatter);
     if (!parsed.success) {
