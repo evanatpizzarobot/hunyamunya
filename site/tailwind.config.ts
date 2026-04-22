@@ -14,9 +14,10 @@ const config: Config = {
         foreground: "var(--foreground)",
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
-        mono: ["var(--font-geist-mono)", "ui-monospace", "monospace"],
-        serif: ["var(--font-geist-sans)", "Georgia", "serif"],
+        sans: ["var(--font-body)", "system-ui", "sans-serif"],
+        serif: ["var(--font-display)", "Georgia", "serif"],
+        display: ["var(--font-display)", "Georgia", "serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
     },
   },

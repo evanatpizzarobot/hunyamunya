@@ -9,6 +9,42 @@
   --accent-cool: #5a7ca8;
 }
 
+/*
+ * Font experiment routing. `html[data-font-set="a|b|c"]` selects a typographic
+ * direction, and all components read --font-body / --font-display / --font-mono
+ * through Tailwind's font-sans / font-display+font-serif / font-mono classes.
+ *
+ *   A — Editorial: Inter body, Source Serif 4 display, JetBrains Mono.
+ *   B — Modernist: Inter for everything (heavier weights for display), Plex Mono.
+ *   C — Character: Space Grotesk body, Fraunces display, Space Mono.
+ *
+ * Default is A so production still renders if the switcher never mounts.
+ */
+html[data-font-set="a"] {
+  --font-body: var(--font-inter);
+  --font-display: var(--font-source-serif);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-display-weight: 600;
+}
+html[data-font-set="b"] {
+  --font-body: var(--font-inter);
+  --font-display: var(--font-inter);
+  --font-mono: var(--font-plex-mono);
+  --font-display-weight: 800;
+}
+html[data-font-set="c"] {
+  --font-body: var(--font-space-grotesk);
+  --font-display: var(--font-fraunces);
+  --font-mono: var(--font-space-mono);
+  --font-display-weight: 600;
+}
+html:not([data-font-set]) {
+  --font-body: var(--font-inter);
+  --font-display: var(--font-source-serif);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-display-weight: 600;
+}
+
 html {
   background: var(--bg-base);
 }
