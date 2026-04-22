@@ -20,8 +20,8 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${LABEL_NAME} — Independent Ambient Electronic Label, Los Angeles`,
-    template: `%s — ${LABEL_NAME}`,
+    default: `${LABEL_NAME} · LA Boutique Label, Electronic Ambient Chillout since 2002`,
+    template: `%s · ${LABEL_NAME}`,
   },
   description:
     "LA based boutique label and publisher since 2002. Hunya Munya Records crafts Electronic, Ambient, and Chillout for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide.",

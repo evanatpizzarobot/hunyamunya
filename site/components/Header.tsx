@@ -23,7 +23,7 @@ export function Header() {
             alt={LABEL_NAME}
             width={900}
             height={600}
-            className="h-14 w-auto md:h-16"
+            className="h-24 w-auto md:h-32 lg:h-40"
             loading="eager"
           />
         </Link>

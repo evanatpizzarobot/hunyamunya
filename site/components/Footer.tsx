@@ -12,7 +12,7 @@ export function Footer() {
               alt={LABEL_NAME}
               width={900}
               height={600}
-              className="h-12 w-auto"
+              className="h-24 w-auto md:h-28"
               loading="lazy"
             />
           </Link>

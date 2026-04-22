@@ -51,21 +51,23 @@ export function buildMetadata(opts: BuildArgs): Metadata {
   };
 }
 
-// Title formulas per SEO spec §2.2.
+// Title formulas per SEO spec §2.2. Separator is the middle-dot U+00B7 per
+// global writing rule (no em-dashes anywhere). Middle-dot is a common SEO
+// title separator alongside | and :.
 export function homeTitle(): string {
-  return `${LABEL_NAME} — Independent Ambient Electronic Label, Los Angeles`;
+  return `${LABEL_NAME} · LA Boutique Label, Electronic Ambient Chillout since 2002`;
 }
 export function artistTitle(name: string): string {
-  return `${name} — ${LABEL_NAME}`;
+  return `${name} · ${LABEL_NAME}`;
 }
 export function releaseTitle(title: string, artistName: string, catno?: string): string {
   return catno
-    ? `${title} — ${artistName} — ${catno} — ${LABEL_NAME}`
-    : `${title} — ${artistName} — ${LABEL_NAME}`;
+    ? `${title} · ${artistName} · ${catno} · ${LABEL_NAME}`
+    : `${title} · ${artistName} · ${LABEL_NAME}`;
 }
 export function newsTitle(postTitle: string): string {
-  return `${postTitle} — ${LABEL_NAME}`;
+  return `${postTitle} · ${LABEL_NAME}`;
 }
 export function sectionTitle(sectionTitle: string): string {
-  return `${sectionTitle} — ${LABEL_NAME}`;
+  return `${sectionTitle} · ${LABEL_NAME}`;
 }

@@ -22,8 +22,19 @@ export default function Home() {
           <Link href="/artists/rykard" className="text-neutral-100 underline underline-offset-4 hover:text-white">
             Rykard
           </Link>
-          , Blue Room Project, Dirk Bajema, and Yenn — working across ambient, electronic, and experimental music.
-          Browse the{" "}
+          , Blue Room Project,{" "}
+          <Link href="/artists/darius-kohanim" className="text-neutral-100 underline underline-offset-4 hover:text-white">
+            Darius Kohanim
+          </Link>
+          ,{" "}
+          <Link href="/artists/habersham" className="text-neutral-100 underline underline-offset-4 hover:text-white">
+            Habersham
+          </Link>
+          ,{" "}
+          <Link href="/artists/shiloh" className="text-neutral-100 underline underline-offset-4 hover:text-white">
+            Shiloh
+          </Link>
+          , and more. Browse the{" "}
           <Link href="/catalog" className="text-neutral-100 underline underline-offset-4 hover:text-white">
             full catalog
           </Link>

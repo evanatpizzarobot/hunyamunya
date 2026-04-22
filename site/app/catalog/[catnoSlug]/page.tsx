@@ -87,7 +87,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
           </p>
           {r.data.status === "draft" ? (
             <p className="mt-3 inline-block border border-amber-700 bg-amber-950 px-2 py-0.5 text-xs uppercase tracking-wider text-amber-200">
-              Draft — awaiting confirmation
+              Draft: awaiting confirmation
             </p>
           ) : null}
         </header>
