@@ -54,10 +54,10 @@ const ARTIST_ENRICHMENTS: Record<string, ArtistEnrichment> = {
   rykard: {
     genres: ["Ambient", "Electronic", "Experimental"],
     shortBio:
-      "Rykard is an anchor artist on Hunya Munya Records, known for 'North Cormorant Obscurity' (25M+ Pandora plays) and the album 'Arrive the Radio Beacon.' A new album lands in 2026.",
+      "Rykard is an anchor artist on Hunya Munya Records, best known for the album 'Arrive the Radio Beacon' and the track 'North Cormorant Obscurity.' A new album lands in 2026.",
     seoTitle: "Rykard · Hunya Munya Records",
     metaDescription:
-      "Rykard on Hunya Munya Records. Ambient electronic project best known for 'North Cormorant Obscurity' (25M+ Pandora plays) and 'Arrive the Radio Beacon.' New album coming 2026.",
+      "Rykard on Hunya Munya Records. Ambient electronic project behind the album 'Arrive the Radio Beacon' and the track 'North Cormorant Obscurity.' New album coming 2026.",
   },
 };
 

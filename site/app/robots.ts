@@ -3,7 +3,13 @@ import { SITE_URL } from "@/lib/jsonld";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: "*", allow: "/" }],
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/contact-submit.php", "/contact/sent"],
+      },
+    ],
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

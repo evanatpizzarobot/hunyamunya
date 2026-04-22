@@ -141,3 +141,24 @@ export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
     })),
   };
 }
+
+export function contactPageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: `Contact ${LABEL_NAME}`,
+    url: `${SITE_URL}/contact`,
+    mainEntity: {
+      "@type": "Organization",
+      "@id": ORG_ID,
+      name: LABEL_NAME,
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "contact@hunyamunyarecords.com",
+        contactType: "customer service",
+        areaServed: "Worldwide",
+        availableLanguage: "English",
+      },
+    },
+  };
+}

@@ -8,7 +8,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("About"),
     description:
-      "Hunya Munya Records is an independent ambient electronic music label in Los Angeles, putting out vinyl, CD, and digital releases since 2002. Home to Rykard, Darius Kohanim, Distant Fragment, and others.",
+      "Hunya Munya Records is an independent Los Angeles record label since 2002. Progressive house, breaks, and tech house in the early years; ambient, chillout, and cinematic electronic from 2010 onward. Home to Rykard, Darius Kohanim, Distant Fragment, and others.",
     path: "/about",
   });
 }
@@ -28,16 +28,16 @@ export default function AboutPage() {
         <h1 className="font-serif text-4xl text-neutral-50">About</h1>
 
         <p>
-          {LABEL_NAME} is an independent ambient electronic music label based in Los Angeles. We started the label in 2002, which makes 2026 our twenty-fourth year putting out music that sits at the edges: ambient, electronic, experimental, and the quiet territory between them.
+          {LABEL_NAME} is an independent Los Angeles record label founded in 2002. We started out putting out progressive house, breaks, and tech house vinyl across HMR001 through HMR009, released between 2004 and 2008. From 2010 onward the label grew into ambient, chillout, and the cinematic electronic territory where most of the recent catalog lives. That makes 2026 our twenty-fourth year; the music has moved, the approach hasn&rsquo;t.
         </p>
 
         <p>
-          The label has always been vinyl-first for the records that earn it. Across ten numbered HMR vinyl releases, four CD full-lengths, and eighteen digital releases from our 2005 to 2008 Hunya Munya Digital sublabel, we&rsquo;ve built a catalog that rewards repeat listening more than it chases attention. Some of these records are two decades old and still finding new listeners; a few of them we lost track of in previous website migrations and are only now putting back where they belong.
+          The label has always been vinyl-first for the records that earn it. Ten numbered HMR 12&rdquo; releases, four CD full-lengths, and eighteen digital releases from our 2005 to 2008 Hunya Munya Digital sublabel: a catalog that rewards repeat listening more than it chases attention. Some of these records are twenty years old and still finding new listeners; a few of them we lost track of in previous website migrations and are only now putting back where they belong.
         </p>
 
         <p>
           Our best-known lineage runs through{" "}
-          <Link href="/artists/rykard">Rykard</Link>, whose track &ldquo;North Cormorant Obscurity&rdquo; crossed twenty-five million plays on Pandora, and whose album &ldquo;Arrive the Radio Beacon&rdquo; remains one of the records we&rsquo;re proudest to have put out. A new Rykard album is in the works for 2026.
+          <Link href="/artists/rykard">Rykard</Link>, whose album &ldquo;Arrive the Radio Beacon&rdquo; remains one of the records we&rsquo;re proudest to have put out. A new Rykard album is in the works for 2026.
         </p>
 
         <p>
@@ -54,7 +54,7 @@ export default function AboutPage() {
         </p>
 
         <p>
-          Los Angeles has been our home since day one. Every record on the label came together here: the rooms, the collaborators, the scenes that hold them up. We&rsquo;ve watched the city&rsquo;s ambient and electronic scenes reshape themselves many times over the years, and we&rsquo;re still glad to be part of whatever it&rsquo;s becoming next.
+          Los Angeles has been our home since day one. Every record on the label came together here: the rooms, the collaborators, the scenes that hold them up. We&rsquo;ve watched the city&rsquo;s scenes reshape themselves many times over the years, from the progressive and breaks era through today&rsquo;s ambient and electronic work, and we&rsquo;re still glad to be part of whatever it&rsquo;s becoming next.
         </p>
 
         <p>

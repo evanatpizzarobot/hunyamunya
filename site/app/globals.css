@@ -57,3 +57,33 @@ body {
     text-wrap: balance;
   }
 }
+
+@layer components {
+  .field {
+    width: 100%;
+    border: 1px solid rgb(38 38 38);
+    background: rgb(10 10 11 / 0.7);
+    padding: 0.75rem 0.875rem;
+    font-size: 0.95rem;
+    color: rgb(236 233 226);
+    transition: border-color 150ms ease;
+  }
+  .field::placeholder {
+    color: rgb(115 115 115);
+  }
+  .field:focus {
+    outline: none;
+    border-color: rgb(163 163 163);
+    box-shadow: 0 0 0 2px rgb(163 163 163 / 0.2);
+  }
+  .field:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: rgb(180 83 92 / 0.8);
+  }
+  select.field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a3a3a3' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    padding-right: 2.25rem;
+  }
+}
