@@ -180,7 +180,7 @@ export const newsSchema = z.object({
   slug: z.string().min(1),
   title: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  author: z.string().default("Evan Rippertoe"),
+  author: z.string().default("Evan Marcus"),
   excerpt: z.string().optional(),
   hero_image: mediaUrl.optional(),
   tags: z.array(z.string()).default([]),

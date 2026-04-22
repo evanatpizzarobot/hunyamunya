@@ -15,7 +15,7 @@ Monorepo for Hunya Munya Records.
 /.github/workflows        deploy workflow (build → force-push deploy branch)
 ```
 
-Owner: Evan Rippertoe. Lead implementer: Claude ("Lord Coder"). Specs authored by Cowork.
+Owner: Evan Marcus. Lead implementer: Claude ("Lord Coder"). Specs authored by Cowork.
 
 ## First-time setup
 

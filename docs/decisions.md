@@ -38,6 +38,23 @@ Format: `## YYYY-MM-DD — short title`, then context, decision, rationale, spec
 
 ---
 
+## 2026-04-22 — Label owner's name is Evan Marcus, not Evan Rippertoe
+
+**Context:** Cowork's early spec drafts referred to the label owner as "Evan Rippertoe" (likely derived from his email `rippertm@gmail.com` and the Windows username `rippe`). I propagated that name into: site copy (About sign-off, news author default), scripts, schema defaults, repo README, and the project memory files. Evan flagged the error when he saw "Evan Rippertoe, founder" on the About page.
+
+**Correction:** his name is **Evan Marcus**. Same person as the Pizza Robot Studios founder named in the global `~/.claude/CLAUDE.md`. He is also the artist credited on HMR003 "Ten Feet From Heaven" (2004) and HMB006 "Re//Rel" (2020).
+
+**Changes applied 2026-04-22:**
+- `site/app/about/page.tsx` sign-off corrected.
+- `site/scripts/wp-import.ts` `AUTHOR_DISPLAY_NAME` constant corrected (propagates through the 51 news MDX `author:` fields on next regen).
+- `site/lib/schema.ts` `newsSchema` `author` default corrected.
+- `README.md` owner line corrected.
+- Memory files (`spec_v1.md`, `MEMORY.md`) corrected with a note to prevent future sessions from reintroducing the typo.
+
+**Not changed:** Cowork's spec docs in `docs/specs/` (`rebuild-v1.md`, `content-drafts-v1.md`) that originated the typo. Those are historical record of Cowork's drafts, preserved as-is; the sign-off correction here is the authoritative source going forward.
+
+---
+
 ## 2026-04-22 — Founding year corrected from 2003 to 2002; positioning tightened
 
 **Context:** Evan's revised footer tagline uses "since 2002." Earlier spec docs (seo-audit-phase-1.md §1.1, hosting-addendum implicit, home anchor copy) said 2003, which was Cowork's assumption from early context. Evan's tagline is authoritative.

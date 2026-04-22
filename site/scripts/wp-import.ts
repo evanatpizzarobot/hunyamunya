@@ -797,7 +797,7 @@ const STUB_ARTISTS: StubArtist[] = [
   { slug: "various-artists", name: "Various Artists", yearsActive: "2008", contextNote: "Credit slot for *International Soundscapes EP* (HMDIGITAL015, 2008) compilation." },
 ];
 
-const AUTHOR_DISPLAY_NAME = "Evan Rippertoe";
+const AUTHOR_DISPLAY_NAME = "Evan Marcus";
 
 function isoDateFromWp(wpDate: string): string {
   // WP format: "2010-04-14 13:43:10". We need "2010-04-14".

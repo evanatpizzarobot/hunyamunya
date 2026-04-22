@@ -63,7 +63,7 @@ export default function AboutPage() {
         </p>
 
         <p className="text-neutral-400">
-          <em>Evan Rippertoe, founder</em>
+          <em>Evan Marcus, founder</em>
         </p>
 
         <h2 className="font-serif text-2xl text-neutral-100">Contact</h2>
