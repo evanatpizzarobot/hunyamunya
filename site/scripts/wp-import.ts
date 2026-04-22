@@ -37,6 +37,30 @@ const RESOLVED_REVIEW_FLAGS: Record<number, string> = {
   1052: "Duplicate of canonical /artists/tim-fretwell. Deleted; 301 from /?page_id=1052 and /tim-fretwell to /artists/tim-fretwell.",
 };
 
+// Per-artist SEO + metadata enrichments that the WP export didn't carry and
+// that Evan has locked in manually. Keyed by canonical artist slug. Merged
+// ON TOP of the WP-derived frontmatter in buildArtistFrontmatter, so the body
+// content from the WP migration is preserved while the metadata is authored.
+type ArtistEnrichment = Partial<{
+  genres: string[];
+  shortBio: string;
+  seoTitle: string;
+  metaDescription: string;
+  tier: "anchor" | "active" | "archived";
+  yearsActive: string;
+}>;
+
+const ARTIST_ENRICHMENTS: Record<string, ArtistEnrichment> = {
+  rykard: {
+    genres: ["Ambient", "Electronic", "Experimental"],
+    shortBio:
+      "Rykard is an anchor artist on Hunya Munya Records, known for 'North Cormorant Obscurity' (25M+ Pandora plays) and the album 'Arrive the Radio Beacon.' A new album lands in 2026.",
+    seoTitle: "Rykard · Hunya Munya Records",
+    metaDescription:
+      "Rykard on Hunya Munya Records. Ambient electronic project best known for 'North Cormorant Obscurity' (25M+ Pandora plays) and 'Arrive the Radio Beacon.' New album coming 2026.",
+  },
+};
+
 type Postmeta = { key: string; value: string };
 type Category = { domain: string; nicename: string; label: string };
 
@@ -628,6 +652,17 @@ function buildArtistFrontmatter(item: RawItem, rewrittenBody: string): Record<st
   if (nofollow === "on" || nofollow === "1") seo.follow = false;
   if (sitemapExclude === "on" || sitemapExclude === "1") seo.in_sitemap = false;
   if (Object.keys(seo).length) front.seo = seo;
+
+  // Merge manual enrichments on top. These win over WP-derived values.
+  const enrichment = ARTIST_ENRICHMENTS[slug];
+  if (enrichment) {
+    if (enrichment.genres) front.genres = enrichment.genres;
+    if (enrichment.shortBio) front.shortBio = enrichment.shortBio;
+    if (enrichment.seoTitle) front.seoTitle = enrichment.seoTitle;
+    if (enrichment.metaDescription) front.metaDescription = enrichment.metaDescription;
+    if (enrichment.tier) front.tier = enrichment.tier;
+    if (enrichment.yearsActive) front.yearsActive = enrichment.yearsActive;
+  }
 
   return front;
 }
