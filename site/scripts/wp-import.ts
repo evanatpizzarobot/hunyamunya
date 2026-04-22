@@ -495,35 +495,42 @@ type ReleaseSeed = {
   note?: string;
 };
 
-// Seed list transcribed from the /discography page body (dry-run §1.3), verified
-// against site/migration/hunyamunyarecords.WordPress.2026-04-22.xml page_id 79.
-// All emitted as `status: draft` for Evan's manual review pass.
+// Seed list canonical per Discogs label 17736 (main HMR catalog), fetched via the
+// Discogs Releases API on 2026-04-22. Every year and title reflects what Discogs
+// records for the canonical 12"/CD release, with `discogs_id` pointing at that
+// specific release. All status: draft until Evan confirms the tracklist/credits
+// in the enrichment pass.
 const RELEASE_SEEDS: ReleaseSeed[] = [
-  // 12" vinyl, HMR001 to HMR010. Original mix years for HMR001-009 are from
-  // the 2010-2012 era; exact per-release dates are not in the WP export.
-  { slug: "twilight", title: "Twilight", catalog_number: "HMR001", artist: "dirk-bajema", year: 2010, format: ["vinyl-12"], note: "Original + Noel Sanger Mix" },
-  { slug: "5b", title: "5B", catalog_number: "HMR002", artist: "blue-room-project", year: 2010, format: ["vinyl-12"], note: "Original + Madoka Mix" },
-  { slug: "ten-feet-from-heaven", title: "Ten Feet From Heaven", catalog_number: "HMR003", artist: "evan-marcus", year: 2011, format: ["vinyl-12"], note: "Original + 017 Breaks Mix" },
-  { slug: "circular", title: "Circular", catalog_number: "HMR004", artist: "snake-sedrick-khans", year: 2011, format: ["vinyl-12"], note: "Original + Tim Fretwell Mix" },
-  { slug: "revitalized", title: "Revitalized", catalog_number: "HMR005", artist: "darius-kohanim", year: 2011, format: ["vinyl-12"], note: "Original + Habersham Mix" },
-  { slug: "flicker", title: "Flicker", catalog_number: "HMR006", artist: "boom-jinx", year: 2011, format: ["vinyl-12"], note: "Original + Shiloh Mix" },
-  { slug: "chasing-memories", title: "Chasing Memories", catalog_number: "HMR007", artist: "distant-fragment", year: 2012, format: ["vinyl-12"], note: "Original + Shmuel Flash & Huge-A Mix" },
-  { slug: "time-code", title: "Time Code", catalog_number: "HMR008", artist: "huge-a", year: 2012, format: ["vinyl-12"], note: "Original + Nosmo & Kris B Mixes" },
-  { slug: "what-i-feel", title: "What I Feel", catalog_number: "HMR009", artist: "yenn", year: 2012, format: ["vinyl-12"], note: "Original + Fabian Schumann & Evan Marcus Mixes" },
-  { slug: "nco", title: "NCO", catalog_number: "HMR010", artist: "rykard", release_date: "2025-12-12", year: 2025, format: ["vinyl-12"], note: "North Cormorant Obscurity + Troup Head" },
-  // CD full-lengths (linked via Discogs on the /discography page).
-  { slug: "arrive-the-radio-beacon", title: "Arrive The Radio Beacon", artist: "rykard", year: 2010, format: ["cd", "digital"], discogs_id: "2993676" },
-  { slug: "the-orange-album", title: "The Orange Album", artist: "evan-marcus", year: 2013, format: ["cd", "digital"], discogs_id: "12157212" },
-  { slug: "luminosity", title: "Luminosity", artist: "rykard", year: 2016, format: ["cd", "digital"], discogs_id: "9084114" },
-  { slug: "night-towers", title: "Night Towers", artist: "rykard", year: 2018, format: ["cd", "digital"], discogs_id: "11959458" },
-  // Digital-only releases inferred from news posts + tags (dry-run §1.3).
-  { slug: "halcyon-days-ep", title: "Halcyon Days EP", artist: "catnip-claws", year: 2011, format: ["digital"] },
+  // 12" vinyl, HMR001 to HMR010. Years come from Discogs; every HMR vinyl was
+  // originally pressed between 2004 and 2008 (HMR010 is the 2025 anniversary
+  // reissue of Rykard's NCO).
+  { slug: "twilight", title: "Twilight", catalog_number: "HMR001", artist: "dirk-bajema", year: 2004, format: ["vinyl-12"], note: "Original + Noel Sanger Mix", discogs_id: "233018" },
+  { slug: "5b", title: "5B", catalog_number: "HMR002", artist: "blue-room-project", year: 2005, format: ["vinyl-12"], note: "Original + Madoka Mix", discogs_id: "232459" },
+  { slug: "ten-feet-from-heaven", title: "Ten Feet From Heaven", catalog_number: "HMR003", artist: "evan-marcus", year: 2004, format: ["vinyl-12"], note: "Original + 017 Breaks Mix", discogs_id: "316504" },
+  { slug: "circular", title: "Circular", catalog_number: "HMR004", artist: "snake-sedrick-khans", year: 2005, format: ["vinyl-12"], note: "Original + Tim Fretwell Mix", discogs_id: "585654" },
+  { slug: "revitalized-ep", title: "Revitalized EP", catalog_number: "HMR005", artist: "darius-kohanim", year: 2006, format: ["vinyl-12"], note: "Original + Habersham Mix", discogs_id: "771225" },
+  { slug: "flicker", title: "Flicker", catalog_number: "HMR006", artist: "boom-jinx", year: 2007, format: ["vinyl-12"], note: "Original + Shiloh Mix", discogs_id: "1032300" },
+  { slug: "chasing-memories", title: "Chasing Memories", catalog_number: "HMR007", artist: "distant-fragment", year: 2008, format: ["vinyl-12"], note: "Original + Shmuel Flash & Huge-A Mix", discogs_id: "1032326" },
+  { slug: "time-code", title: "Time Code", catalog_number: "HMR008", artist: "huge-a", year: 2008, format: ["vinyl-12"], note: "Original + Nosmo & Kris B Mixes", discogs_id: "1343744" },
+  { slug: "what-i-feel", title: "What I Feel", catalog_number: "HMR009", artist: "yenn", year: 2008, format: ["vinyl-12"], note: "Original + Fabian Schumann & Evan Marcus Mixes", discogs_id: "1471668" },
+  { slug: "nco", title: "NCO (15-Year Anniversary Edition)", catalog_number: "HMR010", artist: "rykard", release_date: "2025-12-12", year: 2025, format: ["vinyl-12"], note: "North Cormorant Obscurity + Troup Head. Limited 12\".", discogs_id: "35877076" },
+  // CD full-lengths (HMB catalog, linked via Discogs).
+  { slug: "arrive-the-radio-beacon", title: "Arrive The Radio Beacon", catalog_number: "HMB001", artist: "rykard", year: 2010, format: ["cd", "digital"], discogs_id: "2993676" },
+  { slug: "the-orange-album", title: "The Orange Album", catalog_number: "HMB002", artist: "evan-marcus", year: 2013, format: ["cd", "digital"], discogs_id: "12157212" },
+  { slug: "luminosity", title: "Luminosity", catalog_number: "HMB003", artist: "rykard", year: 2016, format: ["cd", "digital"], discogs_id: "9084114" },
+  { slug: "night-towers", title: "Night Towers", catalog_number: "HMB004", artist: "rykard", year: 2018, format: ["cd", "digital"], discogs_id: "11959458" },
+  { slug: "re-rel", title: "Re//Rel", catalog_number: "HMB006", artist: "evan-marcus", year: 2020, format: ["digital"], note: "7-track album, MP3 320.", discogs_id: "15097294" },
+  // Digital-only / digital-first Rykard releases. Ictis / Artificial Sunshine /
+  // Lansallos / Red Venom aren't on Discogs for the main label (enrichment pass
+  // may turn them up on other storefronts). Explorers Vol. 2 is confirmed 2020
+  // (CD EP Single on Discogs, catno HMB-005b) so re-filed here with the catno.
+  { slug: "halcyon-days-ep", title: "Halcyon Days EP", catalog_number: "HMB002", artist: "catnip-claws", year: 2011, format: ["digital"], note: "2xFile MP3 320 EP. Shares HMB002 catno with Evan Marcus' The Orange Album per Discogs.", discogs_id: "3687228" },
   { slug: "ictis", title: "Ictis", artist: "rykard", year: 2016, format: ["digital"] },
   { slug: "artificial-sunshine", title: "Artificial Sunshine", artist: "rykard", year: 2016, format: ["digital"] },
   { slug: "lansallos", title: "Lansallos", artist: "rykard", year: 2017, format: ["digital"] },
   { slug: "red-venom", title: "Red Venom", artist: "rykard", year: 2020, format: ["digital"] },
-  { slug: "explorers-vol-1", title: "Explorers Vol. 1", artist: "rykard", release_date: "2019-07-12", year: 2019, format: ["digital"] },
-  { slug: "explorers-vol-2", title: "Explorers Vol. 2", artist: "rykard", year: 2019, format: ["digital"] },
+  { slug: "explorers-vol-1", title: "Explorers Vol. 1", artist: "rykard", release_date: "2019-07-12", year: 2019, format: ["digital"], discogs_id: "14184268" },
+  { slug: "explorers-vol-2", title: "Explorers Vol. 2", catalog_number: "HMB005b", artist: "rykard", year: 2020, format: ["cd", "digital"], note: "CD EP Single + digital.", discogs_id: "14895581" },
   { slug: "explorers-vol-3", title: "Explorers Vol. 3", artist: "rykard", release_date: "2020-12-20", year: 2020, format: ["digital"] },
   { slug: "explorers-vol-4", title: "Explorers Vol. 4", artist: "rykard", release_date: "2023-07-07", year: 2023, format: ["digital"] },
   // HMDIGITAL sublabel (Discogs label 79509) per docs/specs/digital-catalog-discogs.md.
