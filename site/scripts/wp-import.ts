@@ -534,7 +534,7 @@ const RELEASE_SEEDS: ReleaseSeed[] = [
   { slug: "dune-in-erf-minor", title: "Dune In Erf Minor", catalog_number: "HMDIGITAL004", artist: "habersham", artists_additional: ["darius-kohanim"], year: 2005, format: ["digital"], note: "1×File, MP3 320" },
   { slug: "doolesitlike", title: "Doolesitlike", catalog_number: "HMDIGITAL005", artist: "habersham", artists_additional: ["darius-kohanim"], year: 2005, format: ["digital"], note: "1×File, MP3 320" },
   { slug: "life-goes-on", title: "Life Goes On", catalog_number: "HMDIGITAL006", artist: "evan-marcus", year: 2005, format: ["digital"], note: "2×File, MP3 320" },
-  { slug: "still-here", title: "Still Here", catalog_number: "HMDIGITAL007", artist: "joel-armstrong", artists_additional: ["gobo"], year: 2006, format: ["digital"], note: "1×File, MP3 320" },
+  { slug: "still-here", title: "Still Here", catalog_number: "HMDIGITAL007", artist: "joel-armstrong-gobo", year: 2006, format: ["digital"], note: "1×File, MP3 320" },
   { slug: "ift", title: "IFT", catalog_number: "HMDIGITAL008", artist: "underground-systems", year: 2006, format: ["digital"], note: "3×File, MP3 320" },
   { slug: "distant-fragment-ep", title: "Distant Fragment EP", catalog_number: "HMDIGITAL009", artist: "distant-fragment", year: 2006, format: ["digital"], note: "2×File, MP3 320. EP." },
   { slug: "running-after-time-ep", title: "Running After Time EP", catalog_number: "HMDIGITAL010", artist: "cassino-laben", year: 2006, format: ["digital"], note: "2×File, MP3 320. EP." },
@@ -562,8 +562,7 @@ type StubArtist = {
 
 const STUB_ARTISTS: StubArtist[] = [
   { slug: "jairus-miller", name: "Jairus Miller", yearsActive: "2005", contextNote: "Released *Ever After* (HMDIGITAL001) on Hunya Munya Digital in 2005." },
-  { slug: "joel-armstrong", name: "Joel Armstrong", yearsActive: "2006", contextNote: "Collaborated with Gobo on *Still Here* (HMDIGITAL007) in 2006." },
-  { slug: "gobo", name: "Gobo", yearsActive: "2006", contextNote: "Collaborated with Joel Armstrong on *Still Here* (HMDIGITAL007) in 2006." },
+  { slug: "joel-armstrong-gobo", name: "Joel Armstrong & Gobo", yearsActive: "2006", contextNote: "Duo. *Still Here* (HMDIGITAL007, 2006) on Hunya Munya Digital." },
   { slug: "underground-systems", name: "Underground Systems", yearsActive: "2006", contextNote: "Released *IFT* (HMDIGITAL008) in 2006." },
   { slug: "cassino-laben", name: "Cassino & Labèn", yearsActive: "2006-2008", contextNote: "Duo. *Running After Time EP* (HMDIGITAL010, 2006) and the *Running After Time Remix EP* (HMDIGITAL016, 2008) on Hunya Munya Digital." },
   { slug: "daniel-gregory", name: "Daniel Gregory", yearsActive: "2007", contextNote: "Released *Jetlag EP* (HMDIGITAL011) in 2007." },
