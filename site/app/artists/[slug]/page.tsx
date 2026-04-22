@@ -56,13 +56,25 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
         ]}
       />
       <article>
-        <header className="mb-8">
-          <p className="text-xs uppercase tracking-wider text-neutral-500">
-            {doc.data.tier === "anchor" ? "Anchor artist" : doc.data.tier === "active" ? "Active" : "Archival"}
-          </p>
-          <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>
-          {doc.data.shortBio ? (
-            <p className="mt-3 max-w-2xl text-lg text-neutral-300">{doc.data.shortBio}</p>
+        <header className="mb-8 grid gap-8 md:grid-cols-[minmax(0,1fr)_320px] md:items-start lg:grid-cols-[minmax(0,1fr)_380px]">
+          <div>
+            <p className="text-xs uppercase tracking-wider text-neutral-500">
+              {doc.data.tier === "anchor" ? "Anchor artist" : doc.data.tier === "active" ? "Active" : "Archival"}
+            </p>
+            <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>
+            {doc.data.shortBio ? (
+              <p className="mt-3 max-w-2xl text-lg text-neutral-300">{doc.data.shortBio}</p>
+            ) : null}
+          </div>
+          {doc.data.portrait ? (
+            <figure className="order-first overflow-hidden border border-neutral-800 md:order-last">
+              <img
+                src={doc.data.portrait}
+                alt={doc.data.name}
+                className="h-full w-full object-cover"
+                loading="eager"
+              />
+            </figure>
           ) : null}
         </header>
 
