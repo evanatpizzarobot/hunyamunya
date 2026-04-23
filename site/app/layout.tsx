@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -7,15 +7,20 @@ import { SEO } from "@/components/SEO";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { orgSchema, LABEL_NAME, SITE_URL } from "@/lib/jsonld";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+const interSerif = Inter({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  display: "swap",
+});
+const interMono = Inter({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -39,13 +44,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${inter.variable} ${interMono.variable} ${interSerif.variable}`}
+    >
       <head>
         <meta name="theme-color" content="#0a0a0a" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-neutral-100`}
-      >
+      <body className="antialiased text-neutral-100">
         <AmbientBackground />
         <SEO jsonLd={[orgSchema()]} />
         <Header />
