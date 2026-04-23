@@ -220,12 +220,77 @@ body {
   to   { background-position: -100% 0; }
 }
 
+/* Transmission overlay for the NCO bookmark photo-insert on the hero.
+   The bookmark sits over the hero ocean photo on the left side; this
+   treatment adds fine CRT scanlines, a soft vignette, and a slow rolling
+   signal band so the paper ephemera reads as a transmitted feed rather
+   than a pasted-in flat asset. */
+.hm-transmission {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  filter: contrast(1.04) saturate(0.85) brightness(0.96);
+  box-shadow:
+    0 18px 50px -12px rgba(5, 9, 13, 0.75),
+    0 0 0 1px rgba(232, 228, 216, 0.08);
+}
+.hm-transmission::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(5, 12, 22, 0.14) 0px,
+    rgba(5, 12, 22, 0.14) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+.hm-transmission::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 50%, transparent 55%, rgba(5, 9, 13, 0.55) 100%),
+    linear-gradient(180deg, rgba(10, 30, 55, 0.18), transparent 22%, transparent 78%, rgba(5, 9, 13, 0.35));
+  z-index: 2;
+}
+.hm-transmission-roll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -40%;
+  height: 28%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(140, 180, 220, 0.06) 42%,
+    rgba(180, 210, 235, 0.14) 50%,
+    rgba(140, 180, 220, 0.06) 58%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  filter: blur(0.8px);
+  animation: hm-transmission-roll 11s linear infinite;
+  z-index: 3;
+}
+@keyframes hm-transmission-roll {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(520%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hm-reveal { opacity: 1; transform: none; transition: none; }
   .hm-scroll-line,
   .hm-hero-signal::before,
   .hm-hero-signal::after,
   .hm-logo-tide,
+  .hm-transmission-roll,
   [class*="animate-hm-"] { animation: none !important; }
   .hm-logo-tide { background-image: none; background-color: #ffffff; }
 }

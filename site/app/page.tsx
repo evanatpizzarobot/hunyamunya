@@ -26,6 +26,11 @@ export default function Home() {
   const featuredArtistName = featuredArtistDoc?.data.name ?? featuredArtistSlug;
   const featuredSpotify = featured.data.embeds?.spotify ?? null;
 
+  const [featuredTitleMain, ...featuredTitleRest] = featured.data.title.split(" (");
+  const featuredTitleSuffix = featuredTitleRest.length
+    ? `(${featuredTitleRest.join(" (")}`
+    : "";
+
   const yearsOperating = new Date().getFullYear() - 2002;
   const totalReleases = releases.length;
   const totalArtists = artists.length;
@@ -120,8 +125,27 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 mx-auto max-w-[1440px] px-5 pt-[140px] pb-[120px] md:px-10">
-          <div className="grid items-end gap-16 md:grid-cols-2" style={{ minHeight: "68vh" }}>
-            <div>
+          <div
+            className="flex flex-col items-center gap-12 md:flex-row md:items-center md:justify-center md:gap-10 lg:gap-14"
+            style={{ minHeight: "58vh" }}
+          >
+            {featured.catnoSlug === "hmr010-nco" ? (
+              <div
+                aria-hidden="true"
+                className="hidden shrink-0 -rotate-[3deg] opacity-90 lg:block lg:w-[230px] xl:w-[270px] 2xl:w-[300px]"
+              >
+                <div className="hm-transmission">
+                  <img
+                    src="/campaigns/nco-bookmark.jpg"
+                    alt=""
+                    className="block h-auto w-full"
+                    loading="lazy"
+                  />
+                  <span className="hm-transmission-roll" />
+                </div>
+              </div>
+            ) : null}
+            <div className="md:max-w-[560px] md:shrink">
               <Reveal>
                 <span
                   className="inline-flex items-center gap-2.5 text-[11px] uppercase text-[color:var(--hm-accent)]"
@@ -133,13 +157,21 @@ export default function Home() {
               </Reveal>
               <Reveal delay={1}>
                 <h1
-                  className="mt-6 text-[clamp(42px,6vw,92px)] font-normal leading-[0.98] text-paper"
+                  className="mt-6 text-[clamp(40px,5vw,78px)] font-normal leading-[0.98] text-paper"
                   style={{ letterSpacing: "-0.02em" }}
                 >
                   {featuredArtistName}{" "}
                   <span className="text-muted">·</span>
                   <br />
-                  {featured.data.title}
+                  {featuredTitleMain}
+                  {featuredTitleSuffix ? (
+                    <span
+                      className="mt-3 block text-[0.38em] font-normal leading-[1.15] text-paper-dim"
+                      style={{ letterSpacing: "0" }}
+                    >
+                      {featuredTitleSuffix}
+                    </span>
+                  ) : null}
                 </h1>
               </Reveal>
               <Reveal delay={2}>
@@ -169,7 +201,7 @@ export default function Home() {
               </Reveal>
             </div>
 
-            <Reveal delay={2} className="md:justify-self-end md:w-full md:max-w-[380px]">
+            <Reveal delay={2} className="w-full shrink-0 md:w-[360px]">
               <Link
                 href={featured.urlPath}
                 className="group block border border-paper/20 bg-ink/55 p-7 backdrop-blur-md transition-all duration-500 hover:-translate-y-1 hover:border-[color:var(--hm-accent)] hover:bg-ink/70"
@@ -222,8 +254,9 @@ export default function Home() {
           <div className="max-w-[58ch]">
             <Reveal delay={1}>
               <p className="text-xl leading-relaxed text-paper md:text-2xl">
-                LA based boutique label and publisher since 2002. Crafting Electronic, Ambient, and
-                Chillout for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide.
+                Hunya Munya Records is an LA based boutique label and publisher since 2002.
+                Crafting Electronic, Ambient, and Chillout for Radio, Film, and TV, plus
+                collectible limited Vinyl and CDs worldwide.
               </p>
             </Reveal>
             <Reveal delay={2}>
@@ -241,12 +274,12 @@ export default function Home() {
                   Habersham
                 </Link>
                 ,{" "}
-                <Link href="/artists/evan-marcus" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">
-                  Evan Marcus
+                <Link href="/artists/shiloh" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">
+                  Shiloh
                 </Link>
                 , and{" "}
-                <Link href="/artists/boom-jinx" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">
-                  Boom Jinx
+                <Link href="/artists/blue-room-project" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">
+                  Blue Room Project
                 </Link>
                 . Browse the{" "}
                 <Link href="/catalog" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">

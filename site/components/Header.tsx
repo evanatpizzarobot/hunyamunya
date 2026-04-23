@@ -66,7 +66,6 @@ export function Header() {
             style={{ background: "oklch(0.78 0.18 145)" }}
           />
           <span>Listen · Rykard</span>
-          <span aria-hidden="true" className="text-[10px] text-muted/80">↗</span>
         </a>
       </div>
     </header>
