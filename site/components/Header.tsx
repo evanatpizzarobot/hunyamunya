@@ -5,8 +5,8 @@ const SHOPIFY_URL = "https://hunyamunya.myshopify.com";
 
 const nav = [
   { href: "/", label: "Home" },
-  { href: "/artists", label: "Artists" },
   { href: "/catalog", label: "Catalog" },
+  { href: "/artists", label: "Artists" },
   { href: "/discography", label: "Discog" },
   { href: "/news", label: "News" },
   { href: "/about", label: "About" },
@@ -16,27 +16,24 @@ const nav = [
 
 export function Header() {
   return (
-    <header className="relative z-10 border-b border-neutral-900/70 bg-black">
-      <div className="mx-auto flex max-w-6xl flex-col gap-1.5 px-4 py-1.5 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-4">
-        <Link href="/" aria-label={LABEL_NAME} className="inline-block md:justify-self-start">
-          <img
-            src="/logo.gif"
-            alt={LABEL_NAME}
-            width={900}
-            height={600}
-            className="h-14 w-auto md:h-16 lg:h-20"
-            loading="eager"
-          />
+    <header
+      className="sticky top-0 z-50 border-b border-rule bg-ink/70 backdrop-blur-[16px] backdrop-saturate-150"
+    >
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 md:px-10" style={{ height: 112 }}>
+        <Link href="/" aria-label={LABEL_NAME} className="flex items-center">
+          <span aria-hidden="true" className="hm-logo-tide block h-20 md:h-24 lg:h-28" />
         </Link>
-        <nav aria-label="Primary" className="md:justify-self-center">
-          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm uppercase tracking-[0.12em] text-neutral-300 md:gap-x-5">
+
+        <nav aria-label="Primary" className="hidden md:block">
+          <ul className="flex gap-[clamp(16px,2.4vw,36px)] text-[12px] uppercase" style={{ letterSpacing: "0.14em" }}>
             {nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="hover:text-neutral-50 hover:underline underline-offset-4"
+                  className="group relative block py-1.5 text-paper-dim transition-colors duration-300 hover:text-paper"
                 >
                   {item.label}
+                  <span className="pointer-events-none absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-[color:var(--hm-accent)] transition-transform duration-[450ms] ease-hm group-hover:scale-x-100" />
                 </Link>
               </li>
             ))}
@@ -45,21 +42,32 @@ export function Header() {
                 href={SHOPIFY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-neutral-50 hover:underline underline-offset-4"
+                className="group relative block py-1.5 text-paper-dim transition-colors duration-300 hover:text-paper"
                 aria-label="Shop (opens in new tab)"
               >
                 Shop
-                <span aria-hidden="true" className="ml-1 text-sm text-neutral-500">
-                  &#8599;
-                </span>
+                <span aria-hidden="true" className="ml-1 text-[10px] text-muted">↗</span>
+                <span className="pointer-events-none absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-[color:var(--hm-accent)] transition-transform duration-[450ms] ease-hm group-hover:scale-x-100" />
               </a>
             </li>
           </ul>
         </nav>
-        {/* Empty spacer column mirrors the logo column so the nav sits in
-            the geometric center of the viewport instead of pushing right
-            via justify-between. */}
-        <div aria-hidden="true" className="hidden md:block" />
+
+        <a
+          href="https://open.spotify.com/artist/1Lv74nSxjs4UMpxaceSclV"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Listen on Spotify, opens in new tab"
+          className="hidden items-center gap-2.5 text-[11px] uppercase text-muted transition-colors duration-300 hover:text-paper lg:flex"
+          style={{ letterSpacing: "0.12em" }}
+        >
+          <span
+            className="inline-block h-[7px] w-[7px] rounded-full animate-hm-pulse"
+            style={{ background: "oklch(0.78 0.18 145)" }}
+          />
+          <span>Listen · Rykard</span>
+          <span aria-hidden="true" className="text-[10px] text-muted/80">↗</span>
+        </a>
       </div>
     </header>
   );

@@ -4,10 +4,16 @@
 
 
 :root {
-  --bg-base: #0a0a0b;
-  --fg: #ece9e2;
-  --accent: #c9a36b;
-  --accent-cool: #5a7ca8;
+  --bg-base: #05090d;
+  --fg: #e8e4d8;
+  --accent: #1b4669;
+  --accent-cool: #14324f;
+
+  /* Design-refresh accent — oklch at hue 215 (Ocean). Exposed as CSS vars
+     so the accent can be retuned (Deep 235 / Ice 200) without touching
+     Tailwind utilities. Used by bg-accent, text-accent, border-accent. */
+  --hm-accent: oklch(0.72 0.12 215);
+  --hm-accent-dim: oklch(0.52 0.10 215);
 }
 
 html {
@@ -30,12 +36,12 @@ body {
  * Respects prefers-reduced-motion: animation disabled, grain still visible.
  */
 .ambient-gradient {
-  background-color: #07070a;
+  background-color: #05090d;
   background-image:
-    radial-gradient(65% 50% at 15% 20%, rgba(201, 163, 107, 0.22), transparent 62%),
-    radial-gradient(58% 44% at 85% 75%, rgba(72, 103, 158, 0.26), transparent 68%),
-    radial-gradient(50% 40% at 55% 95%, rgba(90, 158, 155, 0.14), transparent 70%),
-    radial-gradient(80% 60% at 50% 110%, rgba(5, 5, 8, 0.95), transparent 55%);
+    radial-gradient(65% 50% at 15% 20%, rgba(20, 50, 79, 0.55), transparent 62%),
+    radial-gradient(58% 44% at 85% 75%, rgba(27, 70, 105, 0.45), transparent 68%),
+    radial-gradient(50% 40% at 55% 95%, rgba(13, 33, 56, 0.55), transparent 70%),
+    radial-gradient(80% 60% at 50% 110%, rgba(5, 9, 13, 0.95), transparent 55%);
   background-size: 200% 200%, 200% 200%, 180% 180%, 100% 120%;
   background-position: 0% 0%, 100% 100%, 50% 0%, 50% 100%;
   animation: ambient-drift 70s ease-in-out infinite alternate;
@@ -73,6 +79,155 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Design refresh: hero + section utility classes.
+   Scoped under hm- prefix so they don't clash with the legacy styles on
+   sub-pages we haven't refreshed yet. */
+.hm-noise {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");
+}
+
+.hm-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 800ms cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.hm-reveal.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hm-reveal.d1 { transition-delay: 80ms; }
+.hm-reveal.d2 { transition-delay: 160ms; }
+.hm-reveal.d3 { transition-delay: 240ms; }
+.hm-reveal.d4 { transition-delay: 320ms; }
+
+/* Scroll-cue vertical line under the hero, fading up/down on loop. */
+.hm-scroll-line {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(180deg, #7a8b9a, transparent);
+  animation: hm-drift 2400ms cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+/* CRT static scanlines — fine horizontal lines, always present.
+   5px repeat, very low alpha; reads like old-phosphor texture. */
+.hm-hero-crt {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.3;
+}
+
+/* Rolling signal bands: a soft glowing tracking line drifts top-to-bottom
+   on two offset cadences so they never sync. Pure CSS, additive to the
+   existing hero overlays. */
+.hm-hero-signal {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+}
+.hm-hero-signal::before,
+.hm-hero-signal::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  filter: blur(0.6px);
+  will-change: transform;
+}
+.hm-hero-signal::before {
+  top: -30%;
+  height: 180px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(140, 180, 220, 0.012) 20%,
+    rgba(180, 210, 240, 0.04) 48%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(180, 210, 240, 0.04) 52%,
+    rgba(140, 180, 220, 0.012) 80%,
+    transparent 100%
+  );
+  animation: hm-signal-roll 16s linear infinite;
+}
+.hm-hero-signal::after {
+  top: -20%;
+  height: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(200, 220, 240, 0.18),
+    transparent
+  );
+  animation: hm-signal-roll 42s linear infinite;
+  animation-delay: -8s;
+}
+
+@keyframes hm-signal-roll {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(140vh); }
+}
+
+/* Logo "tide" — the logo PNG is used as a mask so the element's background
+   shows only within the logo's shape. A mostly-white gradient with a soft
+   band of aqua → ocean → violet → ocean → aqua sweeps slowly from left to
+   right, reading like a wave passing through the letterforms. The logo
+   rests as white whenever the color band is off-screen. */
+.hm-logo-tide {
+  aspect-ratio: 3 / 2;
+  -webkit-mask-image: url('/logo.png');
+  mask-image: url('/logo.png');
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  background-image: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #ffffff 18%,
+    #a8efe4 30%,
+    #4fc3e8 39%,
+    #3b7dff 46%,
+    #8e6cff 50%,
+    #3b7dff 54%,
+    #4fc3e8 61%,
+    #a8efe4 70%,
+    #ffffff 82%,
+    #ffffff 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: repeat-x;
+  background-color: #ffffff;
+  animation: hm-logo-wave 11s linear infinite;
+  will-change: background-position;
+}
+@keyframes hm-logo-wave {
+  from { background-position: 100% 0; }
+  to   { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-reveal { opacity: 1; transform: none; transition: none; }
+  .hm-scroll-line,
+  .hm-hero-signal::before,
+  .hm-hero-signal::after,
+  .hm-logo-tide,
+  [class*="animate-hm-"] { animation: none !important; }
+  .hm-logo-tide { background-image: none; background-color: #ffffff; }
 }
 
 @layer components {
