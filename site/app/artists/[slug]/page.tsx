@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { mdxComponents } from "@/components/mdx-components";
 import {
   getAllArtists,
   getArtistBySlug,
@@ -79,7 +80,7 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
         </header>
 
         <div className="prose prose-invert prose-neutral max-w-3xl">
-          <MDXRemote source={doc.body} />
+          <MDXRemote source={doc.body} components={mdxComponents} />
         </div>
 
         {doc.data.featured_video && youtubeEmbedFrom(doc.data.featured_video) ? (
@@ -124,8 +125,13 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
           <section className="mt-12 border-t border-neutral-800 pt-8">
             <h2 className="font-serif text-2xl text-neutral-100">Elsewhere</h2>
             <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-neutral-300">
-              {Object.entries(doc.data.links).map(([k, v]) =>
-                v ? (
+              {Object.entries(doc.data.links).map(([k, v]) => {
+                if (!v) return null;
+                let label = k;
+                try {
+                  label = new URL(v).hostname.replace(/^www\./, "");
+                } catch {}
+                return (
                   <li key={k}>
                     <a
                       href={v}
@@ -133,11 +139,11 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
                       rel="noopener noreferrer"
                       className="underline-offset-4 hover:text-neutral-50 hover:underline"
                     >
-                      {k}
+                      {label}
                     </a>
                   </li>
-                ) : null,
-              )}
+                );
+              })}
             </ul>
           </section>
         ) : null}

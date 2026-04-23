@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { mdxComponents } from "@/components/mdx-components";
 import {
   getAllReleases,
   getArtistBySlug,
@@ -17,6 +18,11 @@ type Params = { catnoSlug: string };
 function youtubeEmbedFrom(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   return m ? `https://www.youtube-nocookie.com/embed/${m[1]}` : null;
+}
+
+function spotifyEmbedFrom(url: string): string | null {
+  const m = url.match(/open\.spotify\.com\/(?:embed\/)?(album|track|playlist|artist|episode|show)\/([A-Za-z0-9]+)/);
+  return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : null;
 }
 
 function TrackTitle({ title, credits }: { title: string; credits?: string }) {
@@ -193,7 +199,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
               ) : null}
             </div>
             <div className="prose prose-invert prose-neutral mt-6 max-w-none">
-              <MDXRemote source={r.body} />
+              <MDXRemote source={r.body} components={mdxComponents} />
             </div>
           </div>
           {r.data.cover_image ? (
@@ -244,6 +250,24 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="h-full w-full"
+              />
+            </div>
+          </section>
+        ) : null}
+
+        {r.data.embeds.spotify && spotifyEmbedFrom(r.data.embeds.spotify) ? (
+          <section className="mt-12 border-t border-neutral-800 pt-8">
+            <h2 className="font-serif text-2xl text-neutral-100">Listen</h2>
+            <div className="mt-4 w-full max-w-3xl overflow-hidden rounded-xl">
+              <iframe
+                src={spotifyEmbedFrom(r.data.embeds.spotify)!}
+                title={`${r.data.title}, Spotify player`}
+                width="100%"
+                height={352}
+                loading="lazy"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                allowFullScreen
+                className="block border-0"
               />
             </div>
           </section>

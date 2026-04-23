@@ -162,6 +162,7 @@ export const releaseSchema = z.object({
       shopify: z.string().url().optional(),
       boomkat: z.string().url().optional(),
       rough_trade: z.string().url().optional(),
+      pandora: z.string().url().optional(),
     })
     .partial()
     .default({}),

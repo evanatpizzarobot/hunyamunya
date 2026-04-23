@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { mdxComponents } from "@/components/mdx-components";
 import { getAllNews, getNewsBySlug } from "@/lib/content";
 import { buildMetadata, newsTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
@@ -50,7 +51,7 @@ export default async function NewsPost({ params }: { params: Promise<Params> }) 
           <h1 className="mt-1 font-serif text-4xl text-neutral-50">{n.data.title}</h1>
         </header>
         <div className="prose prose-invert prose-neutral max-w-3xl">
-          <MDXRemote source={n.body} />
+          <MDXRemote source={n.body} components={mdxComponents} />
         </div>
       </article>
     </>

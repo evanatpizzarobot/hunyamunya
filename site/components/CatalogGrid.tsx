@@ -31,13 +31,15 @@ export function CatalogGrid({ releases }: { releases: ReleaseDoc[] }) {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <img
-                      src="/logo.gif"
-                      alt=""
-                      aria-hidden="true"
-                      className="h-1/2 w-auto opacity-30"
-                    />
+                  <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-950 p-5 text-center">
+                    {r.data.catalog_number ? (
+                      <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-600">
+                        {r.data.catalog_number}
+                      </p>
+                    ) : null}
+                    <p className="mt-3 font-serif text-xl leading-tight text-neutral-100 sm:text-2xl">
+                      {r.data.title}
+                    </p>
                   </div>
                 )}
               </div>
