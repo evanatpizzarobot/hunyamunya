@@ -50,6 +50,10 @@ export const artistSchema = z.object({
     .default({}),
   hero_image: mediaUrl.optional(),
   portrait: mediaUrl.optional(),
+  // A single YouTube video representing this artist's track on HMR. Scraped
+  // from each WP artist page embed during the 2026-04-22 export; kept curated
+  // so Evan can swap in a better track without a full re-import.
+  featured_video: z.string().url().optional(),
   press_quotes: z.array(pressQuote).default([]),
   featured_release: z.string().optional(),
   palette_override: z

@@ -7,6 +7,7 @@ const nav = [
   { href: "/", label: "Home" },
   { href: "/artists", label: "Artists" },
   { href: "/catalog", label: "Catalog" },
+  { href: "/discography", label: "Discog" },
   { href: "/news", label: "News" },
   { href: "/about", label: "About" },
   { href: "/press", label: "Press" },
@@ -15,20 +16,20 @@ const nav = [
 
 export function Header() {
   return (
-    <header className="relative z-10 border-b border-neutral-900/70 bg-neutral-950/70 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 md:flex-row md:items-center md:justify-between">
+    <header className="relative z-10 border-b border-neutral-900/70 bg-black">
+      <div className="mx-auto flex max-w-6xl flex-col gap-1.5 px-4 py-1.5 md:flex-row md:items-center md:justify-between">
         <Link href="/" aria-label={LABEL_NAME} className="inline-block">
           <img
             src="/logo.gif"
             alt={LABEL_NAME}
             width={900}
             height={600}
-            className="h-24 w-auto md:h-32 lg:h-40"
+            className="h-10 w-auto md:h-12 lg:h-14"
             loading="eager"
           />
         </Link>
         <nav aria-label="Primary">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-base text-neutral-300 md:gap-x-7 md:text-lg">
+          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm uppercase tracking-[0.12em] text-neutral-300 md:gap-x-5">
             {nav.map((item) => (
               <li key={item.href}>
                 <Link
