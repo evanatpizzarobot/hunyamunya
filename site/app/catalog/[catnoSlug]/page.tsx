@@ -133,7 +133,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
         ]}
       />
       <article>
-        <header className="mb-10 grid gap-8 md:grid-cols-[minmax(0,1fr)_320px] md:items-start lg:grid-cols-[minmax(0,1fr)_380px]">
+        <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_280px] md:items-start lg:grid-cols-[minmax(0,1fr)_340px]">
           <div>
             <p className="font-mono text-xs uppercase tracking-wider text-neutral-500">
               {r.data.catalog_number ? `${r.data.catalog_number} · ${r.year}` : `${r.year}`} ·{" "}
@@ -176,14 +176,28 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
                 </span>
               ) : null}
               {typeof r.data.price_usd === "number" && !r.data.sold_out && r.data.status !== "oop" ? (
-                <span className="inline-block border border-neutral-700 bg-neutral-900 px-2 py-0.5 uppercase tracking-wider text-neutral-300">
-                  ${r.data.price_usd.toFixed(2)} USD
-                </span>
+                r.data.buy.shopify ? (
+                  <a
+                    href={r.data.buy.shopify}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block border border-emerald-600 bg-emerald-950 px-2 py-0.5 uppercase tracking-wider text-emerald-200 hover:bg-emerald-900 hover:text-emerald-100"
+                  >
+                    ${r.data.price_usd.toFixed(2)} USD · Buy
+                  </a>
+                ) : (
+                  <span className="inline-block border border-emerald-600 bg-emerald-950 px-2 py-0.5 uppercase tracking-wider text-emerald-200">
+                    ${r.data.price_usd.toFixed(2)} USD
+                  </span>
+                )
               ) : null}
+            </div>
+            <div className="prose prose-invert prose-neutral mt-6 max-w-none">
+              <MDXRemote source={r.body} />
             </div>
           </div>
           {r.data.cover_image ? (
-            <figure className="order-first overflow-hidden border border-neutral-800 md:order-last">
+            <figure className="order-first overflow-hidden border border-neutral-800 md:order-last md:sticky md:top-24">
               <img
                 src={r.data.cover_image}
                 alt={`${r.data.title} cover`}
@@ -192,11 +206,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
               />
             </figure>
           ) : null}
-        </header>
-
-        <div className="prose prose-invert prose-neutral max-w-3xl">
-          <MDXRemote source={r.body} />
-        </div>
+        </section>
 
         {r.data.tracklist.length > 0 ? (
           <section className="mt-12 border-t border-neutral-800 pt-8">
