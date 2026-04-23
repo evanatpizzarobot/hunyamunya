@@ -1,13 +1,11 @@
 import Link from "next/link";
-import { getAllArtists, getAllNews, getAllReleases, getCurrentCampaign } from "@/lib/content";
+import { getAllNews, getAllReleases, getCurrentCampaign } from "@/lib/content";
 import { LABEL_NAME } from "@/lib/jsonld";
 import { HomeHeroBackground } from "@/components/HomeHeroBackground";
 
 export default function Home() {
-  const artists = getAllArtists();
   const releases = getAllReleases();
   const news = getAllNews().slice(0, 3);
-  const activeArtists = artists.filter((a) => a.data.tier === "anchor" || a.data.tier === "active");
   const campaign = getCurrentCampaign();
   const activeCampaign = campaign.active ?? null;
 
@@ -34,7 +32,7 @@ export default function Home() {
                 {activeCampaign.cta_primary ? (
                   <Link
                     href={activeCampaign.cta_primary.href}
-                    className="border border-neutral-100 bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-white"
+                    className="rounded-full border border-neutral-100 bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-white"
                   >
                     {activeCampaign.cta_primary.label}
                   </Link>
@@ -42,23 +40,43 @@ export default function Home() {
                 {activeCampaign.cta_secondary ? (
                   <Link
                     href={activeCampaign.cta_secondary.href}
-                    className="border border-neutral-400 px-5 py-2 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-200 hover:text-white"
+                    className="rounded-full border border-neutral-400 px-5 py-2 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-200 hover:text-white"
                   >
                     {activeCampaign.cta_secondary.label}
                   </Link>
                 ) : null}
               </div>
             </div>
-            <figure className="[text-shadow:none]">
-              <img
-                src="/campaigns/rykard-nco-spread.jpg"
-                alt="Rykard — NCO 12&quot; Vinyl, front and back cover spread"
-                width={1024}
-                height={511}
-                className="block w-full border border-neutral-800/80 shadow-2xl"
-                loading="eager"
-              />
-            </figure>
+            <a
+              href="https://hunyamunya.myshopify.com/products/rykard-nco-12-vinyl?variant=47864116936923"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block [text-shadow:none]"
+              aria-label="Rykard, NCO, 12-inch vinyl, buy on Shopify"
+            >
+              <div className="flex items-center justify-center">
+                <figure className="w-1/2">
+                  <img
+                    src="/campaigns/rykard-nco-side-a.png"
+                    alt="Rykard NCO, Side A vinyl"
+                    width={1024}
+                    height={1024}
+                    className="block w-full"
+                    loading="eager"
+                  />
+                </figure>
+                <figure className="-ml-[11%] w-1/2">
+                  <img
+                    src="/campaigns/rykard-nco-side-b.png"
+                    alt="Rykard NCO, Side B vinyl"
+                    width={1024}
+                    height={1024}
+                    className="block w-full"
+                    loading="eager"
+                  />
+                </figure>
+              </div>
+            </a>
           </div>
         ) : (
           <>
@@ -105,24 +123,6 @@ export default function Home() {
           .
         </p>
       </section>
-
-      {activeArtists.length ? (
-        <section className="mt-8 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
-          <h2 className="font-serif text-2xl text-neutral-100">Now</h2>
-          <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {activeArtists.map(({ data }) => (
-              <li key={data.slug}>
-                <Link
-                  href={`/artists/${data.slug}`}
-                  className="block border border-neutral-800 p-4 transition-colors hover:border-neutral-600 hover:bg-neutral-900"
-                >
-                  <p className="font-serif text-lg text-neutral-50">{data.name}</p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
 
       <section className="mt-8 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
         <h2 className="font-serif text-2xl text-neutral-100">Latest</h2>
