@@ -24,7 +24,7 @@ export default function AboutPage() {
           ]),
         ]}
       />
-      <article className="prose prose-invert prose-neutral max-w-3xl rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
+      <article className="prose prose-invert prose-neutral max-w-3xl soft-panel p-6 md:p-8">
         <h1 className="font-serif text-4xl text-neutral-50">About</h1>
 
         <p>

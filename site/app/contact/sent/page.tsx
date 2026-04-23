@@ -31,7 +31,7 @@ export default function ContactSentPage() {
           ]),
         ]}
       />
-      <article className="mx-auto max-w-2xl rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
+      <article className="mx-auto max-w-2xl soft-panel p-6 md:p-8">
         <h1 className="font-serif text-3xl text-neutral-50">Message received.</h1>
         <p className="mt-4 text-neutral-300">
           Thanks for writing. We read every submission ourselves; if you&rsquo;re hoping for a

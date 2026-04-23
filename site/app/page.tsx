@@ -17,69 +17,64 @@ export default function Home() {
           full-bleed background image. When inactive, lead with the label name.
           Featured release artwork (front + back covers) pins just above the
           headline via flex justify-end; swap the srcs + link for each new release. */}
-      <section className="flex min-h-[60vh] flex-col justify-end py-10 md:min-h-[70vh] md:py-14 [text-shadow:0_2px_8px_rgba(0,0,0,0.55)]">
+      <section className="flex min-h-[20vh] flex-col justify-end py-10 md:min-h-[24vh] md:py-14 [text-shadow:0_2px_8px_rgba(0,0,0,0.55)]">
         {activeCampaign ? (
-          <div className="grid items-end gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,520px)] md:gap-12">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
-                  {activeCampaign.type === "release" ? "Out Now" : activeCampaign.type.replace("-", " ")}
-                </p>
-                <h1 className="mt-3 font-serif text-4xl leading-tight text-white md:text-6xl">
-                  {activeCampaign.headline}
-                </h1>
-                {activeCampaign.tagline ? (
-                  <p className="mt-3 text-lg text-neutral-200">{activeCampaign.tagline}</p>
-                ) : null}
-                <div className="mt-7 flex flex-wrap gap-3">
-                  {activeCampaign.cta_primary ? (
-                    <Link
-                      href={activeCampaign.cta_primary.href}
-                      className="rounded-full border border-neutral-100 bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-white"
-                    >
-                      {activeCampaign.cta_primary.label}
-                    </Link>
-                  ) : null}
-                  {activeCampaign.cta_secondary ? (
-                    <Link
-                      href={activeCampaign.cta_secondary.href}
-                      className="rounded-full border border-neutral-400 px-5 py-2 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-200 hover:text-white"
-                    >
-                      {activeCampaign.cta_secondary.label}
-                    </Link>
-                  ) : null}
-                </div>
+          <div className="mx-auto w-full max-w-2xl">
+            <a
+              href="https://hunyamunya.myshopify.com/products/rykard-nco-12-vinyl?variant=47864116936923"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mb-8 block max-w-xl [text-shadow:none] md:mb-10"
+              aria-label="Rykard, NCO, 12-inch vinyl, buy on Shopify"
+            >
+              <div className="grid grid-cols-2 gap-2 md:gap-3">
+                <figure>
+                  <img
+                    src="/campaigns/rykard-nco-front.webp"
+                    alt='Rykard NCO, 12" vinyl, front cover'
+                    width={1200}
+                    height={1200}
+                    className="block w-full"
+                    loading="eager"
+                  />
+                </figure>
+                <figure>
+                  <img
+                    src="/campaigns/rykard-nco-back.webp"
+                    alt='Rykard NCO, 12" vinyl, back cover'
+                    width={1200}
+                    height={1200}
+                    className="block w-full"
+                    loading="eager"
+                  />
+                </figure>
               </div>
-              <a
-                href="https://hunyamunya.myshopify.com/products/rykard-nco-12-vinyl?variant=47864116936923"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block [text-shadow:none]"
-                aria-label="Rykard, NCO, 12-inch vinyl, buy on Shopify"
-              >
-                <div className="grid grid-cols-2 gap-2 md:gap-3">
-                  <figure>
-                    <img
-                      src="/campaigns/rykard-nco-front.webp"
-                      alt='Rykard NCO, 12" vinyl, front cover'
-                      width={1200}
-                      height={1200}
-                      className="block w-full"
-                      loading="eager"
-                    />
-                  </figure>
-                  <figure>
-                    <img
-                      src="/campaigns/rykard-nco-back.webp"
-                      alt='Rykard NCO, 12" vinyl, back cover'
-                      width={1200}
-                      height={1200}
-                      className="block w-full"
-                      loading="eager"
-                    />
-                  </figure>
-                </div>
-              </a>
+            </a>
+            <h1 className="whitespace-nowrap font-serif text-4xl leading-tight text-white md:text-5xl">
+              {activeCampaign.headline}
+            </h1>
+            {activeCampaign.tagline ? (
+              <p className="mt-3 text-lg text-neutral-200">{activeCampaign.tagline}</p>
+            ) : null}
+            <div className="mt-7 flex flex-wrap gap-3">
+              {activeCampaign.cta_primary ? (
+                <Link
+                  href={activeCampaign.cta_primary.href}
+                  className="rounded-full border border-neutral-100 bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-white"
+                >
+                  {activeCampaign.cta_primary.label}
+                </Link>
+              ) : null}
+              {activeCampaign.cta_secondary ? (
+                <Link
+                  href={activeCampaign.cta_secondary.href}
+                  className="rounded-full border border-neutral-400 px-5 py-2 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-200 hover:text-white"
+                >
+                  {activeCampaign.cta_secondary.label}
+                </Link>
+              ) : null}
             </div>
+          </div>
         ) : (
           <>
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
@@ -92,13 +87,35 @@ export default function Home() {
         )}
       </section>
 
-      <section className="mt-2 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
-        <p className="max-w-2xl text-lg text-neutral-300">
-          LA based boutique label and publisher since 2002. Crafting Electronic, Ambient, and Chillout for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide. Artists include{" "}
+      <section className="mx-auto mt-4 w-full max-w-2xl md:mt-6">
+        <p className="text-lg text-neutral-300">
+          Hunya Munya Records is an LA based boutique label and publisher since 2002. Crafting Electronic, Ambient, Breaks, and Chillout for Radio, Film, and TV, plus collectible limited{" "}
+          <a
+            href="https://hunyamunya.myshopify.com/products/rykard-nco-12-vinyl?variant=47864116936923"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-neutral-100 underline underline-offset-4 hover:text-white"
+          >
+            Vinyl
+          </a>
+          {" "}and{" "}
+          <a
+            href="https://hunyamunya.myshopify.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-neutral-100 underline underline-offset-4 hover:text-white"
+          >
+            CDs
+          </a>
+          {" "}worldwide. Artists include{" "}
           <Link href="/artists/rykard" className="text-neutral-100 underline underline-offset-4 hover:text-white">
             Rykard
           </Link>
-          , Blue Room Project,{" "}
+          ,{" "}
+          <Link href="/artists/blue-room-project" className="text-neutral-100 underline underline-offset-4 hover:text-white">
+            Blue Room Project
+          </Link>
+          ,{" "}
           <Link href="/artists/darius-kohanim" className="text-neutral-100 underline underline-offset-4 hover:text-white">
             Darius Kohanim
           </Link>
@@ -124,10 +141,9 @@ export default function Home() {
           </Link>
           .
         </p>
-      </section>
 
-      <section className="mt-8 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
-        <h2 className="font-serif text-2xl text-neutral-100">Latest</h2>
+        <section className="mt-10">
+          <h2 className="font-serif text-2xl text-neutral-100">Latest</h2>
         <ul className="mt-4 space-y-3">
           {news.map((n) => (
             <li key={n.urlPath}>
@@ -138,20 +154,21 @@ export default function Home() {
             </li>
           ))}
         </ul>
-        <p className="mt-4">
-          <Link href="/news" className="text-sm text-neutral-400 underline-offset-4 hover:text-neutral-50 hover:underline">
-            All news →
-          </Link>
-        </p>
-      </section>
+          <p className="mt-4">
+            <Link href="/news" className="text-sm text-neutral-400 underline-offset-4 hover:text-neutral-50 hover:underline">
+              All news →
+            </Link>
+          </p>
+        </section>
 
-      <section className="mt-8 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
-        <p className="font-serif text-xl text-neutral-100">
-          24 years. {releases.length} releases.{" "}
-          <Link href="/catalog" className="underline underline-offset-4">
-            Explore the catalog.
-          </Link>
-        </p>
+        <section className="mt-10">
+          <p className="font-serif text-xl text-neutral-100">
+            24 years. {releases.length} releases.{" "}
+            <Link href="/catalog" className="underline underline-offset-4">
+              Explore the catalog.
+            </Link>
+          </p>
+        </section>
       </section>
     </>
   );

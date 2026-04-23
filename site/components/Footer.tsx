@@ -10,7 +10,7 @@ export function Footer() {
           </p>
         </div>
         <nav aria-label="Footer">
-          <ul className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-neutral-400 md:text-right">
+          <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-neutral-400 md:justify-end">
             <li><Link href="/artists" className="hover:text-neutral-100">Artists</Link></li>
             <li><Link href="/catalog" className="hover:text-neutral-100">Catalog</Link></li>
             <li><Link href="/news" className="hover:text-neutral-100">News</Link></li>

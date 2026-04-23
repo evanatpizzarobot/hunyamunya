@@ -32,6 +32,7 @@ const PAGE_ID_SHOP = 445;
 const RESOLVED_REVIEW_FLAGS: Record<number, string> = {
   14: "Legacy CF7 contact form embed. Deleted; /releases → /catalog already in .htaccess.",
   16: "Release list body; content already in the release seed data. Deleted; /releases-2 → /catalog already in .htaccess.",
+  365: "Leevey: never released on the label (confirmed by Evan 2026-04-23). Do not re-emit on wp-import runs; MDX and portrait removed.",
   504: "Catnip & Claws: emitted at content/artists/catnip-claws.mdx with legacy_slug preserved; redirect from /artists/catnip-claws-2 is in .htaccess.",
   932: "Draft post with empty body; deliberately skipped from publication.",
   1052: "Duplicate of canonical /artists/tim-fretwell. Deleted; 301 from /?page_id=1052 and /tim-fretwell to /artists/tim-fretwell.",
@@ -62,16 +63,22 @@ const ARTIST_ENRICHMENTS: Record<string, ArtistEnrichment> = {
 };
 
 // Manual portrait overrides for artists whose WP body had no extractable image
-// (Leevey, Nosmo & Kris B) or who are HMDIGITAL-era stubs with no body at all.
-// Paths point at files under site/public/media/legacy/ that media-rehost already
-// downloaded from the WP export. Leaving a slug out of this map means the
-// HMR-logo fallback card renders.
+// or who are HMDIGITAL-era stubs with no body at all. Paths point at files
+// under site/public/media/legacy/ that media-rehost already downloaded from
+// the WP export. Leaving a slug out of this map means the HMR-logo fallback
+// card renders.
 const ARTIST_PORTRAIT_OVERRIDES: Record<string, string> = {
-  // WP-migrated artists whose bio body didn't include a portrait:
-  //   leevey: no image found in the 114 rehosted files; Evan to upload.
-  //   "nosmo-kris-b": no image found; Evan to upload.
-  // HMDIGITAL-era stubs: no known portraits in the WP export; Evan to upload.
   "cassino-laben": "/media/legacy/2025/08/Cassino-Laben.jpg",
+  "curtis-dakota": "/media/legacy/2025/08/Curtis-Dakota.jpg",
+  "daniel-gregory": "/media/legacy/2025/08/Daniel-Gregory.jpg",
+  "dj-thee-o": "/media/legacy/2025/08/DJ-Thee-O.jpg",
+  "en-tropic": "/media/legacy/2025/08/En-Tropic.jpg",
+  "jairus-miller": "/media/legacy/2025/08/Jairus-Miller.jpg",
+  "joel-armstrong-gobo": "/media/legacy/2025/08/Joel-Armstrong-Gobo.jpg",
+  "nosmo-kris-b": "/media/legacy/2025/08/Nosmo-Kris-B.png",
+  "onirika": "/media/legacy/2025/08/Onirika.png",
+  "robert-g-roy": "/media/legacy/2025/08/Robert-G-Roy.jpg",
+  "underground-systems": "/media/legacy/2025/08/Underground-Systems.jpg",
 };
 
 // Per-release rich enrichments keyed by release slug. Holds tracklists,

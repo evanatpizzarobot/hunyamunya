@@ -10,7 +10,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Vinyl Catalog"),
     description:
-      "Vinyl catalog from Hunya Munya Records: 12\" HMR001 to HMR010 and collectible limited vinyl since 2002, on an LA-based boutique label crafting Electronic, Ambient, and Chillout.",
+      "Vinyl catalog from Hunya Munya Records: 12\" HMR001 to HMR010 and collectible limited vinyl since 2002, on an LA-based boutique label crafting Electronic, Ambient, Breaks, and Chillout.",
     path: "/catalog/vinyl",
   });
 }

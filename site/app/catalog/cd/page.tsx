@@ -10,7 +10,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("CD Catalog"),
     description:
-      "CD releases from Hunya Munya Records: full-length albums and limited CDr releases across Electronic, Ambient, and Chillout music since 2002.",
+      "CD releases from Hunya Munya Records: full-length albums and limited CDr releases across Electronic, Ambient, Breaks, and Chillout music since 2002.",
     path: "/catalog/cd",
   });
 }

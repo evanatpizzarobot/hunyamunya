@@ -62,9 +62,6 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
       />
       <article>
         <header className="mb-8">
-          <p className="text-xs uppercase tracking-wider text-neutral-500">
-            {doc.data.tier === "anchor" ? "Anchor artist" : doc.data.tier === "active" ? "Active" : "Archival"}
-          </p>
           <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>
           {doc.data.portrait ? (
             <figure className="mt-5 max-w-sm overflow-hidden border border-neutral-800">

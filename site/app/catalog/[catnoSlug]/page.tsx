@@ -14,6 +14,26 @@ import { breadcrumbJsonLd, releaseJsonLd } from "@/lib/jsonld";
 
 type Params = { catnoSlug: string };
 
+function youtubeEmbedFrom(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? `https://www.youtube-nocookie.com/embed/${m[1]}` : null;
+}
+
+function TrackTitle({ title, credits }: { title: string; credits?: string }) {
+  // When per-track credits are set (typical on V/A compilations), surface the
+  // artist ahead of the title in the "Artist · Title" shape that Discogs and
+  // most label sites use. Keeps the same flex-1 element so duration stays
+  // right-aligned.
+  if (!credits) return <span className="flex-1 text-neutral-100">{title}</span>;
+  return (
+    <span className="flex-1 text-neutral-100">
+      <span className="text-neutral-300">{credits}</span>
+      <span className="mx-2 text-neutral-600">·</span>
+      {title}
+    </span>
+  );
+}
+
 function Tracklist({ tracks }: { tracks: Release["tracklist"] }) {
   const hasSides = tracks.some((t) => t.side);
   if (!hasSides) {
@@ -22,7 +42,7 @@ function Tracklist({ tracks }: { tracks: Release["tracklist"] }) {
         {tracks.map((t) => (
           <li key={t.number} className="flex gap-4 border-b border-neutral-900 py-2">
             <span className="font-mono w-8 text-neutral-500">{t.number}.</span>
-            <span className="flex-1 text-neutral-100">{t.title}</span>
+            <TrackTitle title={t.title} credits={t.credits} />
             {t.duration ? <span className="font-mono text-neutral-500">{t.duration}</span> : null}
           </li>
         ))}
@@ -48,7 +68,7 @@ function Tracklist({ tracks }: { tracks: Release["tracklist"] }) {
             {items.map((t) => (
               <li key={`${side}-${t.number}`} className="flex gap-4 border-b border-neutral-900 py-2">
                 <span className="font-mono w-8 text-neutral-500">{t.number}.</span>
-                <span className="flex-1 text-neutral-100">{t.title}</span>
+                <TrackTitle title={t.title} credits={t.credits} />
                 {t.duration ? (
                   <span className="font-mono text-neutral-500">{t.duration}</span>
                 ) : null}
@@ -200,6 +220,22 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
                   </div>
                 ))}
             </dl>
+          </section>
+        ) : null}
+
+        {r.data.embeds.youtube && youtubeEmbedFrom(r.data.embeds.youtube) ? (
+          <section className="mt-12 border-t border-neutral-800 pt-8">
+            <h2 className="font-serif text-2xl text-neutral-100">Watch</h2>
+            <div className="mt-4 aspect-video w-full max-w-3xl overflow-hidden border border-neutral-800 bg-black">
+              <iframe
+                src={youtubeEmbedFrom(r.data.embeds.youtube)!}
+                title={`${r.data.title}, video`}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="h-full w-full"
+              />
+            </div>
           </section>
         ) : null}
 

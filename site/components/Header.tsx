@@ -17,18 +17,18 @@ const nav = [
 export function Header() {
   return (
     <header className="relative z-10 border-b border-neutral-900/70 bg-black">
-      <div className="mx-auto flex max-w-6xl flex-col gap-1.5 px-4 py-1.5 md:flex-row md:items-center md:justify-between">
-        <Link href="/" aria-label={LABEL_NAME} className="inline-block">
+      <div className="mx-auto flex max-w-6xl flex-col gap-1.5 px-4 py-1.5 md:grid md:grid-cols-[1fr_auto_1fr] md:items-center md:gap-4">
+        <Link href="/" aria-label={LABEL_NAME} className="inline-block md:justify-self-start">
           <img
             src="/logo.gif"
             alt={LABEL_NAME}
             width={900}
             height={600}
-            className="h-10 w-auto md:h-12 lg:h-14"
+            className="h-14 w-auto md:h-16 lg:h-20"
             loading="eager"
           />
         </Link>
-        <nav aria-label="Primary">
+        <nav aria-label="Primary" className="md:justify-self-center">
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm uppercase tracking-[0.12em] text-neutral-300 md:gap-x-5">
             {nav.map((item) => (
               <li key={item.href}>
@@ -56,6 +56,10 @@ export function Header() {
             </li>
           </ul>
         </nav>
+        {/* Empty spacer column mirrors the logo column so the nav sits in
+            the geometric center of the viewport instead of pushing right
+            via justify-between. */}
+        <div aria-hidden="true" className="hidden md:block" />
       </div>
     </header>
   );

@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: `%s · ${LABEL_NAME}`,
   },
   description:
-    "LA based boutique label and publisher since 2002. Hunya Munya Records crafts Electronic, Ambient, and Chillout for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide.",
+    "LA based boutique label and publisher since 2002. Hunya Munya Records crafts Electronic, Ambient, Breaks, and Chillout for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide.",
   openGraph: {
     siteName: LABEL_NAME,
     locale: "en_US",

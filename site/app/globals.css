@@ -76,6 +76,39 @@ body {
 }
 
 @layer components {
+  /* Body-section panel rendered as a misty halo rather than a rectangle.
+     A ::before pseudo-element carries a radial-gradient fill extended 28px
+     past the element's box, then filter:blur softens the whole layer so
+     there's no geometric boundary where the gradient ends. Text on the
+     parent stays crisp because the blur only lives on the pseudo-element.
+     isolation:isolate + z-index:-1 keep the pseudo behind its own content
+     without leaking into the page's stacking context. */
+  .soft-panel {
+    position: relative;
+    isolation: isolate;
+    border-radius: 0.25rem;
+  }
+  .soft-panel::before {
+    content: "";
+    position: absolute;
+    /* Extend the mist layer beyond the element so the blur has room to
+       feather outward without clipping at the element's box. */
+    inset: -28px;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(
+      ellipse 70% 75% at center,
+      rgba(10, 10, 11, 0.78) 0%,
+      rgba(10, 10, 11, 0.62) 30%,
+      rgba(10, 10, 11, 0.35) 60%,
+      rgba(10, 10, 11, 0.1) 85%,
+      rgba(10, 10, 11, 0) 100%
+    );
+    /* Blur the whole gradient layer so there's no hard geometric boundary
+       where the ellipse ends; the fill reads as mist rather than a shape. */
+    filter: blur(14px);
+  }
+
   .field {
     width: 100%;
     border: 1px solid rgb(38 38 38);

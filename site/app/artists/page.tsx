@@ -9,13 +9,19 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Artists"),
     description:
-      "The full Hunya Munya Records roster. Active and archival artists crafting Electronic, Ambient, and Chillout music since 2002.",
+      "The full Hunya Munya Records roster. Active and archival artists crafting Electronic, Ambient, Breaks, and Chillout music since 2002.",
     path: "/artists",
   });
 }
 
 export default function ArtistsIndex() {
-  const artists = getAllArtists().sort((a, b) => a.data.name.localeCompare(b.data.name));
+  // "various-artists" is a compilation placeholder for the HMDIGITAL015
+  // International Soundscapes EP, not a real roster artist. The MDX stays
+  // so the release's artist linkage and /artists/various-artists route
+  // still resolve; it's just hidden from the roster listing.
+  const artists = getAllArtists()
+    .filter((a) => a.data.slug !== "various-artists")
+    .sort((a, b) => a.data.name.localeCompare(b.data.name));
 
   return (
     <>
@@ -32,7 +38,11 @@ export default function ArtistsIndex() {
       </header>
       <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {artists.map(({ data }) => {
-          const img = data.portrait ?? data.hero_image;
+          // hero_image wins for the listing card so an artist can ship a
+          // landscape/action shot that crops well into the aspect-square
+          // thumbnail, while keeping a tighter `portrait` for the detail
+          // page header. Falls back to portrait when hero_image is unset.
+          const img = data.hero_image ?? data.portrait;
           return (
             <li key={data.slug}>
               <Link

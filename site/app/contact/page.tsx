@@ -27,7 +27,7 @@ export default function ContactPage() {
       />
 
       <article className="mx-auto max-w-2xl">
-        <header className="mb-8 rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
+        <header className="mb-8 soft-panel p-6 md:p-8">
           <h1 className="font-serif text-4xl text-neutral-50">Contact</h1>
 
           <div className="prose prose-invert prose-neutral mt-4 max-w-none">
@@ -56,7 +56,7 @@ export default function ContactPage() {
           </div>
         </header>
 
-        <section className="rounded-sm border border-neutral-900/70 bg-neutral-950/75 p-6 backdrop-blur-sm md:p-8">
+        <section className="soft-panel p-6 md:p-8">
           <ContactForm />
         </section>
 
