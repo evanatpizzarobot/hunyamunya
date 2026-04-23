@@ -739,7 +739,7 @@ const RELEASE_SEEDS: ReleaseSeed[] = [
   { slug: "nco", title: "NCO (15-Year Anniversary Edition)", catalog_number: "HMR010", artist: "rykard", release_date: "2025-12-12", year: 2025, format: ["vinyl-12"], note: "North Cormorant Obscurity + Troup Head. Limited 12\".", discogs_id: "35877076" },
   // CD full-lengths (HMB catalog, linked via Discogs).
   { slug: "arrive-the-radio-beacon", title: "Arrive The Radio Beacon", catalog_number: "HMB001", artist: "rykard", year: 2010, format: ["cd", "digital"], discogs_id: "2993676" },
-  { slug: "the-orange-album", title: "The Orange Album", catalog_number: "HMB002", artist: "evan-marcus", year: 2013, format: ["cd", "digital"], discogs_id: "12157212" },
+  { slug: "the-orange-album", title: "The Orange Album", catalog_number: "HMB002B", artist: "evan-marcus", year: 2013, format: ["cd", "digital"], discogs_id: "12157212", note: "HMB002B per label decision 2026-04-23; renumbered from the Discogs-listed HMB002 to distinguish from Catnip & Claws Halcyon Days EP (HMB002, 2011)." },
   { slug: "luminosity", title: "Luminosity", catalog_number: "HMB003", artist: "rykard", year: 2016, format: ["cd", "digital"], discogs_id: "9084114" },
   { slug: "night-towers", title: "Night Towers", catalog_number: "HMB004", artist: "rykard", year: 2018, format: ["cd", "digital"], discogs_id: "11959458" },
   { slug: "re-rel", title: "Re//Rel", catalog_number: "HMB006", artist: "evan-marcus", year: 2020, format: ["digital"], note: "7-track album, MP3 320.", discogs_id: "15097294" },
@@ -747,7 +747,7 @@ const RELEASE_SEEDS: ReleaseSeed[] = [
   // Lansallos / Red Venom aren't on Discogs for the main label (enrichment pass
   // may turn them up on other storefronts). Explorers Vol. 2 is confirmed 2020
   // (CD EP Single on Discogs, catno HMB-005b) so re-filed here with the catno.
-  { slug: "halcyon-days-ep", title: "Halcyon Days EP", catalog_number: "HMB002", artist: "catnip-claws", year: 2011, format: ["digital"], note: "2xFile MP3 320 EP. Shares HMB002 catno with Evan Marcus' The Orange Album per Discogs.", discogs_id: "3687228" },
+  { slug: "halcyon-days-ep", title: "Halcyon Days EP", catalog_number: "HMB002", artist: "catnip-claws", year: 2011, format: ["digital"], note: "2xFile MP3 320 EP. Holds HMB002; Evan Marcus' The Orange Album (2013) was renumbered to HMB002B per label decision 2026-04-23.", discogs_id: "3687228" },
   // Ictis, Artificial Sunshine, Lansallos were pre-album promo singles for
   // Luminosity (2016), not standalone releases; they're tracks 12, 11, and 1
   // on that album's tracklist. Removed from the catalog per Evan 2026-04-22:

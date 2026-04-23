@@ -145,7 +145,7 @@ export default function Home() {
                 </div>
               </div>
             ) : null}
-            <div className="md:max-w-[560px] md:shrink">
+            <div className="md:max-w-[560px] md:shrink lg:ml-6 xl:ml-10 2xl:ml-14">
               <Reveal>
                 <span
                   className="inline-flex items-center gap-2.5 text-[11px] uppercase text-[color:var(--hm-accent)]"
