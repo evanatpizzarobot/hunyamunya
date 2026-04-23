@@ -14,70 +14,72 @@ export default function Home() {
       <HomeHeroBackground campaign={campaign} />
 
       {/* Hero: when a campaign is active, lead with the campaign headline over the
-          full-bleed background image. When inactive, lead with the label name. */}
+          full-bleed background image. When inactive, lead with the label name.
+          Featured release artwork (front + back covers) pins just above the
+          headline via flex justify-end; swap the srcs + link for each new release. */}
       <section className="flex min-h-[60vh] flex-col justify-end py-10 md:min-h-[70vh] md:py-14 [text-shadow:0_2px_8px_rgba(0,0,0,0.55)]">
         {activeCampaign ? (
           <div className="grid items-end gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,520px)] md:gap-12">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
-                {activeCampaign.type === "release" ? "Out Now" : activeCampaign.type.replace("-", " ")}
-              </p>
-              <h1 className="mt-3 font-serif text-4xl leading-tight text-white md:text-6xl">
-                {activeCampaign.headline}
-              </h1>
-              {activeCampaign.tagline ? (
-                <p className="mt-3 text-lg text-neutral-200">{activeCampaign.tagline}</p>
-              ) : null}
-              <div className="mt-7 flex flex-wrap gap-3">
-                {activeCampaign.cta_primary ? (
-                  <Link
-                    href={activeCampaign.cta_primary.href}
-                    className="rounded-full border border-neutral-100 bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-white"
-                  >
-                    {activeCampaign.cta_primary.label}
-                  </Link>
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
+                  {activeCampaign.type === "release" ? "Out Now" : activeCampaign.type.replace("-", " ")}
+                </p>
+                <h1 className="mt-3 font-serif text-4xl leading-tight text-white md:text-6xl">
+                  {activeCampaign.headline}
+                </h1>
+                {activeCampaign.tagline ? (
+                  <p className="mt-3 text-lg text-neutral-200">{activeCampaign.tagline}</p>
                 ) : null}
-                {activeCampaign.cta_secondary ? (
-                  <Link
-                    href={activeCampaign.cta_secondary.href}
-                    className="rounded-full border border-neutral-400 px-5 py-2 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-200 hover:text-white"
-                  >
-                    {activeCampaign.cta_secondary.label}
-                  </Link>
-                ) : null}
+                <div className="mt-7 flex flex-wrap gap-3">
+                  {activeCampaign.cta_primary ? (
+                    <Link
+                      href={activeCampaign.cta_primary.href}
+                      className="rounded-full border border-neutral-100 bg-neutral-100 px-5 py-2 text-sm font-medium text-neutral-950 transition-colors hover:bg-white"
+                    >
+                      {activeCampaign.cta_primary.label}
+                    </Link>
+                  ) : null}
+                  {activeCampaign.cta_secondary ? (
+                    <Link
+                      href={activeCampaign.cta_secondary.href}
+                      className="rounded-full border border-neutral-400 px-5 py-2 text-sm font-medium text-neutral-100 transition-colors hover:border-neutral-200 hover:text-white"
+                    >
+                      {activeCampaign.cta_secondary.label}
+                    </Link>
+                  ) : null}
+                </div>
               </div>
+              <a
+                href="https://hunyamunya.myshopify.com/products/rykard-nco-12-vinyl?variant=47864116936923"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block [text-shadow:none]"
+                aria-label="Rykard, NCO, 12-inch vinyl, buy on Shopify"
+              >
+                <div className="grid grid-cols-2 gap-2 md:gap-3">
+                  <figure>
+                    <img
+                      src="/campaigns/rykard-nco-front.webp"
+                      alt='Rykard NCO, 12" vinyl, front cover'
+                      width={1200}
+                      height={1200}
+                      className="block w-full"
+                      loading="eager"
+                    />
+                  </figure>
+                  <figure>
+                    <img
+                      src="/campaigns/rykard-nco-back.webp"
+                      alt='Rykard NCO, 12" vinyl, back cover'
+                      width={1200}
+                      height={1200}
+                      className="block w-full"
+                      loading="eager"
+                    />
+                  </figure>
+                </div>
+              </a>
             </div>
-            <a
-              href="https://hunyamunya.myshopify.com/products/rykard-nco-12-vinyl?variant=47864116936923"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block [text-shadow:none]"
-              aria-label="Rykard, NCO, 12-inch vinyl, buy on Shopify"
-            >
-              <div className="flex items-center justify-center">
-                <figure className="w-1/2">
-                  <img
-                    src="/campaigns/rykard-nco-side-a.png"
-                    alt="Rykard NCO, Side A vinyl"
-                    width={1024}
-                    height={1024}
-                    className="block w-full"
-                    loading="eager"
-                  />
-                </figure>
-                <figure className="-ml-[11%] w-1/2">
-                  <img
-                    src="/campaigns/rykard-nco-side-b.png"
-                    alt="Rykard NCO, Side B vinyl"
-                    width={1024}
-                    height={1024}
-                    className="block w-full"
-                    loading="eager"
-                  />
-                </figure>
-              </div>
-            </a>
-          </div>
         ) : (
           <>
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-300">
