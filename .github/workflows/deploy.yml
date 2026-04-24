@@ -19,14 +19,54 @@ jobs:
       - working-directory: site
         run: npm run postbuild
       - name: Publish to deploy branch
+        # Preserves the deploy branch history so cPanel Git Version Control
+        # can fast-forward on "Update from Remote" instead of diverging. Each
+        # build clones the current deploy branch (or initializes it once if
+        # it does not yet exist), wipes its working tree, copies in the fresh
+        # build output (plus .htaccess and .cpanel.yml dotfiles that Next
+        # does not always copy from public/ on its own), and commits on top
+        # of the previous deploy commit.
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
         run: |
-          cd site/out
-          cp ../public/.htaccess .htaccess
-          cp ../public/.cpanel.yml .cpanel.yml
-          git init -b deploy
+          set -eu
+
+          # Stage dotfiles into out/ (Next.js static export skips these).
+          cp site/public/.htaccess site/out/.htaccess
+          cp site/public/.cpanel.yml site/out/.cpanel.yml
+
+          REMOTE_URL="https://x-access-token:${TOKEN}@github.com/${REPO}.git"
+          WORK_DIR="$RUNNER_TEMP/deploy-work"
+          rm -rf "$WORK_DIR"
+
+          if git ls-remote --exit-code --heads "$REMOTE_URL" deploy > /dev/null 2>&1; then
+            echo "Cloning existing deploy branch to preserve history"
+            git clone --branch deploy --single-branch "$REMOTE_URL" "$WORK_DIR"
+            cd "$WORK_DIR"
+          else
+            echo "deploy branch does not exist yet; initializing fresh orphan branch"
+            git clone "$REMOTE_URL" "$WORK_DIR"
+            cd "$WORK_DIR"
+            git checkout --orphan deploy
+            git rm -rf . 2>/dev/null || true
+          fi
+
+          # Clear the working tree (keep .git directory intact).
+          find . -mindepth 1 -maxdepth 1 -not -name '.git' -exec rm -rf {} +
+
+          # Copy fresh build output into the clone.
+          cp -R "$GITHUB_WORKSPACE/site/out/." .
+
           git config user.email "ci@hunyamunyarecords.com"
           git config user.name "HMR CI"
-          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
           git add -A
-          git commit -m "build: ${{ github.sha }}"
-          git push -f origin deploy
+          # Skip the commit if the tree did not change; still leaves history
+          # pointing at the latest good build.
+          if git diff --quiet --cached; then
+            echo "No changes since last deploy build; skipping commit."
+          else
+            git commit -m "build: ${SHA}"
+            git push origin deploy
+          fi
