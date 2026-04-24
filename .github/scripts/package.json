@@ -1,0 +1,9 @@
+{
+  "name": "hm-ci-tools",
+  "description": "CI-only scripts isolated from site/package.json. Runs on GitHub Actions.",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.50.0"
+  }
+}

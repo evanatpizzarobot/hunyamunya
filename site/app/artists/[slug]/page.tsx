@@ -19,6 +19,43 @@ function youtubeEmbedFrom(url: string): string | null {
   return m ? `https://www.youtube-nocookie.com/embed/${m[1]}` : null;
 }
 
+// Converts `*asterisk-wrapped*` runs in a plaintext shortBio into italic
+// <em> elements so release titles and press names read as properly emphasized
+// inside the Highlights pill. Everything else passes through as text.
+function renderEmphasis(text: string): React.ReactNode[] {
+  return text.split(/(\*[^*]+\*)/g).map((part, i) => {
+    if (part.length > 2 && part.startsWith("*") && part.endsWith("*")) {
+      return <em key={i}>{part.slice(1, -1)}</em>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
+// When an artist has no curated `shortBio` in frontmatter, extract a serviceable
+// highlight from the first paragraph of the MDX body. Strips WP-imported HTML
+// tags, markdown links, and common entities, then trims to one or two sentences.
+// Returns null if the body is a stub with no usable prose.
+function deriveFallbackHighlight(body: string): string | null {
+  const firstPara = body.trim().split(/\n\s*\n/)[0] ?? "";
+  if (!firstPara) return null;
+  let clean = firstPara
+    .replace(/<[^>]+>/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/&ldquo;|&rdquo;/g, '"')
+    .replace(/&lsquo;|&rsquo;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  // Skip if this looks like the stub banner ("Full bio pending...") rather than real bio prose.
+  if (/^>?\s*Full bio pending/i.test(clean) || /enrichment pass will populate/i.test(clean)) {
+    return null;
+  }
+  if (clean.length < 20) return null;
+  const match = clean.match(/^(.{40,260}?[.!?])(\s|$)/);
+  return match ? match[1] : clean.slice(0, 260);
+}
+
 export function generateStaticParams(): Params[] {
   return getAllArtists().map((a) => ({ slug: a.data.slug }));
 }
@@ -62,8 +99,9 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
         ]}
       />
       <article>
-        <header className="mb-8">
+        <header className="mb-10">
           <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>
+
           {doc.data.portrait ? (
             <figure className="mt-5 max-w-sm overflow-hidden border border-neutral-800">
               <img
@@ -74,9 +112,21 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
               />
             </figure>
           ) : null}
-          {doc.data.shortBio ? (
-            <p className="mt-5 max-w-2xl text-lg text-neutral-300">{doc.data.shortBio}</p>
-          ) : null}
+
+          {(() => {
+            const highlight = doc.data.shortBio ?? deriveFallbackHighlight(doc.body);
+            if (!highlight) return null;
+            return (
+              <aside
+                aria-label={`${doc.data.name} highlights`}
+                className="mt-7 max-w-3xl overflow-hidden rounded-2xl border border-paper/10 bg-ink/85 px-6 py-5 shadow-[0_0_0_1px_rgba(27,70,105,0.35),0_0_55px_-5px_rgba(27,70,105,0.55)] backdrop-blur-sm md:px-8 md:py-6"
+              >
+                <p className="text-[17px] leading-relaxed text-paper md:text-[18px]">
+                  {renderEmphasis(highlight)}
+                </p>
+              </aside>
+            );
+          })()}
         </header>
 
         <div className="prose prose-invert prose-neutral max-w-3xl">
