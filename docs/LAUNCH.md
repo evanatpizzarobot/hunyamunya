@@ -191,7 +191,8 @@ Recommended over reusing your main cPanel login, so the credential can be rotate
 - **Run fails on "Sync to hunyamunyarecords.com over FTPS"** with a connection or auth error: the host, username, or password secret is wrong. Re-check **Configure FTP Client** in cPanel FTP Accounts and overwrite the secret in GitHub Settings. Secrets can be updated, not just created.
 - **Run succeeds but the site doesn't update**: confirm the FTP account's **Directory** is exactly `/home/hmrecord/public_html` (no deploy subfolder). If it's wrong, the uploaded files are landing in a jailed subfolder the web server doesn't serve.
 - **`.htaccess` missing after a deploy**: the workflow already stages `site/public/.htaccess` into `site/out/.htaccess` before upload. If this ever breaks, check the "Stage .htaccess into build output" step of the run log.
-- **Never edit `public_html/` files directly in cPanel File Manager again.** The FTPS sync reconciles against a state file it writes to the server; hand-edits will be silently overwritten on the next deploy.
+- **403 on `/_next/*` or subfolders after a deploy**: cPanel FTP sub-accounts upload with restrictive default perms (0600/0700) that Apache can't traverse. The workflow runs `chmod -R 0755 /` after mirror to fix this. If a run fails mid-chmod, either re-run the workflow (cheap; perms pass is idempotent) or extract the last known-good zip via cPanel File Manager as a fallback.
+- **Never edit `public_html/` files directly in cPanel File Manager again** (except for emergency restore from a backup zip). The FTPS mirror reconciles against the local build; hand-edits may be silently overwritten on the next deploy.
 
 ---
 

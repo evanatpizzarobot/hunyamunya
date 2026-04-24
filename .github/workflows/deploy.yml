@@ -3,25 +3,27 @@ on:
   push: { branches: [main] }
   workflow_dispatch:
 
-# Auto-deploy pipeline replacing the old cPanel Git Version Control path.
-# On every push to main (and on manual dispatch), this workflow builds the
-# Next.js static export and syncs `site/out/` directly to the NetActuate
-# cPanel over FTPS. No more manual zip uploads, no more cPanel "Update from
-# Remote" click, no more diverging-branch errors.
+# Auto-deploy pipeline: builds the Next.js static export and syncs `site/out/`
+# to cPanel public_html via FTPS using `lftp mirror`, then runs a recursive
+# chmod pass so Apache can read the uploaded files.
+#
+# Why the chmod pass: cPanel FTP sub-accounts upload files/dirs with
+# restrictive default perms (0600 / 0700 observed on the first deploy) that
+# Apache can't traverse, producing 403 on every subfolder. Running
+# `chmod -R 0755` over the just-uploaded tree ensures Apache can read and
+# traverse everything. 0755 is slightly over-permissive on regular files but
+# it's static web content, not secrets.
+#
+# FTP account setup in cPanel: Directory MUST be
+# `/home/<cpanel-user>/public_html` (no subfolder). That makes the FTP root
+# map directly to the web-served directory, so `/` inside lftp writes into
+# public_html.
 #
 # Required GitHub repo secrets (Settings -> Secrets and variables -> Actions):
-#   FTP_HOST      - cPanel FTP hostname (e.g. server.netactuate.com or
-#                   ftp.hunyamunyarecords.com). Shown in cPanel under
-#                   "FTP Accounts" -> Configure FTP Client -> FTP Server.
-#   FTP_USER      - cPanel FTP username (often matches the cPanel account,
-#                   e.g. hmrecord, or hmrecord@hunyamunyarecords.com).
-#   FTP_PASSWORD  - The password for that FTP user. Recommended: create a
-#                   dedicated FTP account in cPanel -> FTP Accounts rather
-#                   than reusing the main cPanel password.
-#
-# SamKirkland/FTP-Deploy-Action does an incremental sync using a state file
-# it writes to the server, so first deploy uploads everything and subsequent
-# deploys only push changed files.
+#   FTP_HOST      - cPanel FTP hostname (e.g. ftp.hunyamunyarecords.com).
+#                   Shown in cPanel -> FTP Accounts -> Configure FTP Client.
+#   FTP_USER      - Full FTP username (e.g. deploy@hunyamunyarecords.com).
+#   FTP_PASSWORD  - Password for that FTP user.
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -50,18 +52,29 @@ jobs:
           set -eu
           cp site/public/.htaccess site/out/.htaccess
 
-      - name: Sync to hunyamunyarecords.com over FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          port: 21
-          local-dir: ./site/out/
-          server-dir: /public_html/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/.DS_Store
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y lftp
+
+      - name: Deploy via FTPS with lftp (mirror + recursive chmod)
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          set -eu
+          cd site/out
+
+          lftp -c "
+            set ssl:verify-certificate no;
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ftp:passive-mode on;
+            set net:timeout 30;
+            set net:max-retries 3;
+            set net:reconnect-interval-base 5;
+            set mirror:parallel-transfer-count 4;
+            open -u \"$FTP_USER\",\"$FTP_PASSWORD\" \"$FTP_HOST\";
+            mirror --reverse --verbose --only-newer --exclude-glob .git* --exclude-glob node_modules --exclude-glob .DS_Store . /;
+            chmod -R 0755 /;
+            bye;
+          "
