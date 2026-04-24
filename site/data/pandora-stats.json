@@ -1,0 +1,8 @@
+{
+  "rykard": {
+    "monthlyListeners": 66000,
+    "updatedAt": "2026-04-23T00:00:00.000Z",
+    "source": "https://www.pandora.com/artist/rykard/ARp9n26Jhk4qq72",
+    "note": "Seed value (60-100k range reported by Evan). Overwritten monthly by .github/workflows/refresh-pandora-stats.yml."
+  }
+}

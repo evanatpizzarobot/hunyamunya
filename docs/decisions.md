@@ -6,6 +6,20 @@ Format: `## YYYY-MM-DD — short title`, then context, decision, rationale, spec
 
 ---
 
+## 2026-04-23 — Contact page simplified to email-only
+
+**Context:** The `/contact` page previously wrapped a full `ContactForm` React component (`site/components/ContactForm.tsx`) that POSTed to `public/contact-submit.php` (per `docs/specs/contact-form-v1.md`) and redirected to a success route at `site/app/contact/sent/page.tsx`. A v2 migration (`docs/specs/contact-form-v2.md`) was drafted to replace the PHP with a Cloudflare Worker calling the Resend API.
+
+**Decision:** Drop the form entirely. `/contact` now renders a single email display with a hydration-based reveal (`site/components/ContactEmail.tsx`): obfuscated `contact [at] hunyamunyarecords [dot] com` in SSR'd HTML, swapped to a real `mailto:contact@hunyamunyarecords.com` anchor once React hydrates. Retired `ContactForm.tsx`, the `/contact/sent` route, and `contact-submit.php`. `contact-form-v1.md` stays in the repo as historical record; `contact-form-v2.md` stays with a header note marking it superseded and shelved for future reconsideration.
+
+**Rationale:** Label industry standard is direct email. Dropping the form eliminates infrastructure (Worker, Resend API, backend endpoint maintenance, captcha overhead), reduces spam surface, and matches how most visitors prefer to reach indie labels. At current label-scale spam volume, Gmail's default filter handles obfuscation's leakage without operator intervention.
+
+**Reconsider when:** spam volume past Gmail's filter exceeds a few per week, or systematic lead capture becomes a business need. Next step at that point would be Cloudflare Turnstile on `/contact` or a hosted form service (Formspree).
+
+**Spec sections affected:** `contact-form-v1.md` (retired, preserved for history), `contact-form-v2.md` (shelved, header annotated), `rebuild-v1.md` (any §Contact-form references now stale; read in light of this decision), `app/robots.ts` (dropped the `/contact-submit.php` and `/contact/sent` disallow rules since both paths are gone).
+
+---
+
 ## 2026-04-22 — Cowork spec v1 em-dash policy
 
 **Context:** global user policy (`~/.claude/CLAUDE.md`) bans em-dashes and double hyphens in user-facing writing as an anti-AI-detection measure. Cowork's specs (`docs/specs/migration-dry-run.md` and `docs/specs/rebuild-v1.md`) are full of both.

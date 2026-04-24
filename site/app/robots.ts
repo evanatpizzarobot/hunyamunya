@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/contact-submit.php", "/contact/sent"],
+        disallow: [],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

@@ -1,0 +1,61 @@
+name: Refresh Pandora stats
+
+on:
+  # First of each month at 02:00 UTC.
+  schedule:
+    - cron: "0 2 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install CI tool deps
+        working-directory: .github/scripts
+        run: npm install --no-audit --no-fund
+
+      - name: Install Playwright Chromium
+        working-directory: .github/scripts
+        run: npx playwright install chromium --with-deps
+
+      - name: Refresh Pandora stats
+        working-directory: .github/scripts
+        run: node refresh-pandora-stats.mjs
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet site/data/pandora-stats.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open PR with refreshed stats
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          BRANCH="bot/pandora-stats-$DATE"
+          git config user.name "hm-stats-bot"
+          git config user.email "stats-bot@hunyamunyarecords.com"
+          git checkout -b "$BRANCH"
+          git add site/data/pandora-stats.json
+          git commit -m "chore(stats): refresh Pandora listener count"
+          git push origin "$BRANCH"
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "chore(stats): refresh Pandora listener count" \
+            --body "Automated monthly refresh of Rykard's Pandora monthly listener count. Source: https://www.pandora.com/artist/rykard/ARp9n26Jhk4qq72. Merge to ship the updated number to /press."

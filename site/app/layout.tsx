@@ -55,7 +55,7 @@ export default function RootLayout({
         <AmbientBackground />
         <SEO jsonLd={[orgSchema()]} />
         <Header />
-        <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+        <main className="mx-auto max-w-[1440px] px-5 py-8 md:px-10">{children}</main>
         <Footer />
       </body>
     </html>

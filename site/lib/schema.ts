@@ -65,6 +65,34 @@ export const artistSchema = z.object({
     .optional(),
   menu_label: z.string().optional(),
   legacy_slug: z.string().optional(),
+  // Editorial masthead block per Claude Design `artist-intro` spec. All fields
+  // optional; page template falls back to shortBio + genres + computed year
+  // when any piece is missing. `blurb_html` accepts trusted inline HTML
+  // (<strong>, <em>) from frontmatter.
+  intro: z
+    .object({
+      heading_line_1: z.string().optional(),
+      heading_line_2: z.string().optional(),
+      blurb_html: z.string().optional(),
+      est_year: z.number().int().min(1900).max(2100).optional(),
+      highlights: z
+        .array(
+          z.object({
+            num: z.string().min(1),
+            label: z.string().min(1),
+          }),
+        )
+        .default([]),
+      tags: z
+        .array(
+          z.object({
+            name: z.string().min(1),
+            accent: z.boolean().optional(),
+          }),
+        )
+        .default([]),
+    })
+    .optional(),
   // SEO-spec §2.2 top-level fields. Prefer these; nested `seo` block is legacy
   // and kept for the initial migrated output until we deprecate it.
   seoTitle: z.string().optional(),

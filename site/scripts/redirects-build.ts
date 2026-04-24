@@ -58,8 +58,13 @@ function buildStructuralRedirects(): Redirect[] {
     // from a previous permalink regime.
     { kind: "path", from: "^releases/?$", to: "/catalog", status: 301 },
     { kind: "path", from: "^releases-2/?$", to: "/catalog", status: 301 },
-    { kind: "path", from: "^discography/?$", to: "/catalog", status: 301 },
     { kind: "path", from: "^shop/?$", to: "/catalog", status: 301 },
+    // HMB002 → HMB002b rename: Evan Marcus The Orange Album was briefly at the
+    // no-suffix URL before the 2026-04-23 renumber. Second rule catches the
+    // uppercase-B variant that also existed during the brief interim before the
+    // suffix-casing normalization.
+    { kind: "path", from: "^catalog/hmb002-the-orange-album/?$", to: "/catalog/hmb002b-the-orange-album", status: 301 },
+    { kind: "path", from: "^catalog/hmb002B-the-orange-album/?$", to: "/catalog/hmb002b-the-orange-album", status: 301 },
     { kind: "path", from: "^press/?$", to: "/press", status: 301 },
     { kind: "path", from: "^artists/catnip-claws-2/?$", to: "/artists/catnip-claws", status: 301 },
     { kind: "path", from: "^tim-fretwell/?$", to: "/artists/tim-fretwell", status: 301 },

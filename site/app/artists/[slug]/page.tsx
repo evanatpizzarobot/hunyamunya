@@ -19,6 +19,52 @@ function youtubeEmbedFrom(url: string): string | null {
   return m ? `https://www.youtube-nocookie.com/embed/${m[1]}` : null;
 }
 
+// Converts `*asterisk-wrapped*` runs in a plaintext shortBio into italic
+// <em> elements so release titles and press names read as properly emphasized
+// inside the Highlights pill. Everything else passes through as text.
+function renderEmphasis(text: string): React.ReactNode[] {
+  return text.split(/(\*[^*]+\*)/g).map((part, i) => {
+    if (part.length > 2 && part.startsWith("*") && part.endsWith("*")) {
+      return <em key={i}>{part.slice(1, -1)}</em>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
+// First 4-digit year inside a `yearsActive` string like "2005", "2005-2008",
+// or "1989-present". Used to populate the "Est. YEAR" kicker when the artist
+// hasn't set an explicit `intro.est_year`.
+function parseFirstYear(yearsActive: string | undefined): number | undefined {
+  if (!yearsActive) return undefined;
+  const m = yearsActive.match(/\d{4}/);
+  return m ? parseInt(m[0], 10) : undefined;
+}
+
+// When an artist has no curated `shortBio` in frontmatter, extract a serviceable
+// highlight from the first paragraph of the MDX body. Strips WP-imported HTML
+// tags, markdown links, and common entities, then trims to one or two sentences.
+// Returns null if the body is a stub with no usable prose.
+function deriveFallbackHighlight(body: string): string | null {
+  const firstPara = body.trim().split(/\n\s*\n/)[0] ?? "";
+  if (!firstPara) return null;
+  const clean = firstPara
+    .replace(/<[^>]+>/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/&ldquo;|&rdquo;/g, '"')
+    .replace(/&lsquo;|&rsquo;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  // Skip if this looks like the stub banner ("Full bio pending...") rather than real bio prose.
+  if (/^>?\s*Full bio pending/i.test(clean) || /enrichment pass will populate/i.test(clean)) {
+    return null;
+  }
+  if (clean.length < 20) return null;
+  const match = clean.match(/^(.{40,260}?[.!?])(\s|$)/);
+  return match ? match[1] : clean.slice(0, 260);
+}
+
 export function generateStaticParams(): Params[] {
   return getAllArtists().map((a) => ({ slug: a.data.slug }));
 }
@@ -62,8 +108,9 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
         ]}
       />
       <article>
-        <header className="mb-8">
+        <header className="mb-10">
           <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>
+
           {doc.data.portrait ? (
             <figure className="mt-5 max-w-sm overflow-hidden border border-neutral-800">
               <img
@@ -74,9 +121,98 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
               />
             </figure>
           ) : null}
-          {doc.data.shortBio ? (
-            <p className="mt-5 max-w-2xl text-lg text-neutral-300">{doc.data.shortBio}</p>
-          ) : null}
+
+          {(() => {
+            const intro = doc.data.intro;
+            const h1 = intro?.heading_line_1;
+            const h2 = intro?.heading_line_2;
+            const showHeading = Boolean(h1 || h2);
+
+            const blurbHtml = intro?.blurb_html;
+            const blurbText = !blurbHtml
+              ? doc.data.shortBio ?? deriveFallbackHighlight(doc.body)
+              : null;
+
+            const estYear = intro?.est_year ?? parseFirstYear(doc.data.yearsActive);
+
+            const highlights = intro?.highlights ?? [];
+            const tags =
+              intro?.tags && intro.tags.length > 0
+                ? intro.tags
+                : (doc.data.genres ?? []).map((name) => ({
+                    name,
+                    accent: false,
+                  }));
+
+            if (
+              !showHeading &&
+              !blurbHtml &&
+              !blurbText &&
+              highlights.length === 0 &&
+              tags.length === 0
+            ) {
+              return null;
+            }
+
+            return (
+              <section
+                className="artist-intro"
+                aria-label={`${doc.data.name} profile`}
+              >
+                <div className="ai-accent" />
+                <div className="ai-top">
+                  <span className="ai-kicker">§ Profile · HMR</span>
+                  {estYear ? (
+                    <>
+                      <span className="ai-dot" aria-hidden="true" />
+                      <span className="ai-kicker">Est. {estYear}</span>
+                    </>
+                  ) : null}
+                </div>
+                {showHeading ? (
+                  <h2 className="ai-heading">
+                    {h1 ? <span className="ai-heading-line">{h1}</span> : null}
+                    {h2 ? (
+                      <span className="ai-heading-line ai-heading-italic">
+                        {h2}
+                      </span>
+                    ) : null}
+                  </h2>
+                ) : null}
+                {blurbHtml ? (
+                  <p
+                    className="ai-blurb"
+                    dangerouslySetInnerHTML={{ __html: blurbHtml }}
+                  />
+                ) : blurbText ? (
+                  <p className="ai-blurb">{renderEmphasis(blurbText)}</p>
+                ) : null}
+                {highlights.length > 0 ? (
+                  <div className="ai-highlights">
+                    {highlights.map((h, i) => (
+                      <div key={`${h.label}-${i}`} className="ai-stat">
+                        <span className="ai-stat-num">{h.num}</span>
+                        <span className="ai-stat-label">{h.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+                {tags.length > 0 ? (
+                  <div className="ai-tags">
+                    {tags.map((t, i) => (
+                      <span
+                        key={`${t.name}-${i}`}
+                        className={`ai-tag${t.accent ? " ai-tag-accent" : ""}`}
+                      >
+                        {t.accent ? "★ " : ""}
+                        {t.name}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </section>
+            );
+          })()}
         </header>
 
         <div className="prose prose-invert prose-neutral max-w-3xl">

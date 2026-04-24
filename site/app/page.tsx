@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getAllArtists, getAllNews, getAllReleases, getCurrentCampaign } from "@/lib/content";
-import { LABEL_NAME } from "@/lib/jsonld";
 import { Reveal } from "@/components/home/Reveal";
 import { CountUp } from "@/components/home/CountUp";
 import { HeroParallax } from "@/components/home/HeroParallax";
@@ -10,8 +9,30 @@ function spotifyEmbedFrom(url: string): string | null {
   return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : null;
 }
 
+// Home-page catalog preview sort. Starts as year-descending, then collapses
+// multi-volume series that share a catalog-number root (currently HMB005a/b/c/d,
+// Rykard's Explorers series spanning 2019 to 2023) into a contiguous group
+// sorted ascending by volume letter. Prevents the preview from showing
+// Explorers Vol. 4, 2, 3, 1 out of sequence; instead groups them 1, 2, 3, 4.
+function seriesSortKey(r: { data: { catalog_number?: string }; year: number }) {
+  const cat = r.data.catalog_number ?? "";
+  const exp = cat.match(/^HMB005([a-z])$/i);
+  if (exp) {
+    // Anchor the whole Explorers series to Vol. 4's year so the group sits
+    // where the latest volume would have sat in a year-DESC sort.
+    const letterIdx = exp[1].toLowerCase().charCodeAt(0) - "a".charCodeAt(0);
+    return { year: 2023, subOrder: letterIdx };
+  }
+  return { year: r.year, subOrder: 0 };
+}
+
 export default function Home() {
-  const releases = getAllReleases().sort((a, b) => b.year - a.year);
+  const releases = getAllReleases().sort((a, b) => {
+    const aKey = seriesSortKey(a);
+    const bKey = seriesSortKey(b);
+    if (aKey.year !== bKey.year) return bKey.year - aKey.year;
+    return bKey.subOrder - aKey.subOrder;
+  });
   const artists = getAllArtists();
   const news = getAllNews().slice(0, 5);
   const campaign = getCurrentCampaign();
@@ -25,6 +46,11 @@ export default function Home() {
   const featuredArtistDoc = artists.find((a) => a.data.slug === featuredArtistSlug);
   const featuredArtistName = featuredArtistDoc?.data.name ?? featuredArtistSlug;
   const featuredSpotify = featured.data.embeds?.spotify ?? null;
+
+  const [featuredTitleMain, ...featuredTitleRest] = featured.data.title.split(" (");
+  const featuredTitleSuffix = featuredTitleRest.length
+    ? `(${featuredTitleRest.join(" (")}`
+    : "";
 
   const yearsOperating = new Date().getFullYear() - 2002;
   const totalReleases = releases.length;
@@ -78,7 +104,7 @@ export default function Home() {
             }}
           />
           <div
-            className="pointer-events-none absolute left-0 right-0 top-[52%] h-px opacity-60"
+            className="pointer-events-none absolute left-0 right-0 top-[76%] h-px opacity-60"
             style={{
               background:
                 "linear-gradient(90deg, transparent, var(--hm-accent) 20%, var(--hm-accent) 80%, transparent)",
@@ -104,7 +130,7 @@ export default function Home() {
             <span>{featured.data.catalog_number ?? ""}</span>
             <span>{featuredArtistName.toUpperCase()}</span>
             <span>{featured.data.title.split(" (")[0].toUpperCase()}</span>
-            <span style={{ color: "var(--hm-accent)", letterSpacing: 0 }}>//</span>
+            <span style={{ color: "var(--hm-accent)", letterSpacing: 0 }}>{"//"}</span>
             <span>PACIFIC · 0547 HRS</span>
           </div>
           <div className="hm-hero-crt" aria-hidden="true" />
@@ -120,26 +146,53 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 mx-auto max-w-[1440px] px-5 pt-[140px] pb-[120px] md:px-10">
-          <div className="grid items-end gap-16 md:grid-cols-2" style={{ minHeight: "68vh" }}>
-            <div>
+          <div
+            className="flex flex-col items-center gap-12 md:flex-row md:items-center md:justify-center md:gap-10 lg:gap-14"
+            style={{ minHeight: "58vh" }}
+          >
+            {featured.catnoSlug === "hmr010-nco" ? (
+              <div
+                aria-hidden="true"
+                className="hidden shrink-0 -rotate-[3deg] opacity-90 lg:block lg:w-[230px] xl:w-[270px] 2xl:w-[300px]"
+              >
+                <div className="hm-transmission">
+                  <img
+                    src="/campaigns/nco-bookmark.jpg"
+                    alt=""
+                    className="block h-auto w-full"
+                    loading="lazy"
+                  />
+                  <span className="hm-transmission-roll" />
+                </div>
+              </div>
+            ) : null}
+            <div className="md:max-w-[560px] md:shrink lg:ml-6 xl:ml-10 2xl:ml-14">
               <Reveal>
                 <span
                   className="inline-flex items-center gap-2.5 text-[11px] uppercase text-[color:var(--hm-accent)]"
                   style={{ letterSpacing: "0.24em" }}
                 >
                   <span className="block h-px w-6 bg-current" />
-                  Out Now · HM {featured.data.catalog_number ?? featured.catnoSlug.toUpperCase()}
+                  Out Now · {featured.data.catalog_number ?? featured.catnoSlug.toUpperCase()}
                 </span>
               </Reveal>
               <Reveal delay={1}>
                 <h1
-                  className="mt-6 text-[clamp(42px,6vw,92px)] font-normal leading-[0.98] text-paper"
+                  className="mt-6 text-[clamp(40px,5vw,78px)] font-normal leading-[0.98] text-paper"
                   style={{ letterSpacing: "-0.02em" }}
                 >
                   {featuredArtistName}{" "}
                   <span className="text-muted">·</span>
                   <br />
-                  {featured.data.title}
+                  {featuredTitleMain}
+                  {featuredTitleSuffix ? (
+                    <span
+                      className="mt-3 block text-[0.38em] font-normal leading-[1.15] text-paper-dim"
+                      style={{ letterSpacing: "0" }}
+                    >
+                      {featuredTitleSuffix}
+                    </span>
+                  ) : null}
                 </h1>
               </Reveal>
               <Reveal delay={2}>
@@ -169,7 +222,7 @@ export default function Home() {
               </Reveal>
             </div>
 
-            <Reveal delay={2} className="md:justify-self-end md:w-full md:max-w-[380px]">
+            <Reveal delay={2} className="w-full shrink-0 md:w-[360px]">
               <Link
                 href={featured.urlPath}
                 className="group block border border-paper/20 bg-ink/55 p-7 backdrop-blur-md transition-all duration-500 hover:-translate-y-1 hover:border-[color:var(--hm-accent)] hover:bg-ink/70"
@@ -213,17 +266,18 @@ export default function Home() {
 
       {/* ===================== §01 LABEL ===================== */}
       <section className="border-t border-rule py-24 md:py-32">
-        <div className="grid gap-12 md:grid-cols-[180px_1fr]">
+        <div className="mx-auto flex max-w-[68ch] flex-col items-center gap-8 text-center">
           <Reveal>
             <div className="text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
-              §01 — Label
+              Label
             </div>
           </Reveal>
-          <div className="max-w-[58ch]">
+          <div>
             <Reveal delay={1}>
               <p className="text-xl leading-relaxed text-paper md:text-2xl">
-                LA based boutique label and publisher since 2002. Crafting Electronic, Ambient, and
-                Chillout for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide.
+                Hunya Munya Records is an independent boutique label and publisher, founded
+                in 2002. Los Angeles since 2008. Crafting Electronic, Ambient, and Chillout
+                for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide.
               </p>
             </Reveal>
             <Reveal delay={2}>
@@ -241,12 +295,12 @@ export default function Home() {
                   Habersham
                 </Link>
                 ,{" "}
-                <Link href="/artists/evan-marcus" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">
-                  Evan Marcus
+                <Link href="/artists/shiloh" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">
+                  Shiloh
                 </Link>
                 , and{" "}
-                <Link href="/artists/boom-jinx" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">
-                  Boom Jinx
+                <Link href="/artists/blue-room-project" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">
+                  Blue Room Project
                 </Link>
                 . Browse the{" "}
                 <Link href="/catalog" className="border-b border-paper/25 hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]">
@@ -270,21 +324,19 @@ export default function Home() {
       {/* ===================== §02 FEATURED RELEASE (Spotify) ===================== */}
       {featuredSpotify && spotifyEmbedFrom(featuredSpotify) ? (
         <section className="border-t border-rule py-24 md:py-32">
-          <div className="mb-14 flex items-end justify-between gap-6">
-            <div>
-              <div className="mb-3 flex items-center gap-3 text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
-                <span className="block h-px w-[18px] bg-[color:var(--hm-accent)]" />
-                §02 — Featured release
-              </div>
-              <Reveal as="h2" className="text-[clamp(28px,3.6vw,52px)] font-normal leading-none" delay={0}>
-                <span style={{ letterSpacing: "-0.015em" }}>
-                  From the label room.
-                </span>
-              </Reveal>
+          <div className="mb-14 flex flex-col items-center gap-5 text-center">
+            <div className="flex items-center gap-3 text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
+              <span className="block h-px w-[18px] bg-[color:var(--hm-accent)]" />
+              Featured release
             </div>
+            <Reveal as="h2" className="text-[clamp(28px,3.6vw,52px)] font-normal leading-none" delay={0}>
+              <span style={{ letterSpacing: "-0.015em" }}>
+                Side A. &ldquo;North Cormorant Obscurity.&rdquo;
+              </span>
+            </Reveal>
             <Link
               href={featured.urlPath}
-              className="border-b border-paper/25 pb-0.5 text-[11px] uppercase text-paper-dim transition-colors hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]"
+              className="mt-2 border-b border-paper/25 pb-0.5 text-[11px] uppercase text-paper-dim transition-colors hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]"
               style={{ letterSpacing: "0.18em" }}
             >
               Release page →
@@ -307,23 +359,21 @@ export default function Home() {
 
       {/* ===================== §03 CATALOG PREVIEW ===================== */}
       <section className="border-t border-rule py-24 md:py-32">
-        <div className="mb-14 flex items-end justify-between gap-6">
-          <div>
-            <div className="mb-3 flex items-center gap-3 text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
-              <span className="block h-px w-[18px] bg-[color:var(--hm-accent)]" />
-              §03 — Catalog
-            </div>
-            <Reveal as="h2" className="text-[clamp(28px,3.6vw,52px)] font-normal leading-none" delay={0}>
-              <span style={{ letterSpacing: "-0.015em" }}>
-                {totalReleases} records,
-                <br />
-                counting.
-              </span>
-            </Reveal>
+        <div className="mb-14 flex flex-col items-center gap-5 text-center">
+          <div className="flex items-center gap-3 text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
+            <span className="block h-px w-[18px] bg-[color:var(--hm-accent)]" />
+            Catalog
           </div>
+          <Reveal as="h2" className="text-[clamp(28px,3.6vw,52px)] font-normal leading-none" delay={0}>
+            <span style={{ letterSpacing: "-0.015em" }}>
+              {totalReleases} records,
+              <br />
+              counting.
+            </span>
+          </Reveal>
           <Link
             href="/catalog"
-            className="border-b border-paper/25 pb-0.5 text-[11px] uppercase text-paper-dim transition-colors hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]"
+            className="mt-2 border-b border-paper/25 pb-0.5 text-[11px] uppercase text-paper-dim transition-colors hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]"
             style={{ letterSpacing: "0.18em" }}
           >
             Full catalog →
@@ -370,23 +420,21 @@ export default function Home() {
 
       {/* ===================== §04 ROSTER PREVIEW ===================== */}
       <section className="border-t border-rule py-24 md:py-32">
-        <div className="mb-14 flex items-end justify-between gap-6">
-          <div>
-            <div className="mb-3 flex items-center gap-3 text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
-              <span className="block h-px w-[18px] bg-[color:var(--hm-accent)]" />
-              §04 — Roster
-            </div>
-            <Reveal as="h2" className="text-[clamp(28px,3.6vw,52px)] font-normal leading-none" delay={0}>
-              <span style={{ letterSpacing: "-0.015em" }}>
-                The people
-                <br />
-                on the label.
-              </span>
-            </Reveal>
+        <div className="mb-14 flex flex-col items-center gap-5 text-center">
+          <div className="flex items-center gap-3 text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
+            <span className="block h-px w-[18px] bg-[color:var(--hm-accent)]" />
+            Roster
           </div>
+          <Reveal as="h2" className="text-[clamp(28px,3.6vw,52px)] font-normal leading-none" delay={0}>
+            <span style={{ letterSpacing: "-0.015em" }}>
+              The people
+              <br />
+              on the label.
+            </span>
+          </Reveal>
           <Link
             href="/artists"
-            className="border-b border-paper/25 pb-0.5 text-[11px] uppercase text-paper-dim transition-colors hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]"
+            className="mt-2 border-b border-paper/25 pb-0.5 text-[11px] uppercase text-paper-dim transition-colors hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]"
             style={{ letterSpacing: "0.18em" }}
           >
             All artists →
@@ -427,19 +475,17 @@ export default function Home() {
 
       {/* ===================== §05 NEWS ===================== */}
       <section className="border-t border-rule py-24 md:py-32">
-        <div className="mb-14 flex items-end justify-between gap-6">
-          <div>
-            <div className="mb-3 flex items-center gap-3 text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
-              <span className="block h-px w-[18px] bg-[color:var(--hm-accent)]" />
-              §05 — News
-            </div>
-            <Reveal as="h2" className="text-[clamp(28px,3.6vw,52px)] font-normal leading-none" delay={0}>
-              <span style={{ letterSpacing: "-0.015em" }}>Latest.</span>
-            </Reveal>
+        <div className="mb-14 flex flex-col items-center gap-5 text-center">
+          <div className="flex items-center gap-3 text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
+            <span className="block h-px w-[18px] bg-[color:var(--hm-accent)]" />
+            News
           </div>
+          <Reveal as="h2" className="text-[clamp(28px,3.6vw,52px)] font-normal leading-none" delay={0}>
+            <span style={{ letterSpacing: "-0.015em" }}>Latest.</span>
+          </Reveal>
           <Link
             href="/news"
-            className="border-b border-paper/25 pb-0.5 text-[11px] uppercase text-paper-dim transition-colors hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]"
+            className="mt-2 border-b border-paper/25 pb-0.5 text-[11px] uppercase text-paper-dim transition-colors hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]"
             style={{ letterSpacing: "0.18em" }}
           >
             All news →
@@ -471,7 +517,7 @@ export default function Home() {
 
       {/* ===================== STATS ===================== */}
       <section className="mt-24 grid grid-cols-2 border-y border-rule md:grid-cols-4">
-        <div className="flex flex-col gap-2.5 border-b border-r border-rule p-12 md:border-b-0">
+        <div className="flex flex-col items-center gap-2.5 border-b border-r border-rule p-12 text-center md:border-b-0">
           <div
             className="text-[clamp(44px,5.5vw,84px)] leading-none tracking-[-0.02em] tabular-nums text-paper"
           >
@@ -481,7 +527,7 @@ export default function Home() {
             Years operating
           </div>
         </div>
-        <div className="flex flex-col gap-2.5 border-b border-rule p-12 md:border-b-0 md:border-r">
+        <div className="flex flex-col items-center gap-2.5 border-b border-rule p-12 text-center md:border-b-0 md:border-r">
           <div className="text-[clamp(44px,5.5vw,84px)] leading-none tracking-[-0.02em] tabular-nums text-paper">
             <CountUp target={totalReleases} />
           </div>
@@ -489,7 +535,7 @@ export default function Home() {
             Releases
           </div>
         </div>
-        <div className="flex flex-col gap-2.5 border-r border-rule p-12">
+        <div className="flex flex-col items-center gap-2.5 border-r border-rule p-12 text-center">
           <div className="text-[clamp(44px,5.5vw,84px)] leading-none tracking-[-0.02em] tabular-nums text-paper">
             <CountUp target={totalArtists} />
           </div>
@@ -497,7 +543,7 @@ export default function Home() {
             Artists on roster
           </div>
         </div>
-        <div className="flex flex-col gap-2.5 p-12">
+        <div className="flex flex-col items-center gap-2.5 p-12 text-center">
           <div className="text-[clamp(44px,5.5vw,84px)] leading-none tracking-[-0.02em] tabular-nums text-paper">
             25M<span className="text-muted">+</span>
           </div>
@@ -508,12 +554,13 @@ export default function Home() {
       </section>
 
       {/* ===================== WORDMARK ===================== */}
-      <div
-        aria-hidden="true"
-        className="my-16 select-none text-[clamp(80px,14vw,220px)] leading-[0.85] text-[color:#14324f] transition-colors duration-700 hover:text-[color:#1b4669]"
-        style={{ letterSpacing: "-0.04em" }}
-      >
-        HUNYA&nbsp;MUNYA
+      <div aria-hidden="true" className="my-16 flex w-full justify-center">
+        <span
+          className="hm-wordmark-wave inline-block select-none whitespace-nowrap px-6 text-[clamp(64px,10.5vw,170px)] font-normal leading-[0.95]"
+          style={{ letterSpacing: "-0.02em" }}
+        >
+          HUNYA&nbsp;MUNYA
+        </span>
       </div>
     </>
   );

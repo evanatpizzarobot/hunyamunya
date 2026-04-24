@@ -7,7 +7,7 @@ const nav = [
   { href: "/", label: "Home" },
   { href: "/catalog", label: "Catalog" },
   { href: "/artists", label: "Artists" },
-  { href: "/discography", label: "Discog" },
+  { href: "/discography", label: "Discography" },
   { href: "/news", label: "News" },
   { href: "/about", label: "About" },
   { href: "/press", label: "Press" },
@@ -66,7 +66,6 @@ export function Header() {
             style={{ background: "oklch(0.78 0.18 145)" }}
           />
           <span>Listen · Rykard</span>
-          <span aria-hidden="true" className="text-[10px] text-muted/80">↗</span>
         </a>
       </div>
     </header>
