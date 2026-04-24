@@ -47,7 +47,7 @@ function parseFirstYear(yearsActive: string | undefined): number | undefined {
 function deriveFallbackHighlight(body: string): string | null {
   const firstPara = body.trim().split(/\n\s*\n/)[0] ?? "";
   if (!firstPara) return null;
-  let clean = firstPara
+  const clean = firstPara
     .replace(/<[^>]+>/g, "")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/&ldquo;|&rdquo;/g, '"')

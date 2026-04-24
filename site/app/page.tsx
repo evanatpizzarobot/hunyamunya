@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getAllArtists, getAllNews, getAllReleases, getCurrentCampaign } from "@/lib/content";
-import { LABEL_NAME } from "@/lib/jsonld";
 import { Reveal } from "@/components/home/Reveal";
 import { CountUp } from "@/components/home/CountUp";
 import { HeroParallax } from "@/components/home/HeroParallax";
@@ -131,7 +130,7 @@ export default function Home() {
             <span>{featured.data.catalog_number ?? ""}</span>
             <span>{featuredArtistName.toUpperCase()}</span>
             <span>{featured.data.title.split(" (")[0].toUpperCase()}</span>
-            <span style={{ color: "var(--hm-accent)", letterSpacing: 0 }}>//</span>
+            <span style={{ color: "var(--hm-accent)", letterSpacing: 0 }}>{"//"}</span>
             <span>PACIFIC · 0547 HRS</span>
           </div>
           <div className="hm-hero-crt" aria-hidden="true" />
