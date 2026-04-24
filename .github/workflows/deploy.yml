@@ -67,13 +67,23 @@ jobs:
             echo "::error::DEPLOY_TOKEN repo secret is not set. Add it in Settings -> Secrets and variables -> Actions."
             exit 1
           fi
-          python3 -c "
+          echo "DEPLOY_TOKEN length: ${#DEPLOY_TOKEN}"
+          python3 <<'PYEOF'
           import os
           token = os.environ['DEPLOY_TOKEN']
           for path in ('site/out/fix-perms.php', 'site/out/deploy-extract.php'):
-              with open(path, 'r') as f: src = f.read()
-              with open(path, 'w') as f: f.write(src.replace('__DEPLOY_TOKEN__', token))
-          "
+              with open(path, 'r', encoding='utf-8') as f: src = f.read()
+              if '__DEPLOY_TOKEN__' not in src:
+                  raise SystemExit(f'placeholder missing in {path}')
+              new = src.replace('__DEPLOY_TOKEN__', token)
+              with open(path, 'w', encoding='utf-8') as f: f.write(new)
+              if '__DEPLOY_TOKEN__' in new:
+                  raise SystemExit(f'placeholder still present in {path} after replace')
+              print(f'injected into {path}, new size {len(new)}')
+          PYEOF
+          echo "Verification greps (should print 0 matches each):"
+          grep -c '__DEPLOY_TOKEN__' site/out/fix-perms.php || true
+          grep -c '__DEPLOY_TOKEN__' site/out/deploy-extract.php || true
 
       - name: Zip build output
         run: |
