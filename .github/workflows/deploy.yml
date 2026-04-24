@@ -67,7 +67,12 @@ jobs:
             echo "::error::DEPLOY_TOKEN repo secret is not set. Add it in Settings -> Secrets and variables -> Actions."
             exit 1
           fi
-          echo "DEPLOY_TOKEN length: ${#DEPLOY_TOKEN}"
+          # Strip any trailing whitespace/newlines from the secret so the
+          # PHP $expected value matches what HTTP clients send (trailing
+          # whitespace in a header value is silently dropped in transit).
+          DEPLOY_TOKEN="$(printf '%s' "$DEPLOY_TOKEN" | tr -d '[:space:]')"
+          export DEPLOY_TOKEN
+          echo "DEPLOY_TOKEN length after trim: ${#DEPLOY_TOKEN}"
           python3 <<'PYEOF'
           import os
           token = os.environ['DEPLOY_TOKEN']
