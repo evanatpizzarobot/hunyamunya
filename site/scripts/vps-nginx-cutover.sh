@@ -18,6 +18,18 @@ set -e
 touch /var/www/hunyamunya/.nginx-redirects.conf
 chown deploy:deploy /var/www/hunyamunya/.nginx-redirects.conf
 
+# Content-type-keyed Cache-Control. Keeps static assets immutable (1y) but
+# forces HTML to revalidate on every hit, so edits go live immediately
+# without users needing a hard refresh. `map` has to live in http context.
+cat > /etc/nginx/conf.d/hmr-cache-control.conf <<'MAP'
+map $sent_http_content_type $hmr_cache_control {
+    default                "public, max-age=31536000, immutable";
+    ~^text/html            "public, max-age=0, must-revalidate";
+    ~^application/xml      "public, max-age=3600";
+    ~^text/xml             "public, max-age=3600";
+}
+MAP
+
 cat > /etc/nginx/sites-available/hunyamunya <<'NGINX'
 server {
     listen 80 default_server;
@@ -40,6 +52,7 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+    add_header Cache-Control $hmr_cache_control always;
 }
 NGINX
 
