@@ -4,37 +4,33 @@ on:
   workflow_dispatch:
 
 # Auto-deploy pipeline for the static Next.js export. On every push to `main`
-# (and on manual dispatch), this workflow:
-#   1. Builds the static export under `site/out/`.
-#   2. Stamps BUILD_ID.txt with the commit SHA for post-deploy verification.
-#   3. Injects the DEPLOY_TOKEN secret into the fix-perms.php chmod endpoint
-#      that ships with the build.
-#   4. Mirrors `site/out/` to cPanel public_html via FTPS using `lftp`.
-#   5. Runs `chmod -R 0755 /` inside the same lftp session as a primary
-#      perm-correction pass.
-#   6. Calls the /fix-perms.php endpoint as a belt-and-suspenders pass that
-#      runs as the filesystem owner via PHP-FPM (bypasses any FTP server
-#      SITE CHMOD restrictions).
-#   7. Smoke-tests the live site: verifies BUILD_ID.txt matches the deploying
-#      SHA, verifies a handful of page URLs, and verifies the /_next/ CSS
-#      referenced by the homepage is actually fetchable (the exact class of
-#      failure that bit us once and went undetected).
+# (and on manual dispatch):
+#   1. Build the static export under `site/out/`.
+#   2. Stamp BUILD_ID.txt with the commit SHA for post-deploy verification.
+#   3. Inject DEPLOY_TOKEN into site/out/fix-perms.php so the in-build chmod
+#      endpoint is callable only by this workflow.
+#   4. Upload `site/out/` to cPanel public_html via FTPS (SamKirkland's
+#      FTP-Deploy-Action — proven on this server's pure-ftpd config).
+#   5. Call /fix-perms.php with the token; the PHP endpoint runs as the
+#      filesystem owner and resets perms recursively (0755 for dirs, 0644
+#      for files), sidestepping the cPanel FTP sub-account's restrictive
+#      upload umask that otherwise 403s every subfolder.
+#   6. Smoke-test the live site: confirm BUILD_ID.txt matches the deploying
+#      SHA, confirm a few page URLs return 200/301, and confirm the CSS
+#      referenced by the served homepage is actually fetchable (the exact
+#      failure class that bit us on 2026-04-24).
 #
-# Any failure in steps 4-7 turns the run red in Actions so a silently-broken
-# deploy can't stay live. Recovery paths are documented in docs/LAUNCH.md
+# Any failure in steps 4-6 turns the run red in Actions so a silently
+# broken deploy can't stay live. Recovery procedure: see docs/LAUNCH.md
 # Phase 6 "Troubleshooting".
-#
-# FTP account setup in cPanel: FTP account's Directory MUST be
-# `/home/<cpanel-user>/public_html` with no suffix, so the FTP root maps
-# directly onto the web-served directory.
 #
 # Required GitHub repo secrets (Settings -> Secrets and variables -> Actions):
 #   FTP_HOST       - cPanel FTP hostname.
 #   FTP_USER       - Full FTP username, e.g. deploy@hunyamunyarecords.com.
 #   FTP_PASSWORD   - Password for that FTP user.
-#   DEPLOY_TOKEN   - Any random 32+ char string. Used as a shared secret
-#                    between the workflow and fix-perms.php so the chmod
-#                    endpoint is not publicly callable.
+#   DEPLOY_TOKEN   - Any random 32+ char string. Shared secret between
+#                    workflow and fix-perms.php so the chmod endpoint is
+#                    not publicly callable.
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -75,8 +71,6 @@ jobs:
             echo "::error::DEPLOY_TOKEN repo secret is not set. Add it in Settings -> Secrets and variables -> Actions. Any random 32+ char string works."
             exit 1
           fi
-          # Use python for safe replacement (avoids sed delimiter escaping
-          # issues if the token contains /, &, or other sed metachars).
           python3 -c "
           import os, sys
           path = 'site/out/fix-perms.php'
@@ -87,43 +81,39 @@ jobs:
           with open(path, 'w') as f: f.write(src.replace('__DEPLOY_TOKEN__', token))
           "
 
-      - name: Install lftp
-        run: sudo apt-get update -qq && sudo apt-get install -y lftp
+      - name: Upload to public_html via FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./site/out/
+          server-dir: /public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.DS_Store
 
-      - name: Deploy via FTPS with lftp (mirror + recursive chmod)
-        env:
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          FTP_USER: ${{ secrets.FTP_USER }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-        run: |
-          set -eu
-          cd site/out
-
-          lftp -c "
-            set ssl:verify-certificate no;
-            set ftp:ssl-force true;
-            set ftp:ssl-protect-data true;
-            set ftp:passive-mode on;
-            set net:timeout 30;
-            set net:max-retries 3;
-            set net:reconnect-interval-base 5;
-            set mirror:parallel-transfer-count 4;
-            open -u \"$FTP_USER\",\"$FTP_PASSWORD\" \"$FTP_HOST\";
-            mirror --reverse --verbose --only-newer --exclude-glob .git* --exclude-glob node_modules --exclude-glob .DS_Store . /;
-            chmod -R 0755 /;
-            bye;
-          "
-
-      - name: Belt-and-suspenders chmod via PHP endpoint
+      - name: Reset file permissions via PHP chmod endpoint
         env:
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
           set -eu
-          RESPONSE="$(curl -fsS --max-time 60 -H "X-Deploy-Token: $DEPLOY_TOKEN" "https://www.hunyamunyarecords.com/fix-perms.php")"
-          echo "PHP chmod endpoint: $RESPONSE"
+          # Apache/PHP-FPM can read PHP files even at 0600 perms (since
+          # PHP-FPM runs as the filesystem owner), so fix-perms.php is
+          # callable immediately after upload despite the umask problem
+          # that affects static files. This is the step that unlocks
+          # every 403 in one pass.
+          RESPONSE="$(curl -fsS --max-time 60 --retry 3 --retry-delay 5 \
+            -H "X-Deploy-Token: $DEPLOY_TOKEN" \
+            "https://www.hunyamunyarecords.com/fix-perms.php")"
+          echo "fix-perms.php: $RESPONSE"
           case "$RESPONSE" in
             ok\ *) ;;
-            *) echo "::error::fix-perms.php did not return an ok payload. Response was: $RESPONSE"; exit 1 ;;
+            *) echo "::error::fix-perms.php did not return an 'ok' payload. Response was: $RESPONSE"; exit 1 ;;
           esac
 
       - name: Smoke test live site
@@ -138,7 +128,7 @@ jobs:
           echo "Expected: $GITHUB_SHA"
           echo "Live:     $LIVE_SHA"
           if [ "$LIVE_SHA" != "$GITHUB_SHA" ]; then
-            echo "::error::BUILD_ID mismatch. The live site is still serving an older build, which means the FTPS upload did not overwrite live files."
+            echo "::error::BUILD_ID mismatch. The live site is still serving an older build — the FTPS upload did not overwrite live files."
             exit 1
           fi
 
@@ -161,7 +151,7 @@ jobs:
           CSS_CODE="$(curl -s -o /dev/null -w '%{http_code}' "$BASE$CSS_PATH")"
           echo "$CSS_CODE  $CSS_PATH"
           if [ "$CSS_CODE" != "200" ]; then
-            echo "::error::Stylesheet returned $CSS_CODE. Apache likely cannot read /_next/ (perms issue). See docs/LAUNCH.md Phase 6 troubleshooting."
+            echo "::error::Stylesheet returned $CSS_CODE. Apache likely cannot read /_next/. See docs/LAUNCH.md Phase 6 troubleshooting."
             exit 1
           fi
 
