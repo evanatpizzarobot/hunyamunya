@@ -64,8 +64,15 @@ jobs:
           set -eu
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          # Secret holds the private key base64-encoded so newlines/whitespace
+          # can't be mangled by clipboard or the secret-store UI. Decode here.
+          printf '%s' "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
+          # Sanity check: the decoded file must look like an OpenSSH key.
+          head -1 ~/.ssh/id_deploy | grep -q "BEGIN OPENSSH PRIVATE KEY" || {
+            echo "::error::SSH_PRIVATE_KEY did not decode to a valid OpenSSH key. The secret should be the base64-encoded contents of /home/deploy/.ssh/github-deploy from the VPS."
+            exit 1
+          }
           ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
           chmod 644 ~/.ssh/known_hosts
 
