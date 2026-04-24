@@ -123,14 +123,20 @@ jobs:
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
           set -eu
-          RESPONSE="$(curl -fsS --max-time 300 \
+          # Do not use curl -f here; we want the body even on 5xx so we can
+          # see WHAT php is complaining about.
+          HTTP_STATUS="$(curl -sS --max-time 300 -o /tmp/extract.out -w '%{http_code}' \
             -H "X-Deploy-Token: $DEPLOY_TOKEN" \
             "https://www.hunyamunyarecords.com/deploy-extract.php")"
-          echo "extract: $RESPONSE"
-          case "$RESPONSE" in
-            ok\ *) ;;
-            *) echo "::error::deploy-extract.php did not return ok. Response: $RESPONSE"; exit 1 ;;
-          esac
+          echo "http=$HTTP_STATUS"
+          echo "body:"
+          cat /tmp/extract.out
+          echo
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::deploy-extract.php returned HTTP $HTTP_STATUS"
+            exit 1
+          fi
+          grep -q '^ok ' /tmp/extract.out || { echo "::error::deploy-extract.php body did not start with 'ok '"; exit 1; }
 
       - name: Smoke test live site
         env:
