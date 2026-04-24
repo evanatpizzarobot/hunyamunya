@@ -11,17 +11,27 @@
 
 set -e
 
-KEY='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINC+mEG+c6Dm7Jk09VveW9Xq8F+vQj12PXLMf+982YqX evan@vr.org'
+# Both pubkeys are kept here so the script stays idempotent and so the
+# original key (id_ed25519) remains usable from any other client. The
+# wrapper on the desktop uses id_hmr_vps because the original key has a
+# forgotten passphrase that locks Windows OpenSSH out.
+KEYS=(
+    'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINC+mEG+c6Dm7Jk09VveW9Xq8F+vQj12PXLMf+982YqX evan@vr.org'
+    'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBfTsD4facPokzxzK1iLTydGvScqYmMbqpG7dMKBQg0G evan@hmr-vps-desktop'
+)
 
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
+touch /root/.ssh/authorized_keys
 
-if grep -qF "$KEY" /root/.ssh/authorized_keys 2>/dev/null; then
-    echo "key already present"
-else
-    echo "$KEY" >> /root/.ssh/authorized_keys
-    echo "key added"
-fi
+for KEY in "${KEYS[@]}"; do
+    if grep -qF "$KEY" /root/.ssh/authorized_keys; then
+        echo "key already present: ${KEY##* }"
+    else
+        echo "$KEY" >> /root/.ssh/authorized_keys
+        echo "key added: ${KEY##* }"
+    fi
+done
 
 chmod 600 /root/.ssh/authorized_keys
 echo OK
