@@ -11,6 +11,7 @@ out/
 dist/
 build/
 *.tsbuildinfo
+hunyamunya-static-*.zip
 
 # env / secrets (never commit any .env variant)
 .env
