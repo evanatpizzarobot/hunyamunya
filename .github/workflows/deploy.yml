@@ -7,30 +7,26 @@ on:
 # (and on manual dispatch):
 #   1. Build the static export under `site/out/`.
 #   2. Stamp BUILD_ID.txt with the commit SHA for post-deploy verification.
-#   3. Inject DEPLOY_TOKEN into site/out/fix-perms.php so the in-build chmod
-#      endpoint is callable only by this workflow.
-#   4. Upload `site/out/` to cPanel public_html via FTPS (SamKirkland's
-#      FTP-Deploy-Action — proven on this server's pure-ftpd config).
-#   5. Call /fix-perms.php with the token; the PHP endpoint runs as the
-#      filesystem owner and resets perms recursively (0755 for dirs, 0644
-#      for files), sidestepping the cPanel FTP sub-account's restrictive
-#      upload umask that otherwise 403s every subfolder.
-#   6. Smoke-test the live site: confirm BUILD_ID.txt matches the deploying
-#      SHA, confirm a few page URLs return 200/301, and confirm the CSS
-#      referenced by the served homepage is actually fetchable (the exact
-#      failure class that bit us on 2026-04-24).
+#   3. Rsync `site/out/` to cPanel `public_html` over SSH using a key-based
+#      login. Rsync preserves file perms from the Linux runner (0644 files,
+#      0755 dirs), so Apache-friendly perms are the default — no post-upload
+#      chmod dance required.
+#   4. Smoke-test the live site: confirm BUILD_ID.txt matches the deploying
+#      SHA, hit a few URLs, verify the CSS referenced by the homepage
+#      actually returns 200.
 #
-# Any failure in steps 4-6 turns the run red in Actions so a silently
-# broken deploy can't stay live. Recovery procedure: see docs/LAUNCH.md
-# Phase 6 "Troubleshooting".
+# Why SSH/rsync over FTP/FTPS: pure-ftpd on this server's FTP sub-accounts
+# kept returning "421 Home directory not available" after the first clean
+# deploy, regardless of sub-account perms or path. SSH is a completely
+# different daemon (port 22, OpenSSH), bypasses every FTP quirk, and rsync
+# gives us incremental transfer + perm preservation for free.
 #
 # Required GitHub repo secrets (Settings -> Secrets and variables -> Actions):
-#   FTP_HOST       - cPanel FTP hostname.
-#   FTP_USER       - Full FTP username, e.g. deploy@hunyamunyarecords.com.
-#   FTP_PASSWORD   - Password for that FTP user.
-#   DEPLOY_TOKEN   - Any random 32+ char string. Shared secret between
-#                    workflow and fix-perms.php so the chmod endpoint is
-#                    not publicly callable.
+#   SSH_HOST         - cPanel server hostname, e.g. hunyamunyarecords.com
+#   SSH_USER         - cPanel username, e.g. hmrecords
+#   SSH_PRIVATE_KEY  - Private half of the key pair whose public half is
+#                      authorized in cPanel -> SSH Access. Include the
+#                      BEGIN/END header lines.
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -62,59 +58,34 @@ jobs:
           cp site/public/.htaccess site/out/.htaccess
           echo "$GITHUB_SHA" > site/out/BUILD_ID.txt
 
-      - name: Inject DEPLOY_TOKEN into fix-perms.php
+      - name: Install SSH key
         env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           set -eu
-          if [ -z "${DEPLOY_TOKEN:-}" ]; then
-            echo "::error::DEPLOY_TOKEN repo secret is not set. Add it in Settings -> Secrets and variables -> Actions. Any random 32+ char string works."
-            exit 1
-          fi
-          python3 -c "
-          import os, sys
-          path = 'site/out/fix-perms.php'
-          with open(path, 'r') as f: src = f.read()
-          token = os.environ['DEPLOY_TOKEN']
-          if '__DEPLOY_TOKEN__' not in src:
-              sys.exit('placeholder missing in fix-perms.php')
-          with open(path, 'w') as f: f.write(src.replace('__DEPLOY_TOKEN__', token))
-          "
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          # Trust the server's host key on first connect.
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
 
-      - name: Upload to public_html via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          port: 21
-          local-dir: ./site/out/
-          server-dir: /public_html/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/.DS_Store
-
-      - name: Reset file permissions via PHP chmod endpoint
+      - name: Sync site/out to cPanel via rsync over SSH
         env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
         run: |
           set -eu
-          # Apache/PHP-FPM can read PHP files even at 0600 perms (since
-          # PHP-FPM runs as the filesystem owner), so fix-perms.php is
-          # callable immediately after upload despite the umask problem
-          # that affects static files. This is the step that unlocks
-          # every 403 in one pass.
-          RESPONSE="$(curl -fsS --max-time 60 --retry 3 --retry-delay 5 \
-            -H "X-Deploy-Token: $DEPLOY_TOKEN" \
-            "https://www.hunyamunyarecords.com/fix-perms.php")"
-          echo "fix-perms.php: $RESPONSE"
-          case "$RESPONSE" in
-            ok\ *) ;;
-            *) echo "::error::fix-perms.php did not return an 'ok' payload. Response was: $RESPONSE"; exit 1 ;;
-          esac
+          rsync -avz \
+            --chmod=D0755,F0644 \
+            --exclude '.git*' \
+            --exclude 'node_modules/' \
+            --exclude '.DS_Store' \
+            -e "ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=accept-new" \
+            site/out/ \
+            "$SSH_USER@$SSH_HOST:/home/$SSH_USER/public_html/"
 
       - name: Smoke test live site
         env:
@@ -128,7 +99,7 @@ jobs:
           echo "Expected: $GITHUB_SHA"
           echo "Live:     $LIVE_SHA"
           if [ "$LIVE_SHA" != "$GITHUB_SHA" ]; then
-            echo "::error::BUILD_ID mismatch. The live site is still serving an older build — the FTPS upload did not overwrite live files."
+            echo "::error::BUILD_ID mismatch. The live site is still serving an older build."
             exit 1
           fi
 
@@ -137,7 +108,7 @@ jobs:
             CODE="$(curl -s -o /dev/null -w '%{http_code}' "$BASE$path")"
             echo "$CODE  $path"
             if [ "$CODE" != "200" ] && [ "$CODE" != "301" ]; then
-              echo "::error::Smoke test failed: $path returned $CODE (expected 200 or 301)"
+              echo "::error::Smoke test failed: $path returned $CODE"
               exit 1
             fi
           done
@@ -151,7 +122,7 @@ jobs:
           CSS_CODE="$(curl -s -o /dev/null -w '%{http_code}' "$BASE$CSS_PATH")"
           echo "$CSS_CODE  $CSS_PATH"
           if [ "$CSS_CODE" != "200" ]; then
-            echo "::error::Stylesheet returned $CSS_CODE. Apache likely cannot read /_next/. See docs/LAUNCH.md Phase 6 troubleshooting."
+            echo "::error::Stylesheet returned $CSS_CODE."
             exit 1
           fi
 
