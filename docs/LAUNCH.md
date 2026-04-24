@@ -159,7 +159,7 @@ Recommended over reusing your main cPanel login, so the credential can be rotate
 1. cPanel → **FTP Accounts**.
 2. Log In: `deploy` (final username will be `deploy@hunyamunyarecords.com`).
 3. Password: generate a strong one and copy it to a safe place. You'll paste it into GitHub in a moment.
-4. Directory: `/home/hmrecord/public_html` (NOT `/home/hmrecord/public_html/deploy`; remove the trailing part cPanel auto-fills).
+4. Directory: `/home/hmrecords/public_html` (remove the `/deploy` suffix cPanel auto-appends, so the FTP root lands exactly on the web-served directory).
 5. Quota: Unlimited.
 6. Click **Create FTP Account**.
 7. On the FTP Accounts screen, click **Configure FTP Client** next to the new `deploy@...` account. Note the **FTP Server** value (something like `hunyamunyarecords.com` or `server.netactuate.com`). You'll need it.
@@ -189,10 +189,31 @@ Recommended over reusing your main cPanel login, so the credential can be rotate
 ### Troubleshooting
 
 - **Run fails on "Sync to hunyamunyarecords.com over FTPS"** with a connection or auth error: the host, username, or password secret is wrong. Re-check **Configure FTP Client** in cPanel FTP Accounts and overwrite the secret in GitHub Settings. Secrets can be updated, not just created.
-- **Run succeeds but the site doesn't update**: confirm the FTP account's **Directory** is exactly `/home/hmrecord/public_html` (no deploy subfolder). If it's wrong, the uploaded files are landing in a jailed subfolder the web server doesn't serve.
+- **Run succeeds but the site doesn't update**: confirm the FTP account's **Directory** is exactly `/home/hmrecords/public_html` (no deploy subfolder). If it's wrong, the uploaded files are landing in a jailed subfolder the web server doesn't serve.
 - **`.htaccess` missing after a deploy**: the workflow already stages `site/public/.htaccess` into `site/out/.htaccess` before upload. If this ever breaks, check the "Stage .htaccess into build output" step of the run log.
-- **403 on `/_next/*` or subfolders after a deploy**: cPanel FTP sub-accounts upload with restrictive default perms (0600/0700) that Apache can't traverse. The workflow runs `chmod -R 0755 /` after mirror to fix this. If a run fails mid-chmod, either re-run the workflow (cheap; perms pass is idempotent) or extract the last known-good zip via cPanel File Manager as a fallback.
-- **Never edit `public_html/` files directly in cPanel File Manager again** (except for emergency restore from a backup zip). The FTPS mirror reconciles against the local build; hand-edits may be silently overwritten on the next deploy.
+- **Smoke test failed after a successful upload**: the workflow pulls `/BUILD_ID.txt` and checks it matches the deploying commit SHA, then hits `/`, `/catalog`, `/artists/rykard`, `/news`, and the referenced stylesheet. Any non-2xx (except 301 redirects) fails the run. Click into the failing run to see the exact URL and status code.
+- **403 on `/_next/*` or subfolders after a deploy** (the failure mode we hit on the first FTPS deploy): cPanel FTP sub-accounts upload with restrictive default perms (0600/0700) that Apache can't traverse. The workflow runs `chmod -R 0755 /` after mirror to fix this, and the smoke test catches any case where that silently fails. Manual recovery if ever needed:
+
+  1. File Manager → `public_html/` → **+ File** → create `fix-perms.php` with this content (update the `$root` line to match your cPanel user, e.g. `hmrecords` not `hmrecord`):
+     ```php
+     <?php
+     $root = '/home/hmrecords/public_html';
+     $d = 0; $f = 0;
+     @chmod($root, 0755);
+     $it = new RecursiveIteratorIterator(
+         new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
+         RecursiveIteratorIterator::SELF_FIRST
+     );
+     foreach ($it as $p) {
+         if (is_dir($p)) { @chmod($p, 0755); $d++; }
+         else { @chmod($p, 0644); $f++; }
+     }
+     echo "dirs: $d, files: $f — done";
+     ```
+  2. Visit `https://www.hunyamunyarecords.com/fix-perms.php` in a browser. Should print `dirs: N, files: M — done`.
+  3. File Manager → right-click `fix-perms.php` → **Delete** (don't leave it on the server).
+  4. Hard-refresh the site.
+- **Never edit `public_html/` files directly in cPanel File Manager again** (except for emergency restore from a backup zip or the chmod recovery above). The FTPS mirror reconciles against the local build; hand-edits may be silently overwritten on the next deploy.
 
 ---
 
