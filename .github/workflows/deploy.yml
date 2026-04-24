@@ -3,30 +3,30 @@ on:
   push: { branches: [main] }
   workflow_dispatch:
 
-# Auto-deploy pipeline for the static Next.js export. On every push to `main`
-# (and on manual dispatch):
-#   1. Build the static export under `site/out/`.
-#   2. Stamp BUILD_ID.txt with the commit SHA for post-deploy verification.
-#   3. Rsync `site/out/` to cPanel `public_html` over SSH using a key-based
-#      login. Rsync preserves file perms from the Linux runner (0644 files,
-#      0755 dirs), so Apache-friendly perms are the default — no post-upload
-#      chmod dance required.
-#   4. Smoke-test the live site: confirm BUILD_ID.txt matches the deploying
-#      SHA, hit a few URLs, verify the CSS referenced by the homepage
-#      actually returns 200.
+# Auto-deploy pipeline using cPanel's own UAPI over HTTPS. This avoids every
+# FTP/SSH quirk we hit on this NetActuate host (pure-ftpd 421 on sub-accounts,
+# cPHulk blocks, SSH port unreachable from the outside). The cPanel web
+# interface is demonstrably accessible on port 2083, so the UAPI endpoints
+# there are as well.
 #
-# Why SSH/rsync over FTP/FTPS: pure-ftpd on this server's FTP sub-accounts
-# kept returning "421 Home directory not available" after the first clean
-# deploy, regardless of sub-account perms or path. SSH is a completely
-# different daemon (port 22, OpenSSH), bypasses every FTP quirk, and rsync
-# gives us incremental transfer + perm preservation for free.
+# Flow on every push to `main`:
+#   1. Build the Next.js static export into site/out/.
+#   2. Stamp BUILD_ID.txt with the commit SHA for post-deploy verification.
+#   3. Zip site/out/ into site.zip (contents at the archive root, not nested
+#      under an `out/` folder).
+#   4. Upload site.zip into /home/<user>/public_html/ via
+#      UAPI Fileman::upload_files.
+#   5. Extract site.zip in place via UAPI Fileman::extract. cPanel's extractor
+#      writes files with standard umask perms (0644 files / 0755 dirs), so
+#      Apache can read everything — no post-deploy chmod dance needed.
+#   6. Delete site.zip via UAPI Fileman::fileop so the archive doesn't sit in
+#      public_html as a publicly-readable artifact.
+#   7. Smoke-test the live site (BUILD_ID match + key URLs + CSS reachable).
 #
 # Required GitHub repo secrets (Settings -> Secrets and variables -> Actions):
-#   SSH_HOST         - cPanel server hostname, e.g. hunyamunyarecords.com
-#   SSH_USER         - cPanel username, e.g. hmrecords
-#   SSH_PRIVATE_KEY  - Private half of the key pair whose public half is
-#                      authorized in cPanel -> SSH Access. Include the
-#                      BEGIN/END header lines.
+#   CPANEL_HOST        - e.g. hunyamunyarecords.com (no scheme, no port)
+#   CPANEL_USER        - cPanel username, e.g. hmrecords
+#   CPANEL_API_TOKEN   - Token created in cPanel -> Manage API Tokens
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -58,55 +58,56 @@ jobs:
           cp site/public/.htaccess site/out/.htaccess
           echo "$GITHUB_SHA" > site/out/BUILD_ID.txt
 
-      - name: Install SSH key and detect SSH port
-        env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
+      - name: Zip build output
         run: |
           set -eu
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
+          cd site/out
+          zip -qr "$GITHUB_WORKSPACE/site.zip" .
+          ls -lh "$GITHUB_WORKSPACE/site.zip"
 
-          # cPanel hosts often expose SSH on a non-standard port. Probe 22
-          # first, then cPanel's common alternates. Accept SSH_PORT secret
-          # as an override.
-          PORTS="22 2222 2083 22022"
-          if [ -n "${SSH_PORT:-}" ]; then
-            PORTS="$SSH_PORT"
-          fi
-          FOUND_PORT=""
-          for p in $PORTS; do
-            echo "probing $SSH_HOST:$p"
-            if ssh-keyscan -T 5 -p "$p" -H "$SSH_HOST" 2>&1 | tee -a ~/.ssh/known_hosts | grep -q "ssh-"; then
-              echo "✓ SSH responded on port $p"
-              FOUND_PORT="$p"
-              break
-            fi
-          done
-          if [ -z "$FOUND_PORT" ]; then
-            echo "::error::Could not reach SSH on any of: $PORTS. If your host uses a different port, add an SSH_PORT secret."
-            exit 1
-          fi
-          echo "SSH_PORT_RESOLVED=$FOUND_PORT" >> "$GITHUB_ENV"
-          chmod 644 ~/.ssh/known_hosts
-
-      - name: Sync site/out to cPanel via rsync over SSH
+      - name: Upload zip to public_html via cPanel UAPI
         env:
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
+          HOST: ${{ secrets.CPANEL_HOST }}
+          USER: ${{ secrets.CPANEL_USER }}
+          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
         run: |
           set -eu
-          rsync -avz \
-            --chmod=D0755,F0644 \
-            --exclude '.git*' \
-            --exclude 'node_modules/' \
-            --exclude '.DS_Store' \
-            -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT_RESOLVED -o StrictHostKeyChecking=accept-new" \
-            site/out/ \
-            "$SSH_USER@$SSH_HOST:/home/$SSH_USER/public_html/"
+          RESPONSE="$(curl -fsS --max-time 600 \
+            -H "Authorization: cpanel $USER:$TOKEN" \
+            -F "dir=/home/$USER/public_html" \
+            -F "file-1=@$GITHUB_WORKSPACE/site.zip" \
+            "https://$HOST:2083/execute/Fileman/upload_files")"
+          echo "upload: $RESPONSE"
+          echo "$RESPONSE" | grep -q '"status":1' || { echo "::error::upload_files did not return status:1"; exit 1; }
+
+      - name: Extract zip via cPanel UAPI
+        env:
+          HOST: ${{ secrets.CPANEL_HOST }}
+          USER: ${{ secrets.CPANEL_USER }}
+          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: |
+          set -eu
+          RESPONSE="$(curl -fsS --max-time 300 \
+            -H "Authorization: cpanel $USER:$TOKEN" \
+            --data-urlencode "sourcefiles=/home/$USER/public_html/site.zip" \
+            --data-urlencode "destdir=/home/$USER/public_html" \
+            "https://$HOST:2083/execute/Fileman/extract")"
+          echo "extract: $RESPONSE"
+          echo "$RESPONSE" | grep -q '"status":1' || { echo "::error::extract did not return status:1"; exit 1; }
+
+      - name: Delete uploaded zip via cPanel UAPI
+        env:
+          HOST: ${{ secrets.CPANEL_HOST }}
+          USER: ${{ secrets.CPANEL_USER }}
+          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: |
+          set -eu
+          RESPONSE="$(curl -fsS --max-time 60 \
+            -H "Authorization: cpanel $USER:$TOKEN" \
+            --data-urlencode "op=unlink" \
+            --data-urlencode "sourcefiles=/home/$USER/public_html/site.zip" \
+            "https://$HOST:2083/execute/Fileman/fileop")"
+          echo "cleanup: $RESPONSE"
 
       - name: Smoke test live site
         env:
@@ -114,13 +115,15 @@ jobs:
         run: |
           set -eu
           BASE="https://www.hunyamunyarecords.com"
+          # Give cPanel's extractor a couple seconds to finalize writes.
+          sleep 3
 
           echo "--- BUILD_ID check ---"
           LIVE_SHA="$(curl -fsS --max-time 30 "$BASE/BUILD_ID.txt" | tr -d '[:space:]')"
           echo "Expected: $GITHUB_SHA"
           echo "Live:     $LIVE_SHA"
           if [ "$LIVE_SHA" != "$GITHUB_SHA" ]; then
-            echo "::error::BUILD_ID mismatch. The live site is still serving an older build."
+            echo "::error::BUILD_ID mismatch. Live site is still serving older build."
             exit 1
           fi
 
@@ -137,7 +140,7 @@ jobs:
           echo "--- Asset perms check ---"
           CSS_PATH="$(curl -fsS "$BASE/" | grep -oE '/_next/static/css/[a-f0-9]+\.css' | head -n 1)"
           if [ -z "$CSS_PATH" ]; then
-            echo "::error::Could not find a /_next/static/css/*.css reference in the served homepage."
+            echo "::error::No /_next/static/css/*.css reference found in homepage."
             exit 1
           fi
           CSS_CODE="$(curl -s -o /dev/null -w '%{http_code}' "$BASE$CSS_PATH")"
