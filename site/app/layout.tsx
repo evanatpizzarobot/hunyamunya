@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
@@ -36,6 +36,16 @@ export const metadata: Metadata = {
     locale: "en_US",
   },
   robots: { index: true, follow: true },
+};
+
+// Clamp mobile viewport to a fixed zoom. Prevents iOS Safari from letting
+// users pinch-zoom-out past 1.0, which exposed side whitespace and felt
+// broken on mobile. Horizontal overflow is also locked in globals.css; this
+// stops the zoom-gesture path that can produce the same bug state.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

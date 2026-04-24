@@ -29,12 +29,20 @@
 
 html {
   background: var(--bg-base);
+  /* Lock horizontal scrolling on mobile so a stray wide element (or iOS
+     Safari's rubber-band + zoom-out combo) can't expose blank side area
+     or let users pan sideways. `clip` is stricter than `hidden`: no
+     scrollbars, no programmatic scroll, no pinch-pan bug. */
+  overflow-x: clip;
 }
 
 body {
   color: var(--fg);
   background: transparent;
   min-height: 100vh;
+  overflow-x: clip;
+  /* Stop horizontal swipe from chaining up to browser back/forward gestures. */
+  overscroll-behavior-x: none;
 }
 
 /*

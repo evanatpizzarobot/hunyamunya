@@ -70,10 +70,13 @@ export default function Home() {
     return "Digital";
   };
 
-  const artistName = (r: (typeof releases)[number]) =>
-    r.resolvedArtists
+  const artistName = (r: (typeof releases)[number]) => {
+    const primaries = r.resolvedArtists.filter((a) => a.role === "primary");
+    const source = primaries.length > 0 ? primaries : r.resolvedArtists.slice(0, 1);
+    return source
       .map((a) => a.name ?? artists.find((x) => x.data.slug === a.slug)?.data.name ?? a.slug)
       .join(" & ");
+  };
 
   return (
     <>
