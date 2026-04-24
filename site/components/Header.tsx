@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LABEL_NAME } from "@/lib/jsonld";
+import { MobileNav } from "@/components/MobileNav";
 
 const SHOPIFY_URL = "https://hunyamunya.myshopify.com";
 
@@ -67,6 +68,8 @@ export function Header() {
           />
           <span>Listen · Rykard</span>
         </a>
+
+        <MobileNav items={nav} shopifyUrl={SHOPIFY_URL} />
       </div>
     </header>
   );
