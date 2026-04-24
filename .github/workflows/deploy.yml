@@ -22,6 +22,7 @@ jobs:
         run: |
           cd site/out
           cp ../public/.htaccess .htaccess
+          cp ../public/.cpanel.yml .cpanel.yml
           git init -b deploy
           git config user.email "ci@hunyamunyarecords.com"
           git config user.name "HMR CI"
