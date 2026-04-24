@@ -96,6 +96,7 @@ jobs:
           RESPONSE="$(curl -fsS --max-time 60 \
             -H "Authorization: cpanel $USER:$TOKEN" \
             -F "dir=/home/$USER/public_html" \
+            -F "overwrite=1" \
             -F "file-1=@site/out/deploy-extract.php" \
             "https://$HOST:2083/execute/Fileman/upload_files")"
           echo "upload extractor: $RESPONSE"
@@ -111,6 +112,7 @@ jobs:
           RESPONSE="$(curl -fsS --max-time 600 \
             -H "Authorization: cpanel $USER:$TOKEN" \
             -F "dir=/home/$USER/public_html" \
+            -F "overwrite=1" \
             -F "file-1=@$GITHUB_WORKSPACE/site.zip" \
             "https://$HOST:2083/execute/Fileman/upload_files")"
           echo "upload zip: $RESPONSE"
