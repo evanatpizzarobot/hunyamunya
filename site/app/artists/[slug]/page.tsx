@@ -31,6 +31,15 @@ function renderEmphasis(text: string): React.ReactNode[] {
   });
 }
 
+// First 4-digit year inside a `yearsActive` string like "2005", "2005-2008",
+// or "1989-present". Used to populate the "Est. YEAR" kicker when the artist
+// hasn't set an explicit `intro.est_year`.
+function parseFirstYear(yearsActive: string | undefined): number | undefined {
+  if (!yearsActive) return undefined;
+  const m = yearsActive.match(/\d{4}/);
+  return m ? parseInt(m[0], 10) : undefined;
+}
+
 // When an artist has no curated `shortBio` in frontmatter, extract a serviceable
 // highlight from the first paragraph of the MDX body. Strips WP-imported HTML
 // tags, markdown links, and common entities, then trims to one or two sentences.
@@ -114,17 +123,94 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
           ) : null}
 
           {(() => {
-            const highlight = doc.data.shortBio ?? deriveFallbackHighlight(doc.body);
-            if (!highlight) return null;
+            const intro = doc.data.intro;
+            const h1 = intro?.heading_line_1;
+            const h2 = intro?.heading_line_2;
+            const showHeading = Boolean(h1 || h2);
+
+            const blurbHtml = intro?.blurb_html;
+            const blurbText = !blurbHtml
+              ? doc.data.shortBio ?? deriveFallbackHighlight(doc.body)
+              : null;
+
+            const estYear = intro?.est_year ?? parseFirstYear(doc.data.yearsActive);
+
+            const highlights = intro?.highlights ?? [];
+            const tags =
+              intro?.tags && intro.tags.length > 0
+                ? intro.tags
+                : (doc.data.genres ?? []).map((name) => ({
+                    name,
+                    accent: false,
+                  }));
+
+            if (
+              !showHeading &&
+              !blurbHtml &&
+              !blurbText &&
+              highlights.length === 0 &&
+              tags.length === 0
+            ) {
+              return null;
+            }
+
             return (
-              <aside
-                aria-label={`${doc.data.name} highlights`}
-                className="mt-7 max-w-3xl overflow-hidden rounded-2xl border border-paper/10 bg-ink/85 px-6 py-5 shadow-[0_0_0_1px_rgba(27,70,105,0.35),0_0_55px_-5px_rgba(27,70,105,0.55)] backdrop-blur-sm md:px-8 md:py-6"
+              <section
+                className="artist-intro"
+                aria-label={`${doc.data.name} profile`}
               >
-                <p className="text-[17px] leading-relaxed text-paper md:text-[18px]">
-                  {renderEmphasis(highlight)}
-                </p>
-              </aside>
+                <div className="ai-accent" />
+                <div className="ai-top">
+                  <span className="ai-kicker">§ Profile · HMR</span>
+                  {estYear ? (
+                    <>
+                      <span className="ai-dot" aria-hidden="true" />
+                      <span className="ai-kicker">Est. {estYear}</span>
+                    </>
+                  ) : null}
+                </div>
+                {showHeading ? (
+                  <h2 className="ai-heading">
+                    {h1 ? <span className="ai-heading-line">{h1}</span> : null}
+                    {h2 ? (
+                      <span className="ai-heading-line ai-heading-italic">
+                        {h2}
+                      </span>
+                    ) : null}
+                  </h2>
+                ) : null}
+                {blurbHtml ? (
+                  <p
+                    className="ai-blurb"
+                    dangerouslySetInnerHTML={{ __html: blurbHtml }}
+                  />
+                ) : blurbText ? (
+                  <p className="ai-blurb">{renderEmphasis(blurbText)}</p>
+                ) : null}
+                {highlights.length > 0 ? (
+                  <div className="ai-highlights">
+                    {highlights.map((h, i) => (
+                      <div key={`${h.label}-${i}`} className="ai-stat">
+                        <span className="ai-stat-num">{h.num}</span>
+                        <span className="ai-stat-label">{h.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+                {tags.length > 0 ? (
+                  <div className="ai-tags">
+                    {tags.map((t, i) => (
+                      <span
+                        key={`${t.name}-${i}`}
+                        className={`ai-tag${t.accent ? " ai-tag-accent" : ""}`}
+                      >
+                        {t.accent ? "★ " : ""}
+                        {t.name}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </section>
             );
           })()}
         </header>

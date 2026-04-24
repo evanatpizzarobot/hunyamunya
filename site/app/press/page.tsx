@@ -46,14 +46,19 @@ type Station = {
   plays: Play[];
 };
 
-type DJSupportEntry = {
-  dj: string;
-  venue: string;
+type DJSupportPlay = {
   date: string;
   track: string;
   artist: string;
+  note?: string;
   releasePath?: string;
   url?: string;
+};
+
+type DJSupportEntry = {
+  dj: string;
+  venue: string;
+  plays: DJSupportPlay[];
 };
 
 type Listing = {
@@ -275,13 +280,38 @@ const STATIONS: Station[] = [
 
 const DJ_SUPPORT: DJSupportEntry[] = [
   {
+    dj: "John Digweed",
+    venue: "Kiss 100, London",
+    plays: [
+      {
+        date: "2003",
+        artist: "Evan Marcus",
+        track: "Ten Feet From Heaven",
+        note: "White-label era, ahead of the official HMR003 release",
+        releasePath: "/catalog/hmr003-ten-feet-from-heaven",
+      },
+      {
+        date: "Jul 31, 2005",
+        artist: "Darius Kohanim",
+        track: "Revitalized (Habersham Remix)",
+        note: "Habersham guest hour, track 10 of the set (HMR005 remix)",
+        releasePath: "/catalog/hmr005-revitalized-ep",
+        url: "https://www.buenosaliens.com/foros/mensajes.cfm/id.20432.t.transitions-by-john-digweed-ii.htm",
+      },
+    ],
+  },
+  {
     dj: "Sasha",
     venue: "Warung Beach Club, Brazil",
-    date: "Feb 28, 2006",
-    artist: "Habersham & Darius Kohanim",
-    track: "Dune In Erf Minor",
-    releasePath: "/catalog/hmdigital004-dune-in-erf-minor",
-    url: "https://www.1001tracklists.com/tracklist/dvlb69/sasha-warung-beach-club-brazil-2006-02-28.html",
+    plays: [
+      {
+        date: "Feb 28, 2006",
+        artist: "Habersham & Darius Kohanim",
+        track: "Dune In Erf Minor",
+        releasePath: "/catalog/hmdigital004-dune-in-erf-minor",
+        url: "https://www.1001tracklists.com/tracklist/dvlb69/sasha-warung-beach-club-brazil-2006-02-28.html",
+      },
+    ],
   },
 ];
 
@@ -583,7 +613,7 @@ export default function PressPage() {
 
         <div className="mt-14 space-y-16">
           {DJ_SUPPORT.map((d) => (
-            <div key={`${d.dj}-${d.date}`}>
+            <div key={d.dj}>
               <div className="mb-5 flex items-baseline justify-between gap-6 border-b border-rule pb-3">
                 <div>
                   <h3 className="font-serif text-[clamp(22px,2.4vw,34px)] leading-none text-paper">
@@ -600,49 +630,65 @@ export default function PressPage() {
                   className="text-[10px] uppercase text-muted tabular-nums"
                   style={{ letterSpacing: "0.18em" }}
                 >
-                  1 set
+                  {d.plays.length}{" "}
+                  {d.plays.length === 1 ? "documented play" : "documented plays"}
                 </p>
               </div>
-              <div className="grid grid-cols-[90px_1fr_auto] items-baseline gap-5 py-4 text-[14px] md:grid-cols-[110px_1fr_auto]">
-                <span
-                  className="text-[10px] uppercase text-muted tabular-nums"
-                  style={{ letterSpacing: "0.12em" }}
-                >
-                  {d.date}
-                </span>
-                <span className="text-paper">
-                  <em className="font-serif italic text-paper">
-                    &ldquo;{d.track}&rdquo;
-                  </em>{" "}
-                  <span className="text-paper-dim">by</span>{" "}
-                  {d.releasePath ? (
-                    <Link
-                      href={d.releasePath}
-                      className="uppercase underline-offset-4 hover:text-[color:var(--hm-accent)] hover:underline"
-                      style={{ letterSpacing: "0.06em" }}
-                    >
-                      {d.artist}
-                    </Link>
-                  ) : (
-                    <span className="uppercase" style={{ letterSpacing: "0.06em" }}>
-                      {d.artist}
-                    </span>
-                  )}
-                </span>
-                {d.url ? (
-                  <a
-                    href={d.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] uppercase text-[color:var(--hm-accent)] underline-offset-4 hover:underline"
-                    style={{ letterSpacing: "0.2em" }}
+              <ul className="divide-y divide-rule">
+                {d.plays.map((p, i) => (
+                  <li
+                    key={`${d.dj}-${i}`}
+                    className="grid grid-cols-[90px_1fr_auto] items-baseline gap-5 py-4 text-[14px] md:grid-cols-[110px_1fr_auto]"
                   >
-                    Tracklist &rarr;
-                  </a>
-                ) : (
-                  <span aria-hidden="true" />
-                )}
-              </div>
+                    <span
+                      className="text-[10px] uppercase text-muted tabular-nums"
+                      style={{ letterSpacing: "0.12em" }}
+                    >
+                      {p.date}
+                    </span>
+                    <span className="text-paper">
+                      <em className="font-serif italic text-paper">
+                        &ldquo;{p.track}&rdquo;
+                      </em>{" "}
+                      <span className="text-paper-dim">by</span>{" "}
+                      {p.releasePath ? (
+                        <Link
+                          href={p.releasePath}
+                          className="uppercase underline-offset-4 hover:text-[color:var(--hm-accent)] hover:underline"
+                          style={{ letterSpacing: "0.06em" }}
+                        >
+                          {p.artist}
+                        </Link>
+                      ) : (
+                        <span
+                          className="uppercase"
+                          style={{ letterSpacing: "0.06em" }}
+                        >
+                          {p.artist}
+                        </span>
+                      )}
+                      {p.note ? (
+                        <span className="mt-1 block text-[11px] text-paper-dim">
+                          {p.note}
+                        </span>
+                      ) : null}
+                    </span>
+                    {p.url ? (
+                      <a
+                        href={p.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] uppercase text-[color:var(--hm-accent)] underline-offset-4 hover:underline"
+                        style={{ letterSpacing: "0.2em" }}
+                      >
+                        Tracklist &rarr;
+                      </a>
+                    ) : (
+                      <span aria-hidden="true" />
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

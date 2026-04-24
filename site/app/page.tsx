@@ -32,7 +32,7 @@ export default function Home() {
     const aKey = seriesSortKey(a);
     const bKey = seriesSortKey(b);
     if (aKey.year !== bKey.year) return bKey.year - aKey.year;
-    return aKey.subOrder - bKey.subOrder;
+    return bKey.subOrder - aKey.subOrder;
   });
   const artists = getAllArtists();
   const news = getAllNews().slice(0, 5);
@@ -555,12 +555,13 @@ export default function Home() {
       </section>
 
       {/* ===================== WORDMARK ===================== */}
-      <div
-        aria-hidden="true"
-        className="my-16 select-none text-center text-[clamp(80px,14vw,220px)] leading-[0.85] text-[color:#14324f] transition-colors duration-700 hover:text-[color:#1b4669]"
-        style={{ letterSpacing: "-0.04em" }}
-      >
-        HUNYA&nbsp;MUNYA
+      <div aria-hidden="true" className="my-16 flex w-full justify-center">
+        <span
+          className="hm-wordmark-wave inline-block select-none whitespace-nowrap px-6 text-[clamp(64px,10.5vw,170px)] font-normal leading-[0.95]"
+          style={{ letterSpacing: "-0.02em" }}
+        >
+          HUNYA&nbsp;MUNYA
+        </span>
       </div>
     </>
   );
