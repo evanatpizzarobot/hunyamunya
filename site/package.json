@@ -12,7 +12,7 @@
     "import:wp": "tsx scripts/wp-import.ts",
     "verify:wp": "tsx scripts/wp-verify.ts",
     "rehost:media": "tsx scripts/media-rehost.ts",
-    "build:redirects": "tsx scripts/redirects-build.ts"
+    "build:redirects": "tsx scripts/redirects-build.ts && tsx scripts/redirects-build-nginx.ts"
   },
   "dependencies": {
     "next": "14.2.35",
