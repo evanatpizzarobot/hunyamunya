@@ -58,12 +58,48 @@ jobs:
           cp site/public/.htaccess site/out/.htaccess
           echo "$GITHUB_SHA" > site/out/BUILD_ID.txt
 
+      - name: Inject DEPLOY_TOKEN into PHP endpoints
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          set -eu
+          if [ -z "${DEPLOY_TOKEN:-}" ]; then
+            echo "::error::DEPLOY_TOKEN repo secret is not set. Add it in Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+          python3 -c "
+          import os
+          token = os.environ['DEPLOY_TOKEN']
+          for path in ('site/out/fix-perms.php', 'site/out/deploy-extract.php'):
+              with open(path, 'r') as f: src = f.read()
+              with open(path, 'w') as f: f.write(src.replace('__DEPLOY_TOKEN__', token))
+          "
+
       - name: Zip build output
         run: |
           set -eu
           cd site/out
           zip -qr "$GITHUB_WORKSPACE/site.zip" .
           ls -lh "$GITHUB_WORKSPACE/site.zip"
+
+      - name: Upload deploy-extract.php via cPanel UAPI
+        env:
+          HOST: ${{ secrets.CPANEL_HOST }}
+          USER: ${{ secrets.CPANEL_USER }}
+          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: |
+          set -eu
+          # Upload the extraction endpoint first. Subsequent deploys overwrite
+          # it via the zip extraction itself, but we upload explicitly every
+          # time in case a prior build was rolled back or the file was
+          # removed manually.
+          RESPONSE="$(curl -fsS --max-time 60 \
+            -H "Authorization: cpanel $USER:$TOKEN" \
+            -F "dir=/home/$USER/public_html" \
+            -F "file-1=@site/out/deploy-extract.php" \
+            "https://$HOST:2083/execute/Fileman/upload_files")"
+          echo "upload extractor: $RESPONSE"
+          echo "$RESPONSE" | grep -q '"status":1' || { echo "::error::extractor upload failed"; exit 1; }
 
       - name: Upload zip to public_html via cPanel UAPI
         env:
@@ -77,37 +113,22 @@ jobs:
             -F "dir=/home/$USER/public_html" \
             -F "file-1=@$GITHUB_WORKSPACE/site.zip" \
             "https://$HOST:2083/execute/Fileman/upload_files")"
-          echo "upload: $RESPONSE"
-          echo "$RESPONSE" | grep -q '"status":1' || { echo "::error::upload_files did not return status:1"; exit 1; }
+          echo "upload zip: $RESPONSE"
+          echo "$RESPONSE" | grep -q '"status":1' || { echo "::error::zip upload failed"; exit 1; }
 
-      - name: Extract zip via cPanel UAPI
+      - name: Extract zip via PHP endpoint
         env:
-          HOST: ${{ secrets.CPANEL_HOST }}
-          USER: ${{ secrets.CPANEL_USER }}
-          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
           set -eu
           RESPONSE="$(curl -fsS --max-time 300 \
-            -H "Authorization: cpanel $USER:$TOKEN" \
-            --data-urlencode "sourcefiles=/home/$USER/public_html/site.zip" \
-            --data-urlencode "destdir=/home/$USER/public_html" \
-            "https://$HOST:2083/execute/Fileman/extract")"
+            -H "X-Deploy-Token: $DEPLOY_TOKEN" \
+            "https://www.hunyamunyarecords.com/deploy-extract.php")"
           echo "extract: $RESPONSE"
-          echo "$RESPONSE" | grep -q '"status":1' || { echo "::error::extract did not return status:1"; exit 1; }
-
-      - name: Delete uploaded zip via cPanel UAPI
-        env:
-          HOST: ${{ secrets.CPANEL_HOST }}
-          USER: ${{ secrets.CPANEL_USER }}
-          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
-        run: |
-          set -eu
-          RESPONSE="$(curl -fsS --max-time 60 \
-            -H "Authorization: cpanel $USER:$TOKEN" \
-            --data-urlencode "op=unlink" \
-            --data-urlencode "sourcefiles=/home/$USER/public_html/site.zip" \
-            "https://$HOST:2083/execute/Fileman/fileop")"
-          echo "cleanup: $RESPONSE"
+          case "$RESPONSE" in
+            ok\ *) ;;
+            *) echo "::error::deploy-extract.php did not return ok. Response: $RESPONSE"; exit 1 ;;
+          esac
 
       - name: Smoke test live site
         env:
