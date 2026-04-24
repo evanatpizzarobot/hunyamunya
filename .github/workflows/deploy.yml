@@ -90,6 +90,7 @@ jobs:
             --exclude '.DS_Store' \
             --exclude 'gd' \
             --exclude 'gd.txt' \
+            --exclude 'api/' \
             -e "ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=accept-new" \
             site/out/ \
             "$SSH_USER@$SSH_HOST:/var/www/hunyamunya/"
