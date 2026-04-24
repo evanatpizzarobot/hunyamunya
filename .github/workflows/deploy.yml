@@ -58,18 +58,39 @@ jobs:
           cp site/public/.htaccess site/out/.htaccess
           echo "$GITHUB_SHA" > site/out/BUILD_ID.txt
 
-      - name: Install SSH key
+      - name: Install SSH key and detect SSH port
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
         run: |
           set -eu
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          # Trust the server's host key on first connect.
-          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          # cPanel hosts often expose SSH on a non-standard port. Probe 22
+          # first, then cPanel's common alternates. Accept SSH_PORT secret
+          # as an override.
+          PORTS="22 2222 2083 22022"
+          if [ -n "${SSH_PORT:-}" ]; then
+            PORTS="$SSH_PORT"
+          fi
+          FOUND_PORT=""
+          for p in $PORTS; do
+            echo "probing $SSH_HOST:$p"
+            if ssh-keyscan -T 5 -p "$p" -H "$SSH_HOST" 2>&1 | tee -a ~/.ssh/known_hosts | grep -q "ssh-"; then
+              echo "✓ SSH responded on port $p"
+              FOUND_PORT="$p"
+              break
+            fi
+          done
+          if [ -z "$FOUND_PORT" ]; then
+            echo "::error::Could not reach SSH on any of: $PORTS. If your host uses a different port, add an SSH_PORT secret."
+            exit 1
+          fi
+          echo "SSH_PORT_RESOLVED=$FOUND_PORT" >> "$GITHUB_ENV"
           chmod 644 ~/.ssh/known_hosts
 
       - name: Sync site/out to cPanel via rsync over SSH
@@ -83,7 +104,7 @@ jobs:
             --exclude '.git*' \
             --exclude 'node_modules/' \
             --exclude '.DS_Store' \
-            -e "ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=accept-new" \
+            -e "ssh -i ~/.ssh/id_deploy -p $SSH_PORT_RESOLVED -o StrictHostKeyChecking=accept-new" \
             site/out/ \
             "$SSH_USER@$SSH_HOST:/home/$SSH_USER/public_html/"
 
