@@ -95,12 +95,12 @@
     repeating-linear-gradient(
       92deg,
       transparent 0px,
-      transparent 280px,
-      rgba(200, 220, 240, 0.30) 320px,
-      rgba(200, 220, 240, 0.45) 340px,
-      rgba(200, 220, 240, 0.30) 360px,
-      transparent 400px,
-      transparent 680px
+      transparent 320px,
+      rgba(200, 220, 240, 0.18) 340px,
+      rgba(200, 220, 240, 0.28) 350px,
+      rgba(200, 220, 240, 0.18) 360px,
+      transparent 380px,
+      transparent 720px
     );
   -webkit-mask-image: linear-gradient(180deg, black 0%, black 32%, transparent 100%);
           mask-image: linear-gradient(180deg, black 0%, black 32%, transparent 100%);
@@ -194,11 +194,11 @@
 /* Opacities scaled to the shadow technique's 0.15–0.32 range.
    --uw-rays: 0 means no light reaches that depth; higher means more
    sun penetration (lookup is "looking up at hulls", abyss is total dark). */
-.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; --uw-rays: 0.06; }
-.underwater[data-zone="mid"]      { --uw-opacity: 0.18; --uw-rays: 0.05; }
-.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; --uw-rays: 0.03; }
-.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; --uw-rays: 0.10; }
-.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; --uw-rays: 0.04; }
+.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; --uw-rays: 0.04; }
+.underwater[data-zone="mid"]      { --uw-opacity: 0.18; --uw-rays: 0.035; }
+.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; --uw-rays: 0.02; }
+.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; --uw-rays: 0.07; }
+.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; --uw-rays: 0.03; }
 .underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0;    --uw-rays: 0;    }
-.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; --uw-rays: 0.12; }
-.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; --uw-rays: 0.04; }
+.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; --uw-rays: 0.08; }
+.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; --uw-rays: 0.03; }
