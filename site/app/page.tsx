@@ -576,7 +576,12 @@ export default function Home() {
       </section>
 
       {/* ===================== WORDMARK ===================== */}
-      <div aria-hidden="true" className="my-16 flex w-full justify-center">
+      {/* mb-0 (no bottom margin) so the wordmark sits flush against the
+          UnderwaterLayer's bottom edge, which is itself flush with the
+          footer's border-t line. Anything below the wordmark inside the
+          underwater wrapper shows the depth gradient's bottom-end blue,
+          which reads as a stray blue strip between wordmark and line. */}
+      <div aria-hidden="true" className="mt-16 flex w-full justify-center">
         <span
           className="hm-wordmark-wave inline-block select-none whitespace-nowrap px-6 text-[clamp(64px,10.5vw,170px)] font-normal leading-[0.95]"
           style={{ letterSpacing: "-0.02em" }}
