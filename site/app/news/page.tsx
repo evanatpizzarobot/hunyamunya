@@ -17,7 +17,8 @@ const NEWS_LANES: LaneConfig[] = [
 export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("News"),
-    description: "News and updates from Hunya Munya Records: releases, press, and artist milestones.",
+    description:
+      "News and updates from Hunya Munya Records: releases, press coverage, radio airplay, sync placements, and artist milestones across Ambient, Downtempo, Chillout, Breakbeat, and Progressive electronic music since 2002.",
     path: "/news",
   });
 }

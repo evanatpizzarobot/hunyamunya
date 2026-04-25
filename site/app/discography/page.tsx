@@ -17,7 +17,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Discography"),
     description:
-      'The full Hunya Munya Records discography, HMR001 through HMR010 on 12" vinyl, HMB CD releases, and the HMDIGITAL series. An LA-based boutique label and publisher since 2002.',
+      'The full Hunya Munya Records discography. HMR001-HMR010 on 12" vinyl, the HMB CD full-lengths, and the HMDIGITAL EP series, spanning Ambient, Downtempo, Chillout, Breakbeat, Tech House, and Progressive electronic music. LA-based boutique label since 2002.',
     path: "/discography",
   });
 }

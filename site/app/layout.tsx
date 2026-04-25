@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: `%s · ${LABEL_NAME}`,
   },
   description:
-    "LA based boutique label and publisher since 2002. Hunya Munya Records crafts Electronic, Ambient, Breaks, and Chillout for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide.",
+    "LA based boutique electronic music label and publisher since 2002. Hunya Munya Records crafts Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, and Progressive electronic music for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide. Home to Rykard, Darius Kohanim, Habersham, and a 24-year roster of cinematic electronic artists.",
   openGraph: {
     siteName: LABEL_NAME,
     locale: "en_US",

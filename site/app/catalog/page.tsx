@@ -19,7 +19,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Catalog"),
     description:
-      "The complete release catalog of Hunya Munya Records: limited vinyl, CD, and digital releases since 2002 across Electronic, Ambient, Breaks, and Chillout music.",
+      "Hunya Munya Records release catalog. 38 limited vinyl, CD, and digital releases since 2002 across Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, Progressive House, and cinematic electronic. From HMR001 (2004) through HMR010 NCO (2025).",
     path: "/catalog",
   });
 }

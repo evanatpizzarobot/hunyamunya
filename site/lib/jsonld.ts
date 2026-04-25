@@ -8,21 +8,87 @@ export const SITE_URL = "https://hunyamunyarecords.com";
 export const LABEL_NAME = "Hunya Munya Records";
 export const ORG_ID = `${SITE_URL}/#organization`;
 
+// Genres the label has released across its 24-year catalog. Surfaced on the
+// MusicLabel JSON-LD's `genre` array so search engines can associate the
+// org entity with these terms without depending on per-page text alone.
+// Pulled from the union of release/artist `genres` frontmatter — keep in sync
+// when a release introduces a genre that isn't already on this list.
+const LABEL_GENRES = [
+  "Electronic",
+  "Ambient",
+  "Downtempo",
+  "Chillout",
+  "Breakbeat",
+  "Breaks",
+  "Progressive Breaks",
+  "Progressive House",
+  "Progressive Trance",
+  "Tech House",
+  "Deep House",
+  "House",
+  "Techno",
+  "Melodic Techno",
+  "Trance",
+  "IDM",
+  "Experimental",
+  "Dark Ambient",
+  "Cinematic Electronic",
+  "Drum and Bass",
+];
+
+// Confirmed external profiles for the LABEL (not individual artists). Keep
+// this list to entries that point at the Hunya Munya entity itself.
+const LABEL_SAME_AS = [
+  "https://ra.co/labels/385",
+  "https://www.allmusic.com/artist/hunya-munya-mn0002854507",
+];
+
 export function orgSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "MusicLabel",
     "@id": ORG_ID,
     name: LABEL_NAME,
+    alternateName: ["Hunya Munya", "HMR"],
     url: SITE_URL,
     logo: `${SITE_URL}/logo.png`, // 900x600, transparent PNG sourced from hm_transparent.gif
+    image: `${SITE_URL}/logo.png`,
     email: "contact@hunyamunyarecords.com",
+    description:
+      "LA-based independent electronic music label and publisher. Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, and Progressive across 38 releases since 2002. Home to Rykard, Darius Kohanim, Habersham, Distant Fragment, and Blue Room Project.",
+    slogan: "Boutique electronic music label · LA · since 2002",
     foundingDate: "2002",
     foundingLocation: {
       "@type": "Place",
       name: "Los Angeles, CA, USA",
     },
-    // sameAs populated once Evan confirms Discogs + socials (SEO spec §7 open item).
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "3705 W Pico Blvd #B",
+      addressLocality: "Los Angeles",
+      addressRegion: "CA",
+      postalCode: "90019",
+      addressCountry: "US",
+    },
+    areaServed: "Worldwide",
+    genre: LABEL_GENRES,
+    sameAs: LABEL_SAME_AS,
+  };
+}
+
+// WebSite entity — gives search engines a clean root entity for the site
+// (separate from the org). Not adding `potentialAction` SearchAction yet
+// because Google requires a working search endpoint for it and we don't
+// have one. WebSite alone still helps disambiguate the brand entity.
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    url: SITE_URL,
+    name: LABEL_NAME,
+    inLanguage: "en-US",
+    publisher: { "@id": ORG_ID },
   };
 }
 

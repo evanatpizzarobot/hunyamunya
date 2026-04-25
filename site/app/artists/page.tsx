@@ -19,7 +19,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Artists"),
     description:
-      "The full Hunya Munya Records roster. Active and archival artists crafting Electronic, Ambient, Breaks, and Chillout music since 2002.",
+      "The Hunya Munya Records roster. Electronic music artists across Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, and Progressive since 2002. Rykard, Darius Kohanim, Habersham, Distant Fragment, Blue Room Project, Shiloh, and the full archival lineup.",
     path: "/artists",
   });
 }

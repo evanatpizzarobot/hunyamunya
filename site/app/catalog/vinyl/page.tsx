@@ -17,7 +17,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Vinyl Catalog"),
     description:
-      "Vinyl catalog from Hunya Munya Records: 12\" HMR001 to HMR010 and collectible limited vinyl since 2002, on an LA-based boutique label crafting Electronic, Ambient, Breaks, and Chillout.",
+      "Vinyl catalog from Hunya Munya Records: 12\" 45rpm limited pressings HMR001 through HMR010, spanning Progressive House, Tech House, Breakbeat, Ambient, and Downtempo electronic music. Boutique LA label since 2002. New 2025 reissue: Rykard NCO.",
     path: "/catalog/vinyl",
   });
 }

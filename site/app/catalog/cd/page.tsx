@@ -17,7 +17,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("CD Catalog"),
     description:
-      "CD releases from Hunya Munya Records: full-length albums and limited CDr releases across Electronic, Ambient, Breaks, and Chillout music since 2002.",
+      "CD releases from Hunya Munya Records: full-length albums and limited CD EPs from Rykard (Arrive the Radio Beacon, Luminosity, Night Towers, Explorers), Evan Marcus, and the HMB series. Ambient, Downtempo, Chillout, and cinematic electronic music since 2002.",
     path: "/catalog/cd",
   });
 }

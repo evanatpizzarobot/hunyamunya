@@ -17,7 +17,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Digital Catalog"),
     description:
-      "Digital releases from Hunya Munya Records: HMDIGITAL001 through HMDIGITAL018 (2005-2008) plus Rykard digital-only EPs and singles.",
+      "Digital catalog from Hunya Munya Records. HMDIGITAL001-HMDIGITAL018 (2005-2008): Tech House, Progressive House, Deep House, Breakbeat, and Tribal EPs. Plus later Rykard digital-only releases in Ambient, Downtempo, and cinematic electronic music.",
     path: "/catalog/digital",
   });
 }

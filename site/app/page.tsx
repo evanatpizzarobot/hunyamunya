@@ -1,9 +1,27 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getAllArtists, getAllNews, getAllReleases, getCurrentCampaign } from "@/lib/content";
 import { Reveal } from "@/components/home/Reveal";
 import { CountUp } from "@/components/home/CountUp";
 import { HeroParallax } from "@/components/home/HeroParallax";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+import { SEO } from "@/components/SEO";
+import { buildMetadata, homeTitle } from "@/lib/seo";
+import { websiteJsonLd } from "@/lib/jsonld";
+
+// Home-page generateMetadata. The root layout sets a sensible default title +
+// description, but the home route needs its own canonical pointing at "/" and
+// a description tuned for the keywords we want to surface (Ambient, Downtempo,
+// Chillout, Breakbeat, IDM, Tech House, Progressive) rather than inheriting
+// the layout default.
+export function generateMetadata(): Metadata {
+  return buildMetadata({
+    title: homeTitle(),
+    description:
+      "Hunya Munya Records is an LA-based independent electronic music label and publisher, founded 2002. Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, and Progressive across 38 releases since 2002. Home to Rykard (25M+ streams, BBC Radio, KCRW), Darius Kohanim, Habersham, Distant Fragment, and Blue Room Project. Limited 12\" vinyl, CD, and digital. Sync and licensing for Film, TV, and Radio.",
+    path: "/",
+  });
+}
 
 // Home page underwater lane composition: full 5-creature mix at the
 // "shallow" zone (NCO campaign). Same lane positions and timings as
@@ -94,6 +112,7 @@ export default function Home() {
 
   return (
     <>
+      <SEO jsonLd={[websiteJsonLd()]} />
       <HeroParallax />
 
       {/* ===================== HERO ===================== */}
@@ -297,9 +316,11 @@ export default function Home() {
           <div>
             <Reveal delay={1}>
               <p className="text-xl leading-relaxed text-paper md:text-2xl">
-                Hunya Munya Records is an independent boutique label and publisher, founded
-                in 2002. Los Angeles since 2008. Crafting Electronic, Ambient, and Chillout
-                for Radio, Film, and TV, plus collectible limited Vinyl and CDs worldwide.
+                Hunya Munya Records is an independent boutique electronic music label and
+                publisher, founded in 2002. Los Angeles since 2008. Twenty-four years of
+                Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, and Progressive,
+                with sync placements for Radio, Film, and TV, plus collectible limited
+                Vinyl and CDs worldwide.
               </p>
             </Reveal>
             <Reveal delay={2}>
