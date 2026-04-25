@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxComponents } from "@/components/mdx-components";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 import {
   getAllReleases,
   getArtistBySlug,
@@ -112,6 +113,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
+// Surface zone, single drift. Detail-page calm.
+const RELEASE_LANES: LaneConfig[] = [
+  { shape: "oblong", direction: "lr", top: "55%", width: 110, duration: 70, delay: -10, opacityMod: 0.9 },
+];
+
 export default async function ReleasePage({ params }: { params: Promise<Params> }) {
   const { catnoSlug } = await params;
   const r = getReleaseByCatnoSlug(catnoSlug);
@@ -138,6 +144,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
           releaseJsonLd(r.data, primaryArtistDoc?.data ?? null),
         ]}
       />
+      <UnderwaterLayer zone="surface" lanes={RELEASE_LANES}>
       <article>
         <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_280px] md:items-start lg:grid-cols-[minmax(0,1fr)_340px]">
           <div>
@@ -313,6 +320,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
           </section>
         ) : null}
       </article>
+      </UnderwaterLayer>
     </>
   );
 }

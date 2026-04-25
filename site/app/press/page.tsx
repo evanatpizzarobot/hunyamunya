@@ -4,6 +4,15 @@ import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
 import pandoraStats from "@/data/pandora-stats.json";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+
+// Lookup zone: looking up at hulls passing overhead. Higher opacity
+// override (--uw-opacity 0.30) gives a more solid, looming presence.
+// Two slow shadows near the surface, no deeper drifters.
+const PRESS_LANES: LaneConfig[] = [
+  { shape: "round", direction: "lr", top: "8%",  width: 90,  duration: 95, delay: -25, opacityMod: 1.0 },
+  { shape: "long",  direction: "rl", top: "16%", width: 220, duration: 130, delay: -55, opacityMod: 0.85, mobileHide: true },
+];
 
 function formatThousands(n: number): string {
   if (n < 1000) return String(n);
@@ -352,6 +361,7 @@ export default function PressPage() {
         ]}
       />
 
+      <UnderwaterLayer zone="lookup" lanes={PRESS_LANES}>
       <section className="border-b border-rule pb-16 pt-20 md:pb-20 md:pt-28">
         <div
           className="mb-5 flex items-center gap-3 text-[11px] uppercase text-[color:var(--hm-accent)]"
@@ -762,6 +772,7 @@ export default function PressPage() {
           </a>
         </div>
       </section>
+      </UnderwaterLayer>
     </>
   );
 }

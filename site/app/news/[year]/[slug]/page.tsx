@@ -6,6 +6,12 @@ import { getAllNews, getNewsBySlug } from "@/lib/content";
 import { buildMetadata, newsTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd, newsJsonLd } from "@/lib/jsonld";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+
+// Surface zone, single drift. Detail-page calm.
+const NEWS_DETAIL_LANES: LaneConfig[] = [
+  { shape: "narrow", direction: "lr", top: "60%", width: 80, duration: 65, delay: -15, opacityMod: 0.85 },
+];
 
 type Params = { year: string; slug: string };
 
@@ -45,6 +51,7 @@ export default async function NewsPost({ params }: { params: Promise<Params> }) 
           newsJsonLd(n.data, n.urlPath),
         ]}
       />
+      <UnderwaterLayer zone="surface" lanes={NEWS_DETAIL_LANES}>
       <article>
         <header className="mb-6">
           <p className="font-mono text-xs uppercase tracking-wider text-neutral-500">{n.data.date}</p>
@@ -54,6 +61,7 @@ export default async function NewsPost({ params }: { params: Promise<Params> }) 
           <MDXRemote source={n.body} components={mdxComponents} />
         </div>
       </article>
+      </UnderwaterLayer>
     </>
   );
 }

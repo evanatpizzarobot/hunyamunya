@@ -3,6 +3,13 @@ import type { Metadata } from "next";
 import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd, LABEL_NAME } from "@/lib/jsonld";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+
+// Abyss zone: one giant slow shadow far below. Reads as the whale you
+// can't quite see — appropriate for the founder-voice page.
+const ABOUT_LANES: LaneConfig[] = [
+  { shape: "whale", direction: "lr", top: "55%", width: 360, duration: 140, delay: -50, opacityMod: 0.7 },
+];
 
 export function generateMetadata(): Metadata {
   return buildMetadata({
@@ -24,6 +31,7 @@ export default function AboutPage() {
           ]),
         ]}
       />
+      <UnderwaterLayer zone="abyss" lanes={ABOUT_LANES}>
       <article className="prose prose-invert prose-neutral max-w-3xl soft-panel p-6 md:p-8">
         <h1 className="font-serif text-4xl text-neutral-50">About</h1>
 
@@ -72,6 +80,7 @@ export default function AboutPage() {
           <a href="mailto:contact@hunyamunyarecords.com">contact@hunyamunyarecords.com</a>.
         </p>
       </article>
+      </UnderwaterLayer>
     </>
   );
 }

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxComponents } from "@/components/mdx-components";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 import {
   getAllArtists,
   getArtistBySlug,
@@ -86,6 +87,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
+// Surface zone: a single drift, brighter caustic. Detail pages get a
+// quieter layer so the focus stays on the article content.
+const ARTIST_LANES: LaneConfig[] = [
+  { shape: "oblong", direction: "lr", top: "55%", width: 110, duration: 70, delay: -10, opacityMod: 0.9 },
+];
+
 export default async function ArtistPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const doc = getArtistBySlug(slug);
@@ -107,6 +114,7 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
           ),
         ]}
       />
+      <UnderwaterLayer zone="surface" lanes={ARTIST_LANES}>
       <article>
         <header className="mb-10">
           <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>
@@ -284,6 +292,7 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
           </section>
         ) : null}
       </article>
+      </UnderwaterLayer>
     </>
   );
 }

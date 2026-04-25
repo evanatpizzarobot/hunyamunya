@@ -4,6 +4,14 @@ import { getAllReleases, getArtistBySlug, type ReleaseDoc } from "@/lib/content"
 import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+
+// Wreck zone same as catalog — the discography page is the catalog
+// reorganized by format, so the mood matches.
+const DISCOGRAPHY_LANES: LaneConfig[] = [
+  { shape: "long",   direction: "rl", top: "75%", width: 240, duration: 100, delay: -40, opacityMod: 0.8 },
+  { shape: "oblong", direction: "lr", top: "30%", width: 120, duration: 75,  delay: -10, opacityMod: 0.9 },
+];
 
 export function generateMetadata(): Metadata {
   return buildMetadata({
@@ -115,6 +123,7 @@ export default function Discography() {
           ]),
         ]}
       />
+      <UnderwaterLayer zone="wreck" lanes={DISCOGRAPHY_LANES}>
       <header className="mb-10">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-500">Since 2002</p>
         <h1 className="mt-2 font-serif text-5xl text-neutral-50">Discography</h1>
@@ -139,6 +148,7 @@ export default function Discography() {
         subtitle="HMDIGITAL series, EPs and singles."
         releases={digital}
       />
+      </UnderwaterLayer>
     </>
   );
 }

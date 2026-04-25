@@ -3,6 +3,20 @@ import { getAllArtists, getAllNews, getAllReleases, getCurrentCampaign } from "@
 import { Reveal } from "@/components/home/Reveal";
 import { CountUp } from "@/components/home/CountUp";
 import { HeroParallax } from "@/components/home/HeroParallax";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+
+// Home page underwater lane composition: full 5-creature mix at the
+// "shallow" zone (NCO campaign). Same lane positions and timings as
+// the Phase 1 hardcoded version. Lanes 2 (manta) and 5 (manta-form
+// near surface) hide on mobile to keep ≤3 visible at any scroll
+// position on small viewports.
+const HOME_LANES: LaneConfig[] = [
+  { shape: "long",   direction: "lr", top: "65%", width: 280, duration: 95,  delay: -22, opacityMod: 1.0 },
+  { shape: "round",  direction: "rl", top: "78%", width: 70,  duration: 70,  delay: -40, opacityMod: 0.85, mobileHide: true },
+  { shape: "oblong", direction: "lr", top: "38%", width: 130, duration: 62,  delay: -10, opacityMod: 0.95 },
+  { shape: "narrow", direction: "rl", top: "22%", width: 80,  duration: 80,  delay: -55, opacityMod: 0.75 },
+  { shape: "whale",  direction: "lr", top: "10%", width: 360, duration: 110, delay: -35, opacityMod: 0.65, mobileHide: true },
+];
 
 function spotifyEmbedFrom(url: string): string | null {
   const m = url.match(/open\.spotify\.com\/(?:embed\/)?(album|track|playlist|artist|episode|show)\/([A-Za-z0-9]+)/);
@@ -267,39 +281,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ====================================================================
-          UNDERWATER AMBIENT LAYER (Phase 1, NCO campaign)
-          Wraps §01 LABEL through the giant wordmark in a full-viewport-width
-          underwater layer. Hero stays outside (above); footer stays outside
-          (rendered by layout.tsx after <main>). See site/app/underwater.css
-          for the layer styles and docs/specs/underwater-layer-v1.md for
-          the spec. Sprite definitions live in site/app/layout.tsx.
-          =================================================================== */}
-      <div
-        className="underwater relative w-screen"
-        data-zone="shallow"
-        style={{ marginLeft: "calc(50% - 50vw)" }}
-      >
-        <div className="uw-depth" aria-hidden="true" />
-        <div className="uw-caustic" aria-hidden="true" />
-        <div className="uw-swimmers" aria-hidden="true">
-          <svg className="uw-swim uw-lane-1" viewBox="0 0 240 60" preserveAspectRatio="xMidYMid meet">
-            <use href="#silShadowLong" />
-          </svg>
-          <svg className="uw-swim uw-lane-2 uw-reverse" viewBox="0 0 100 60" preserveAspectRatio="xMidYMid meet">
-            <use href="#silShadowRound" />
-          </svg>
-          <svg className="uw-swim uw-lane-3" viewBox="0 0 140 50" preserveAspectRatio="xMidYMid meet">
-            <use href="#silShadowOblong" />
-          </svg>
-          <svg className="uw-swim uw-lane-4 uw-reverse" viewBox="0 0 120 24" preserveAspectRatio="xMidYMid meet">
-            <use href="#silShadowNarrow" />
-          </svg>
-          <svg className="uw-swim uw-lane-5" viewBox="0 0 360 80" preserveAspectRatio="xMidYMid meet">
-            <use href="#silShadowWhale" />
-          </svg>
-        </div>
-        <div className="uw-content mx-auto max-w-[1440px] px-5 md:px-10">
+      {/* Underwater ambient layer wraps §01 LABEL through the wordmark.
+          Hero stays outside (above); footer stays outside (rendered by
+          layout.tsx after <main>). Sprite definitions live in layout.tsx. */}
+      <UnderwaterLayer zone="shallow" lanes={HOME_LANES}>
 
       {/* ===================== §01 LABEL ===================== */}
       <section className="border-t border-rule py-24 md:py-32">
@@ -600,10 +585,7 @@ export default function Home() {
         </span>
       </div>
 
-        </div>
-        {/* end .uw-content */}
-      </div>
-      {/* end .underwater */}
+      </UnderwaterLayer>
     </>
   );
 }

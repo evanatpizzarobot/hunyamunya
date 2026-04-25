@@ -5,6 +5,14 @@ import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
 import { CatalogGrid } from "@/components/CatalogGrid";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+
+// Wreck zone: larger drifters at depth, fewer/slower than the home page.
+// One whale-form cruises far below, one oblong passes higher up.
+const CATALOG_LANES: LaneConfig[] = [
+  { shape: "long",   direction: "rl", top: "75%", width: 240, duration: 100, delay: -40, opacityMod: 0.8 },
+  { shape: "oblong", direction: "lr", top: "30%", width: 120, duration: 75,  delay: -10, opacityMod: 0.9 },
+];
 
 export function generateMetadata(): Metadata {
   return buildMetadata({
@@ -28,6 +36,7 @@ export default function CatalogIndex() {
           ]),
         ]}
       />
+      <UnderwaterLayer zone="wreck" lanes={CATALOG_LANES}>
       <header className="mb-10">
         <h1 className="font-serif text-4xl text-neutral-50">Catalog</h1>
         <p className="mt-2 max-w-2xl text-neutral-400">
@@ -52,6 +61,7 @@ export default function CatalogIndex() {
         </nav>
       </header>
       <CatalogGrid releases={releases} />
+      </UnderwaterLayer>
     </>
   );
 }

@@ -4,6 +4,15 @@ import { getAllNews } from "@/lib/content";
 import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+
+// Kelp zone: smaller faster shadows. Reads as a current carrying small
+// debris through — appropriate for a news feed full of dated entries.
+const NEWS_LANES: LaneConfig[] = [
+  { shape: "narrow", direction: "lr", top: "35%", width: 80, duration: 55, delay: -10, opacityMod: 0.85 },
+  { shape: "narrow", direction: "rl", top: "60%", width: 65, duration: 50, delay: -20, opacityMod: 0.75, mobileHide: true },
+  { shape: "narrow", direction: "lr", top: "80%", width: 75, duration: 60, delay: -30, opacityMod: 0.9 },
+];
 
 export function generateMetadata(): Metadata {
   return buildMetadata({
@@ -26,6 +35,7 @@ export default function NewsIndex() {
           ]),
         ]}
       />
+      <UnderwaterLayer zone="kelp" lanes={NEWS_LANES}>
       <header className="mb-10">
         <h1 className="font-serif text-4xl text-neutral-50">News</h1>
       </header>
@@ -68,6 +78,7 @@ export default function NewsIndex() {
           </li>
         ))}
       </ul>
+      </UnderwaterLayer>
     </>
   );
 }

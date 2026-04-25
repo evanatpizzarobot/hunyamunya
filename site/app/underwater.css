@@ -1,8 +1,13 @@
 /* ==================================================================
    UNDERWATER AMBIENT LAYER — styles
-   Phase 1: home page, below the fold, NCO campaign.
+   Phases 1-2: home + every other route, per data-zone.
    Pure CSS animations, no JS, prefers-reduced-motion respected.
-   Source bundle: C:\Users\rippe\Desktop\underwater_bundle\underwater.css
+
+   Lane positioning is driven entirely by inline styles passed from the
+   <UnderwaterLayer> component (top, width, animationDuration,
+   animationDelay, opacity). Mobile slowdown happens via the
+   --uw-mobile-factor multiplier so per-lane durations don't need to
+   know about viewport size.
    ================================================================== */
 
 
@@ -12,22 +17,14 @@
   position: relative;
   isolation: isolate;
 
-  /* tunable knobs (override per zone) */
-  /* Pivoted from fish silhouettes to abstract shadow shapes (creatures
-     passing overhead, casting voids on the viewer below). True black on a
-     near-black gradient reads as "absence of light" rather than as a same-
-     color blur, so the opacity range shifts up vs. the silhouette technique:
-        floor 0.15, default 0.22, ceiling 0.32.
-     Per-zone overrides below already scaled to this new range. */
-  --uw-fill:        #000000;
-  --uw-opacity:     0.22;        /* default visibility (range: 0.15–0.32) */
-  --uw-caustic:     0.08;        /* shimmer band opacity */
-
-  --uw-duration-1:  95s;         /* large elongated, deepest, slowest */
-  --uw-duration-2:  70s;         /* round blob, mid-deep, R→L */
-  --uw-duration-3:  62s;         /* mid oblong, mid */
-  --uw-duration-4:  80s;         /* small narrow, mid-shallow, R→L */
-  --uw-duration-5:  110s;        /* very long, near surface, slowest */
+  /* tunable knobs (override per zone via [data-zone="..."]) */
+  /* Pure black on a near-black gradient reads as "absence of light"
+     rather than as a same-color blur. Opacity floor 0.15, default 0.22,
+     ceiling 0.32 for the shadow technique. */
+  --uw-fill:           #000000;
+  --uw-opacity:        0.22;        /* default visibility (0.15–0.32) */
+  --uw-caustic:        0.08;        /* shimmer band opacity */
+  --uw-mobile-factor:  1;           /* desktop: 1; mobile: 1.4 (slower drift) */
 }
 
 .underwater > .uw-content {
@@ -91,71 +88,22 @@
   color: var(--uw-fill);    /* SVG paths use fill: currentColor */
 }
 
+/* Per-lane top/width/animation-delay/opacity are set inline by the
+   <UnderwaterLayer> component. Animation duration uses a CSS var so
+   --uw-mobile-factor can scale every lane on small viewports without
+   the component knowing about it. */
 .uw-swim {
   position: absolute;
   fill: currentColor;
-  opacity: var(--uw-opacity);
   will-change: transform;
   animation-name: uwDriftLR;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+  animation-duration: calc(var(--uw-base-duration, 60s) * var(--uw-mobile-factor, 1));
 }
 
 .uw-swim.uw-reverse {
   animation-name: uwDriftRL;
-}
-
-
-/* ---------- per-lane placement, scale, speed -------------------- */
-
-.uw-lane-1 {
-  /* large elongated shadow — deepest */
-  top: 65%;
-  width: 280px;
-  height: auto;
-  opacity: calc(var(--uw-opacity) * 1.0);
-  animation-duration: var(--uw-duration-1);
-  animation-delay: -22s;
-}
-
-.uw-lane-2 {
-  /* round blob — mid-deep, right-to-left */
-  top: 78%;
-  width: 70px;
-  height: auto;
-  opacity: calc(var(--uw-opacity) * 0.85);
-  animation-duration: var(--uw-duration-2);
-  animation-delay: -40s;
-}
-
-.uw-lane-3 {
-  /* mid oblong — mid */
-  top: 38%;
-  width: 130px;
-  height: auto;
-  opacity: calc(var(--uw-opacity) * 0.95);
-  animation-duration: var(--uw-duration-3);
-  animation-delay: -10s;
-}
-
-.uw-lane-4 {
-  /* small narrow — mid-shallow, R→L */
-  top: 22%;
-  width: 80px;
-  height: auto;
-  opacity: calc(var(--uw-opacity) * 0.75);
-  animation-duration: var(--uw-duration-4);
-  animation-delay: -55s;
-}
-
-.uw-lane-5 {
-  /* very long whale-scale shadow — near surface, slowest, faintest */
-  top: 10%;
-  width: 360px;
-  height: auto;
-  opacity: calc(var(--uw-opacity) * 0.65);
-  animation-duration: var(--uw-duration-5);
-  animation-delay: -35s;
 }
 
 
@@ -176,49 +124,37 @@
 }
 
 
-/* ---------- mobile: reduce density + slow further --------------- */
+/* ---------- mobile: slow drift, allow per-lane hide ------------- */
 
 @media (max-width: 768px) {
-  .underwater {
-    --uw-duration-1: 130s;
-    --uw-duration-2: 110s;
-    --uw-duration-3: 95s;
-    --uw-duration-4: 115s;
-    --uw-duration-5: 120s;
-  }
-  /* hide two lanes — keep 3 of 5 visible */
-  .uw-lane-2,
-  .uw-lane-5 {
-    display: none;
-  }
-  .uw-lane-1 { width: 200px; }
-  .uw-lane-3 { width: 96px; }
-  .uw-lane-4 { width: 64px; }
+  .underwater { --uw-mobile-factor: 1.4; }
+  .uw-mobile-hide { display: none; }
 }
 
 
-/* ---------- reduced motion: stop drift, keep silhouettes -------- */
+/* ---------- reduced motion: stop drift, park shadows ------------ */
 
 @media (prefers-reduced-motion: reduce) {
   .uw-swim,
   .uw-caustic {
     animation: none !important;
   }
-  /* park each shadow somewhere off-edge so they don't draw the eye */
-  .uw-lane-1 { transform: translateX(70vw); }
-  .uw-lane-2 { transform: translateX(20vw); }
-  .uw-lane-3 { transform: translateX(45vw); }
-  .uw-lane-4 { transform: translateX(82vw); }
-  .uw-lane-5 { transform: translateX(15vw); }
+  /* Park each shadow at a fixed off-edge x position so they don't draw
+     the eye. nth-child cycles through 5 positions for any lane count. */
+  .uw-swimmers > svg:nth-child(5n+1) { transform: translateX(70vw); }
+  .uw-swimmers > svg:nth-child(5n+2) { transform: translateX(20vw); }
+  .uw-swimmers > svg:nth-child(5n+3) { transform: translateX(45vw); }
+  .uw-swimmers > svg:nth-child(5n+4) { transform: translateX(82vw); }
+  .uw-swimmers > svg:nth-child(5n+5) { transform: translateX(15vw); }
 }
 
 
 /* ==================================================================
-   PER-ZONE OVERRIDES (Phases 2–3, ready in advance)
+   PER-ZONE OVERRIDES
    ================================================================== */
 
-/* Opacities scaled to the shadow technique's 0.15–0.32 range. Original
-   silhouette-era values (0.08–0.16) sat below the new floor. */
+/* Opacities scaled to the shadow technique's 0.15–0.32 range. */
+.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; }
 .underwater[data-zone="mid"]      { --uw-opacity: 0.18; }
 .underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; }
 .underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; }

@@ -3,6 +3,13 @@ import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd, contactPageJsonLd } from "@/lib/jsonld";
 import { ContactEmail } from "@/components/ContactEmail";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+
+// Empty zone: a single faint jellyfish-form drift, very slow. Reads as
+// the empty deep — appropriate for the "send us a message" page.
+const CONTACT_LANES: LaneConfig[] = [
+  { shape: "round", direction: "lr", top: "50%", width: 70, duration: 110, delay: -30, opacityMod: 1.0 },
+];
 
 export function generateMetadata(): Metadata {
   return buildMetadata({
@@ -26,6 +33,7 @@ export default function ContactPage() {
         ]}
       />
 
+      <UnderwaterLayer zone="empty" lanes={CONTACT_LANES}>
       <section className="border-b border-rule pb-16 pt-20 md:pb-20 md:pt-28">
         <div
           className="mb-5 flex items-center gap-3 text-[11px] uppercase text-[color:var(--hm-accent)]"
@@ -79,6 +87,7 @@ export default function ContactPage() {
           </ul>
         </div>
       </section>
+      </UnderwaterLayer>
     </>
   );
 }

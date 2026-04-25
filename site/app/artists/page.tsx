@@ -4,6 +4,16 @@ import { getAllArtists } from "@/lib/content";
 import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
+import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+
+// Mid zone, schooling activity. A trio of staggered school-form
+// shadows passes shallow-ish, with one deeper oblong cruising opposite.
+const ARTISTS_LANES: LaneConfig[] = [
+  { shape: "narrow", direction: "lr", top: "30%", width: 90,  duration: 65, delay: -10, opacityMod: 0.9 },
+  { shape: "narrow", direction: "lr", top: "36%", width: 70,  duration: 70, delay: -25, opacityMod: 0.8, mobileHide: true },
+  { shape: "narrow", direction: "lr", top: "42%", width: 80,  duration: 62, delay: -40, opacityMod: 0.85 },
+  { shape: "oblong", direction: "rl", top: "70%", width: 130, duration: 80, delay: -15, opacityMod: 1.0 },
+];
 
 export function generateMetadata(): Metadata {
   return buildMetadata({
@@ -33,6 +43,7 @@ export default function ArtistsIndex() {
           ]),
         ]}
       />
+      <UnderwaterLayer zone="mid" lanes={ARTISTS_LANES}>
       <header className="mb-10">
         <h1 className="font-serif text-4xl text-neutral-50">Artists</h1>
       </header>
@@ -76,6 +87,7 @@ export default function ArtistsIndex() {
           );
         })}
       </ul>
+      </UnderwaterLayer>
     </>
   );
 }
