@@ -13,7 +13,13 @@
   isolation: isolate;
 
   /* tunable knobs (override per zone) */
-  --uw-fill:        var(--ink);  /* silhouette base — tokenized to ocean palette */
+  /* Desaturated mid-tide blue. The original bundle used a near-black one stop
+     deeper than --ink, but in our dark scheme the depth gradient is already
+     near-black at the bottom, so darker silhouettes vanished into the
+     gradient. Lighter fill reads as fish catching ambient light from above.
+     Tokenize later if a palette swatch lands in this range (R 60-90, G 90-130,
+     B 120-160); none of --ink/--ocean/--ocean-2/--tide currently do. */
+  --uw-fill:        #4a6f8c;
   --uw-opacity:     0.12;        /* default visibility (range: 0.06–0.18) */
   --uw-caustic:     0.08;        /* shimmer band opacity */
 
