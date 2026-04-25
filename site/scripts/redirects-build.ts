@@ -65,7 +65,6 @@ function buildStructuralRedirects(): Redirect[] {
     // suffix-casing normalization.
     { kind: "path", from: "^catalog/hmb002-the-orange-album/?$", to: "/catalog/hmb002b-the-orange-album", status: 301 },
     { kind: "path", from: "^catalog/hmb002B-the-orange-album/?$", to: "/catalog/hmb002b-the-orange-album", status: 301 },
-    { kind: "path", from: "^press/?$", to: "/press", status: 301 },
     { kind: "path", from: "^artists/catnip-claws-2/?$", to: "/artists/catnip-claws", status: 301 },
     { kind: "path", from: "^tim-fretwell/?$", to: "/artists/tim-fretwell", status: 301 },
     // Feeds go to 410 so Google deindexes (spec §8.4).
