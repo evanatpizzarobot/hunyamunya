@@ -26,6 +26,7 @@
   --uw-caustic:        0.08;        /* shimmer band opacity */
   --uw-motes:          0.06;        /* suspended particulate opacity */
   --uw-thermo:         0.05;        /* thermocline band opacity */
+  --uw-bubble:         1;           /* bubble visibility (0 disables) */
   --uw-mobile-factor:  1;           /* desktop: 1; mobile: 1.4 (slower drift) */
 }
 
@@ -82,6 +83,42 @@
 @keyframes uwCaustic {
   from { background-position: 0 0; }
   to   { background-position: 800px 0; }
+}
+
+
+/* ---------- bubbles (a single bubble at a time, ~ every 30-60s) -- */
+/* Cowork's brief: "single bubble every 30s+ is the absolute ceiling".
+   Three independent bubble elements with varied sizes, x positions,
+   and durations. Each is visible for ~35% of its cycle and invisible
+   the rest, so adjacent bubbles rarely overlap on screen. Per-zone
+   --uw-bubble (0..1) scales their visibility; abyss and lookup set
+   it to 0 (deep dark / looking up at hulls — bubbles don't fit). */
+
+.uw-bubble {
+  position: absolute;
+  bottom: -8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(180, 210, 240, 0.9);
+  box-shadow: inset -1px -1px 1.5px rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  animation: uwBubble 50s linear infinite;
+}
+
+.uw-bubble-1 { left: 18%; width: 5px; height: 5px; animation-duration: 52s; animation-delay: -4s; }
+.uw-bubble-2 { left: 64%; width: 7px; height: 7px; animation-duration: 62s; animation-delay: -28s; }
+.uw-bubble-3 { left: 42%; width: 4px; height: 4px; animation-duration: 45s; animation-delay: -38s; }
+
+@keyframes uwBubble {
+  0%   { transform: translateY(0)      translateX(0);    opacity: 0; }
+  4%   {                                                 opacity: calc(0.55 * var(--uw-bubble, 1)); }
+  18%  { transform: translateY(-25vh)  translateX(6px);  }
+  35%  { transform: translateY(-60vh)  translateX(-4px); opacity: calc(0.55 * var(--uw-bubble, 1)); }
+  44%  { transform: translateY(-100vh) translateX(2px);  opacity: 0; }
+  100% { transform: translateY(-100vh) translateX(2px);  opacity: 0; }
 }
 
 
@@ -211,9 +248,13 @@
   .uw-swim,
   .uw-caustic,
   .uw-motes,
-  .uw-thermocline {
+  .uw-thermocline,
+  .uw-bubble {
     animation: none !important;
   }
+  /* Bubbles park off-screen at the bottom (where the keyframe starts)
+     when reduced-motion is on, so no static dot is visible. */
+  .uw-bubble { opacity: 0 !important; }
   /* Park each shadow at a fixed off-edge x position so they don't draw
      the eye. nth-child cycles through 5 positions for any lane count. */
   .uw-swimmers > svg:nth-child(5n+1) { transform: translateX(70vw); }
@@ -231,11 +272,11 @@
 /* Opacities scaled to the shadow technique's 0.15–0.32 range.
    --uw-motes is lower in abyss (less particulate visible at depth)
    and higher near the surface where light reaches the dust. */
-.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; --uw-motes: 0.06; --uw-thermo: 0.05; }
-.underwater[data-zone="mid"]      { --uw-opacity: 0.18; --uw-motes: 0.06; --uw-thermo: 0.05; }
-.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; --uw-motes: 0.05; --uw-thermo: 0.06; }
-.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; --uw-motes: 0.07; --uw-thermo: 0.04; }
-.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; --uw-motes: 0.05; --uw-thermo: 0.05; }
-.underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0;    --uw-motes: 0.03; --uw-thermo: 0.03; }
-.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; --uw-motes: 0.08; --uw-thermo: 0.04; }
-.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; --uw-motes: 0.04; --uw-thermo: 0.04; }
+.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; --uw-motes: 0.06; --uw-thermo: 0.05; --uw-bubble: 1;   }
+.underwater[data-zone="mid"]      { --uw-opacity: 0.18; --uw-motes: 0.06; --uw-thermo: 0.05; --uw-bubble: 1;   }
+.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; --uw-motes: 0.05; --uw-thermo: 0.06; --uw-bubble: 0.8; }
+.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; --uw-motes: 0.07; --uw-thermo: 0.04; --uw-bubble: 1;   }
+.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; --uw-motes: 0.05; --uw-thermo: 0.05; --uw-bubble: 1;   }
+.underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0;    --uw-motes: 0.03; --uw-thermo: 0.03; --uw-bubble: 0;   }
+.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; --uw-motes: 0.08; --uw-thermo: 0.04; --uw-bubble: 0;   }
+.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; --uw-motes: 0.04; --uw-thermo: 0.04; --uw-bubble: 1;   }

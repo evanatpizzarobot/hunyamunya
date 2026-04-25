@@ -92,6 +92,9 @@ export function UnderwaterLayer({ zone, lanes, flushTop, children }: UnderwaterL
       <div className="uw-thermocline" aria-hidden="true" />
       <div className="uw-motes" aria-hidden="true" />
       <div className="uw-caustic" aria-hidden="true" />
+      <span className="uw-bubble uw-bubble-1" aria-hidden="true" />
+      <span className="uw-bubble uw-bubble-2" aria-hidden="true" />
+      <span className="uw-bubble uw-bubble-3" aria-hidden="true" />
       <div className="uw-swimmers" aria-hidden="true">
         {lanes.map((lane, i) => {
           const ref = SHAPE_REFS[lane.shape];
