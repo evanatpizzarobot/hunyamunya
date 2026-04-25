@@ -75,6 +75,7 @@ export function UnderwaterLayer({ zone, lanes, children }: UnderwaterLayerProps)
     >
       <div className="uw-depth" aria-hidden="true" />
       <div className="uw-caustic" aria-hidden="true" />
+      <div className="uw-rays" aria-hidden="true" />
       <div className="uw-swimmers" aria-hidden="true">
         {lanes.map((lane, i) => {
           const ref = SHAPE_REFS[lane.shape];
