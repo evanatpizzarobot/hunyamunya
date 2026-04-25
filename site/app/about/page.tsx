@@ -31,7 +31,7 @@ export default function AboutPage() {
           ]),
         ]}
       />
-      <UnderwaterLayer zone="abyss" lanes={ABOUT_LANES}>
+      <UnderwaterLayer zone="abyss" lanes={ABOUT_LANES} flushTop>
       <article className="prose prose-invert prose-neutral max-w-3xl soft-panel p-6 md:p-8">
         <h1 className="font-serif text-4xl text-neutral-50">About</h1>
 

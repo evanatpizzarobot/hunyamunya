@@ -37,7 +37,7 @@ export default function CDCatalog() {
           ]),
         ]}
       />
-      <UnderwaterLayer zone="wreck" lanes={CATALOG_LANES}>
+      <UnderwaterLayer zone="wreck" lanes={CATALOG_LANES} flushTop>
       <header className="mb-10">
         <h1 className="font-serif text-4xl text-neutral-50">CD</h1>
         <p className="mt-2 max-w-2xl text-neutral-400">

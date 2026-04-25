@@ -51,7 +51,7 @@ export default async function NewsPost({ params }: { params: Promise<Params> }) 
           newsJsonLd(n.data, n.urlPath),
         ]}
       />
-      <UnderwaterLayer zone="surface" lanes={NEWS_DETAIL_LANES}>
+      <UnderwaterLayer zone="surface" lanes={NEWS_DETAIL_LANES} flushTop>
       <article>
         <header className="mb-6">
           <p className="font-mono text-xs uppercase tracking-wider text-neutral-500">{n.data.date}</p>

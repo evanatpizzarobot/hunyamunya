@@ -144,7 +144,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
           releaseJsonLd(r.data, primaryArtistDoc?.data ?? null),
         ]}
       />
-      <UnderwaterLayer zone="surface" lanes={RELEASE_LANES}>
+      <UnderwaterLayer zone="surface" lanes={RELEASE_LANES} flushTop>
       <article>
         <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_280px] md:items-start lg:grid-cols-[minmax(0,1fr)_340px]">
           <div>

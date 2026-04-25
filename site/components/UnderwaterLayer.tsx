@@ -72,13 +72,17 @@ const DEFAULT_BOBS_RL = [10, 16, 8, 20, 12, 6];
 export interface UnderwaterLayerProps {
   zone: Zone;
   lanes: LaneConfig[];
+  /** Negate <main>'s py-8 top padding so the layer sits flush against the
+   *  sticky header. Use on routes where the wrapper is the first element
+   *  inside <main> (i.e. anything without a hero above it). */
+  flushTop?: boolean;
   children: ReactNode;
 }
 
-export function UnderwaterLayer({ zone, lanes, children }: UnderwaterLayerProps) {
+export function UnderwaterLayer({ zone, lanes, flushTop, children }: UnderwaterLayerProps) {
   return (
     <div
-      className="underwater relative w-screen"
+      className={`underwater relative w-screen${flushTop ? " -mt-8" : ""}`}
       data-zone={zone}
       style={{ marginLeft: "calc(50% - 50vw)" }}
     >

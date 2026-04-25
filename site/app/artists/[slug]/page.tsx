@@ -114,7 +114,7 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
           ),
         ]}
       />
-      <UnderwaterLayer zone="surface" lanes={ARTIST_LANES}>
+      <UnderwaterLayer zone="surface" lanes={ARTIST_LANES} flushTop>
       <article>
         <header className="mb-10">
           <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>

@@ -35,7 +35,7 @@ export default function NewsIndex() {
           ]),
         ]}
       />
-      <UnderwaterLayer zone="kelp" lanes={NEWS_LANES}>
+      <UnderwaterLayer zone="kelp" lanes={NEWS_LANES} flushTop>
       <header className="mb-10">
         <h1 className="font-serif text-4xl text-neutral-50">News</h1>
       </header>

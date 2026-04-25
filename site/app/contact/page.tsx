@@ -33,7 +33,7 @@ export default function ContactPage() {
         ]}
       />
 
-      <UnderwaterLayer zone="empty" lanes={CONTACT_LANES}>
+      <UnderwaterLayer zone="empty" lanes={CONTACT_LANES} flushTop>
       <section className="border-b border-rule pb-16 pt-20 md:pb-20 md:pt-28">
         <div
           className="mb-5 flex items-center gap-3 text-[11px] uppercase text-[color:var(--hm-accent)]"

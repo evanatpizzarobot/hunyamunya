@@ -43,7 +43,7 @@ export default function ArtistsIndex() {
           ]),
         ]}
       />
-      <UnderwaterLayer zone="mid" lanes={ARTISTS_LANES}>
+      <UnderwaterLayer zone="mid" lanes={ARTISTS_LANES} flushTop>
       <header className="mb-10">
         <h1 className="font-serif text-4xl text-neutral-50">Artists</h1>
       </header>

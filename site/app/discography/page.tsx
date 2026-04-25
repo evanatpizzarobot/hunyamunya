@@ -123,7 +123,7 @@ export default function Discography() {
           ]),
         ]}
       />
-      <UnderwaterLayer zone="wreck" lanes={DISCOGRAPHY_LANES}>
+      <UnderwaterLayer zone="wreck" lanes={DISCOGRAPHY_LANES} flushTop>
       <header className="mb-10">
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-500">Since 2002</p>
         <h1 className="mt-2 font-serif text-5xl text-neutral-50">Discography</h1>
