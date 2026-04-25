@@ -358,7 +358,7 @@ export default function PressPage() {
           style={{ letterSpacing: "0.22em" }}
         >
           <span className="block h-px w-6 bg-current" />
-          § Press
+          Press
         </div>
         <h1 className="text-[clamp(40px,5.5vw,84px)] font-normal leading-[0.98] tracking-tighter text-paper">
           On the air.
@@ -435,7 +435,7 @@ export default function PressPage() {
           style={{ letterSpacing: "0.22em" }}
         >
           <span className="block h-px w-6 bg-[color:var(--hm-accent)]" />
-          § Words
+          Words
         </div>
         <ul className="grid gap-10 md:grid-cols-2 md:gap-14">
           {PRESS_QUOTES.map((q) => (
@@ -487,7 +487,7 @@ export default function PressPage() {
           style={{ letterSpacing: "0.22em" }}
         >
           <span className="block h-px w-6 bg-[color:var(--hm-accent)]" />
-          § On the dial
+          On the dial
         </div>
         <p className="mb-12 max-w-[62ch] font-serif text-[18px] italic leading-[1.5] text-paper-dim">
           By July 2010, three months after release,{" "}
@@ -601,7 +601,7 @@ export default function PressPage() {
           style={{ letterSpacing: "0.22em" }}
         >
           <span className="block h-px w-6 bg-[color:var(--hm-accent)]" />
-          § Support
+          Support
         </div>
         <h2 className="text-[clamp(32px,4vw,60px)] font-normal leading-[0.98] tracking-tighter text-paper">
           DJ support.
@@ -740,7 +740,7 @@ export default function PressPage() {
           style={{ letterSpacing: "0.22em" }}
         >
           <span className="block h-px w-6 bg-[color:var(--hm-accent)]" />
-          § Inquiries
+          Inquiries
         </div>
         <div className="grid gap-10 md:grid-cols-[1fr_auto] md:items-end">
           <div>

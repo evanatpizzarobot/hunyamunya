@@ -161,7 +161,7 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
               >
                 <div className="ai-accent" />
                 <div className="ai-top">
-                  <span className="ai-kicker">§ Profile · HMR</span>
+                  <span className="ai-kicker">Profile · HMR</span>
                   {estYear ? (
                     <>
                       <span className="ai-dot" aria-hidden="true" />

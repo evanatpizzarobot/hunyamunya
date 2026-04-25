@@ -32,7 +32,7 @@ export default function ContactPage() {
           style={{ letterSpacing: "0.22em" }}
         >
           <span className="block h-px w-6 bg-current" />
-          § Contact
+          Contact
         </div>
         <h1 className="text-[clamp(40px,5.5vw,84px)] font-normal leading-[0.98] tracking-tighter text-paper">
           Get in touch.
@@ -54,7 +54,7 @@ export default function ContactPage() {
             style={{ letterSpacing: "0.22em" }}
           >
             <span className="block h-px w-6 bg-[color:var(--hm-accent)]" />
-            § What to include
+            What to include
           </div>
           <ul className="max-w-[62ch] space-y-5 font-serif text-[18px] italic leading-[1.55] text-paper-dim">
             <li>
