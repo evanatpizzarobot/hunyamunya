@@ -1,0 +1,217 @@
+/* ==================================================================
+   UNDERWATER AMBIENT LAYER — styles
+   Phase 1: home page, below the fold, NCO campaign.
+   Pure CSS animations, no JS, prefers-reduced-motion respected.
+   Source bundle: C:\Users\rippe\Desktop\underwater_bundle\underwater.css
+   ================================================================== */
+
+
+/* ---------- wrapper ---------------------------------------------- */
+
+.underwater {
+  position: relative;
+  isolation: isolate;
+
+  /* tunable knobs (override per zone) */
+  --uw-fill:        var(--ink);  /* silhouette base — tokenized to ocean palette */
+  --uw-opacity:     0.12;        /* default visibility (range: 0.06–0.18) */
+  --uw-caustic:     0.08;        /* shimmer band opacity */
+
+  --uw-duration-1:  90s;         /* basking shark, deepest, slowest */
+  --uw-duration-2:  72s;         /* ROV, deep */
+  --uw-duration-3:  60s;         /* cod, mid */
+  --uw-duration-4:  78s;         /* mackerel, mid-shallow */
+  --uw-duration-5:  84s;         /* cormorant, surface */
+}
+
+.underwater > .uw-content {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ---------- depth gradient (fills the wrapper height) ----------- */
+
+.uw-depth {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg,
+      rgba(10, 22, 32, 1)   0%,
+      rgba(7, 16, 24, 1)    35%,
+      rgba(4, 10, 16, 1)    70%,
+      rgba(2, 6, 10, 1)     100%);
+}
+
+
+/* ---------- caustic shimmer (top of underwater zone only) ------- */
+
+.uw-caustic {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 220px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--uw-caustic);
+  background:
+    repeating-linear-gradient(
+      105deg,
+      transparent 0px,
+      transparent 36px,
+      rgba(180, 210, 240, 0.12) 38px,
+      transparent 42px,
+      transparent 80px
+    );
+  mix-blend-mode: screen;
+  animation: uwCaustic 60s linear infinite;
+}
+
+@keyframes uwCaustic {
+  from { background-position: 0 0; }
+  to   { background-position: 800px 0; }
+}
+
+
+/* ---------- swimmer container ----------------------------------- */
+
+.uw-swimmers {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  color: var(--uw-fill);    /* SVG paths use fill: currentColor */
+}
+
+.uw-swim {
+  position: absolute;
+  fill: currentColor;
+  opacity: var(--uw-opacity);
+  will-change: transform;
+  animation-name: uwDriftLR;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.uw-swim.uw-reverse {
+  animation-name: uwDriftRL;
+}
+
+
+/* ---------- per-lane placement, scale, speed -------------------- */
+
+.uw-lane-1 {
+  /* basking shark — far back, deep, slowest */
+  top: 62%;
+  width: 280px;
+  height: auto;
+  opacity: calc(var(--uw-opacity) * 0.85);
+  animation-duration: var(--uw-duration-1);
+  animation-delay: -20s;
+}
+
+.uw-lane-2 {
+  /* ROV — deep, right-to-left */
+  top: 78%;
+  width: 90px;
+  height: auto;
+  opacity: calc(var(--uw-opacity) * 1.1);
+  animation-duration: var(--uw-duration-2);
+  animation-delay: -45s;
+}
+
+.uw-lane-3 {
+  /* cod — mid */
+  top: 38%;
+  width: 130px;
+  height: auto;
+  animation-duration: var(--uw-duration-3);
+  animation-delay: -8s;
+}
+
+.uw-lane-4 {
+  /* mackerel — mid-shallow, R→L */
+  top: 22%;
+  width: 80px;
+  height: auto;
+  opacity: calc(var(--uw-opacity) * 0.95);
+  animation-duration: var(--uw-duration-4);
+  animation-delay: -55s;
+}
+
+.uw-lane-5 {
+  /* cormorant — surface */
+  top: 8%;
+  width: 100px;
+  height: auto;
+  opacity: calc(var(--uw-opacity) * 0.7);
+  animation-duration: var(--uw-duration-5);
+  animation-delay: -30s;
+}
+
+
+/* ---------- drift keyframes ------------------------------------- */
+
+@keyframes uwDriftLR {
+  from { transform: translateX(-15vw) translateY(0); }
+  50%  { transform: translateX(50vw)  translateY(-6px); }
+  to   { transform: translateX(115vw) translateY(0); }
+}
+
+@keyframes uwDriftRL {
+  from { transform: translateX(115vw) translateY(0)  scaleX(-1); }
+  50%  { transform: translateX(50vw)  translateY(4px) scaleX(-1); }
+  to   { transform: translateX(-15vw) translateY(0)  scaleX(-1); }
+}
+
+
+/* ---------- mobile: reduce density + slow further --------------- */
+
+@media (max-width: 768px) {
+  .underwater {
+    --uw-duration-1: 130s;
+    --uw-duration-2: 110s;
+    --uw-duration-3: 95s;
+    --uw-duration-4: 115s;
+    --uw-duration-5: 120s;
+  }
+  /* hide two lanes — keep 3 of 5 visible */
+  .uw-lane-2,
+  .uw-lane-5 {
+    display: none;
+  }
+  .uw-lane-1 { width: 200px; }
+  .uw-lane-3 { width: 96px; }
+  .uw-lane-4 { width: 64px; }
+}
+
+
+/* ---------- reduced motion: stop drift, keep silhouettes -------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .uw-swim,
+  .uw-caustic {
+    animation: none !important;
+  }
+  /* park each swimmer somewhere off-edge so they don't draw the eye */
+  .uw-lane-1 { transform: translateX(70vw); }
+  .uw-lane-2 { transform: translateX(20vw) scaleX(-1); }
+  .uw-lane-3 { transform: translateX(45vw); }
+  .uw-lane-4 { transform: translateX(82vw) scaleX(-1); }
+  .uw-lane-5 { transform: translateX(15vw); }
+}
+
+
+/* ==================================================================
+   PER-ZONE OVERRIDES (Phases 2–3, ready in advance)
+   ================================================================== */
+
+.underwater[data-zone="mid"]      { --uw-opacity: 0.10; }
+.underwater[data-zone="wreck"]    { --uw-opacity: 0.14; --uw-caustic: 0.04; }
+.underwater[data-zone="surface"]  { --uw-opacity: 0.10; --uw-caustic: 0.12; }
+.underwater[data-zone="kelp"]     { --uw-opacity: 0.12; --uw-caustic: 0.06; }
+.underwater[data-zone="abyss"]    { --uw-opacity: 0.08; --uw-caustic: 0; }
+.underwater[data-zone="lookup"]   { --uw-opacity: 0.16; --uw-caustic: 0.16; }
+.underwater[data-zone="empty"]    { --uw-opacity: 0.09; --uw-caustic: 0.02; }

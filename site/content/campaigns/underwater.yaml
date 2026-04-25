@@ -1,0 +1,126 @@
+# =====================================================================
+# Campaign: NCO — Rykard, HMR010
+# =====================================================================
+# Defines the underwater prop set + per-page assignments for the active
+# campaign. Phase 4 deliverable in scaffold form: Phase 1 only reads
+# pages.home; later phases hydrate the rest.
+#
+# Future campaigns: copy this file, swap props.* and pages.*.<set>,
+# leave the structure intact.
+# =====================================================================
+
+campaign:
+  id: nco
+  release: HMR010
+  artist: Rykard
+  active: true
+  notes: |
+    North Sea geographic anchor. Cormorant (track A1), Troup Head, North
+    Cormorant gas field. Maritime specificity carries the campaign.
+
+# ---------------------------------------------------------------------
+# PROP SET — every silhouette available to this campaign
+# ---------------------------------------------------------------------
+
+props:
+  cormorant:
+    sprite: "#silCormorant"
+    file:   "props/cormorant.svg"
+    natural_zone: surface
+  cod:
+    sprite: "#silCod"
+    file:   "props/cod.svg"
+    natural_zone: mid
+  mackerel:
+    sprite: "#silMackerel"
+    file:   "props/mackerel.svg"
+    natural_zone: mid
+  basking_shark:
+    sprite: "#silShark"
+    file:   "props/basking-shark.svg"
+    natural_zone: deep
+  rov:
+    sprite: "#silROV"
+    file:   "props/rov.svg"
+    natural_zone: deep
+  kelp:
+    sprite: "#silKelp"
+    file:   "props/kelp-strand.svg"
+    natural_zone: drift
+  jellyfish:
+    sprite: "#silJelly"
+    file:   "props/jellyfish.svg"
+    natural_zone: empty
+  chain:
+    sprite: "#silChain"
+    file:   "props/anchor-chain.svg"
+    natural_zone: vertical_edge
+
+# ---------------------------------------------------------------------
+# PER-PAGE LANE ASSIGNMENT
+# ---------------------------------------------------------------------
+# Each lane maps to .uw-lane-N in CSS. Up to 5 lanes per page.
+# direction: lr | rl
+# top:       % from top of .underwater wrapper
+# width:     px
+# duration:  seconds (drift across viewport)
+# opacity_mod: multiplier on --uw-opacity (0.7–1.1 typical)
+# delay:     negative offset so creatures aren't all entering at t=0
+
+pages:
+
+  home:
+    zone: shallow
+    lanes:
+      - { prop: basking_shark, direction: lr, top: 62%, width: 280, duration: 90, opacity_mod: 0.85, delay: -20 }
+      - { prop: rov,           direction: rl, top: 78%, width: 90,  duration: 72, opacity_mod: 1.10, delay: -45 }
+      - { prop: cod,           direction: lr, top: 38%, width: 130, duration: 60, opacity_mod: 1.00, delay: -8  }
+      - { prop: mackerel,      direction: rl, top: 22%, width: 80,  duration: 78, opacity_mod: 0.95, delay: -55 }
+      - { prop: cormorant,     direction: lr, top: 8%,  width: 100, duration: 84, opacity_mod: 0.70, delay: -30 }
+
+  artists:
+    zone: mid
+    lanes:
+      - { prop: mackerel, direction: lr, top: 30%, width: 70, duration: 65, opacity_mod: 0.9, delay: -10 }
+      - { prop: mackerel, direction: lr, top: 35%, width: 60, duration: 70, opacity_mod: 0.8, delay: -25 }
+      - { prop: mackerel, direction: lr, top: 40%, width: 75, duration: 62, opacity_mod: 0.95, delay: -40 }
+      - { prop: cod,      direction: rl, top: 70%, width: 130, duration: 80, opacity_mod: 1.0, delay: -15 }
+
+  catalog:
+    zone: wreck
+    lanes:
+      - { prop: chain,         direction: static, top: 0%,  width: 16,  duration: 0,  opacity_mod: 1.0, delay: 0,
+          position: "right: 6vw; height: 100%;" }
+      - { prop: basking_shark, direction: rl, top: 80%, width: 240, duration: 100, opacity_mod: 0.7, delay: -50 }
+
+  release:
+    zone: surface
+    lanes:
+      - { prop: cod, direction: lr, top: 55%, width: 110, duration: 70, opacity_mod: 0.9, delay: -10 }
+
+  news:
+    zone: kelp
+    lanes:
+      - { prop: kelp,     direction: static, top: 0%, width: 30, duration: 0,  opacity_mod: 1.0, delay: 0,
+          position: "left: 8vw; height: 100%;" }
+      - { prop: kelp,     direction: static, top: 0%, width: 26, duration: 0,  opacity_mod: 0.7, delay: 0,
+          position: "right: 14vw; height: 100%;" }
+      - { prop: mackerel, direction: lr, top: 45%, width: 70, duration: 75, opacity_mod: 0.85, delay: -20 }
+
+  about:
+    zone: abyss
+    lanes:
+      - { prop: basking_shark, direction: lr, top: 60%, width: 320, duration: 130, opacity_mod: 0.6, delay: -40 }
+
+  press:
+    zone: lookup
+    lanes:
+      # silhouettes from below — implementation note: render with
+      # transform: scaleY(-1) so hulls appear on top of the wrapper
+      - { prop: rov, direction: rl, top: 0%, width: 100, duration: 90, opacity_mod: 1.1, delay: -20,
+          extra_transform: "scaleY(-1)" }
+
+  contact:
+    zone: empty
+    lanes:
+      - { prop: jellyfish, direction: lr, top: 50%, width: 60, duration: 110, opacity_mod: 1.0, delay: -30 }

@@ -267,6 +267,40 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ====================================================================
+          UNDERWATER AMBIENT LAYER (Phase 1, NCO campaign)
+          Wraps §01 LABEL through the giant wordmark in a full-viewport-width
+          underwater layer. Hero stays outside (above); footer stays outside
+          (rendered by layout.tsx after <main>). See site/app/underwater.css
+          for the layer styles and docs/specs/underwater-layer-v1.md for
+          the spec. Sprite definitions live in site/app/layout.tsx.
+          =================================================================== */}
+      <div
+        className="underwater relative w-screen"
+        data-zone="shallow"
+        style={{ marginLeft: "calc(50% - 50vw)" }}
+      >
+        <div className="uw-depth" aria-hidden="true" />
+        <div className="uw-caustic" aria-hidden="true" />
+        <div className="uw-swimmers" aria-hidden="true">
+          <svg className="uw-swim uw-lane-1" viewBox="0 0 240 60" preserveAspectRatio="xMidYMid meet">
+            <use href="#silShark" />
+          </svg>
+          <svg className="uw-swim uw-lane-2 uw-reverse" viewBox="0 0 100 70" preserveAspectRatio="xMidYMid meet">
+            <use href="#silROV" />
+          </svg>
+          <svg className="uw-swim uw-lane-3" viewBox="0 0 140 50" preserveAspectRatio="xMidYMid meet">
+            <use href="#silCod" />
+          </svg>
+          <svg className="uw-swim uw-lane-4 uw-reverse" viewBox="0 0 100 32" preserveAspectRatio="xMidYMid meet">
+            <use href="#silMackerel" />
+          </svg>
+          <svg className="uw-swim uw-lane-5" viewBox="0 0 120 60" preserveAspectRatio="xMidYMid meet">
+            <use href="#silCormorant" />
+          </svg>
+        </div>
+        <div className="uw-content mx-auto max-w-[1440px] px-5 md:px-10">
+
       {/* ===================== §01 LABEL ===================== */}
       <section className="border-t border-rule py-24 md:py-32">
         <div className="mx-auto flex max-w-[68ch] flex-col items-center gap-8 text-center">
@@ -565,6 +599,11 @@ export default function Home() {
           HUNYA&nbsp;MUNYA
         </span>
       </div>
+
+        </div>
+        {/* end .uw-content */}
+      </div>
+      {/* end .underwater */}
     </>
   );
 }

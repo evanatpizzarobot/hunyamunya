@@ -1,3 +1,5 @@
+@import "./underwater.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,6 +10,10 @@
   --fg: #e8e4d8;
   --accent: #1b4669;
   --accent-cool: #14324f;
+
+  /* Ocean palette mirrored from tailwind.config.ts so plain-CSS components
+     (e.g. underwater.css) can reference the same hex via var(--ink). */
+  --ink: #05090d;
 
   /* Design-refresh accent — oklch at hue 215 (Ocean). Exposed as CSS vars
      so the accent can be retuned (Deep 235 / Ice 200) without touching
