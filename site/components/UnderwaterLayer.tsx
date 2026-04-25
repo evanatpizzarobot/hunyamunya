@@ -128,7 +128,13 @@ export function UnderwaterLayer({ zone, lanes, flushTop, children }: UnderwaterL
           );
         })}
       </div>
-      <div className="uw-content mx-auto max-w-[1440px] px-5 md:px-10">
+      {/* When the wrapper is pulled up to the header (-mt-8), the inner
+          content would otherwise hug the header line. pt-8 restores the
+          ~32px of breathing room <main>'s py-8 used to provide. Bottom
+          stays at -mb-8 only — no content sits near the bottom edge. */}
+      <div
+        className={`uw-content mx-auto max-w-[1440px] px-5 md:px-10${flushTop ? " pt-8" : ""}`}
+      >
         {children}
       </div>
     </div>
