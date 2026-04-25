@@ -25,6 +25,7 @@
   --uw-opacity:        0.22;        /* default visibility (0.15–0.32) */
   --uw-caustic:        0.08;        /* shimmer band opacity */
   --uw-motes:          0.06;        /* suspended particulate opacity */
+  --uw-thermo:         0.05;        /* thermocline band opacity */
   --uw-mobile-factor:  1;           /* desktop: 1; mobile: 1.4 (slower drift) */
 }
 
@@ -81,6 +82,36 @@
 @keyframes uwCaustic {
   from { background-position: 0 0; }
   to   { background-position: 800px 0; }
+}
+
+
+/* ---------- thermocline (a temperature layer in the column) ----- */
+/* A soft, wide horizontal band of slightly lighter water that drifts
+   up and down on a 5+ minute alternate cycle. Reads as a temperature
+   or density layer — the spot where cold deep meets warmer shallow.
+   Subtle by design; --uw-thermo controls intensity per zone. */
+
+.uw-thermocline {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--uw-thermo);
+  background:
+    linear-gradient(180deg,
+      transparent 0%,
+      transparent 30%,
+      rgba(80, 130, 170, 0.5) 50%,
+      transparent 70%,
+      transparent 100%);
+  background-size: 100% 220%;
+  mix-blend-mode: screen;
+  animation: uwThermocline 320s ease-in-out infinite alternate;
+}
+
+@keyframes uwThermocline {
+  from { background-position: 0 -55%; }
+  to   { background-position: 0  55%; }
 }
 
 
@@ -179,7 +210,8 @@
 @media (prefers-reduced-motion: reduce) {
   .uw-swim,
   .uw-caustic,
-  .uw-motes {
+  .uw-motes,
+  .uw-thermocline {
     animation: none !important;
   }
   /* Park each shadow at a fixed off-edge x position so they don't draw
@@ -199,11 +231,11 @@
 /* Opacities scaled to the shadow technique's 0.15–0.32 range.
    --uw-motes is lower in abyss (less particulate visible at depth)
    and higher near the surface where light reaches the dust. */
-.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; --uw-motes: 0.06; }
-.underwater[data-zone="mid"]      { --uw-opacity: 0.18; --uw-motes: 0.06; }
-.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; --uw-motes: 0.05; }
-.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; --uw-motes: 0.07; }
-.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; --uw-motes: 0.05; }
-.underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0;    --uw-motes: 0.03; }
-.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; --uw-motes: 0.08; }
-.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; --uw-motes: 0.04; }
+.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; --uw-motes: 0.06; --uw-thermo: 0.05; }
+.underwater[data-zone="mid"]      { --uw-opacity: 0.18; --uw-motes: 0.06; --uw-thermo: 0.05; }
+.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; --uw-motes: 0.05; --uw-thermo: 0.06; }
+.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; --uw-motes: 0.07; --uw-thermo: 0.04; }
+.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; --uw-motes: 0.05; --uw-thermo: 0.05; }
+.underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0;    --uw-motes: 0.03; --uw-thermo: 0.03; }
+.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; --uw-motes: 0.08; --uw-thermo: 0.04; }
+.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; --uw-motes: 0.04; --uw-thermo: 0.04; }

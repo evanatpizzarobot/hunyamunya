@@ -89,6 +89,7 @@ export function UnderwaterLayer({ zone, lanes, flushTop, children }: UnderwaterL
       style={{ marginLeft: "calc(50% - 50vw)" }}
     >
       <div className="uw-depth" aria-hidden="true" />
+      <div className="uw-thermocline" aria-hidden="true" />
       <div className="uw-motes" aria-hidden="true" />
       <div className="uw-caustic" aria-hidden="true" />
       <div className="uw-swimmers" aria-hidden="true">
