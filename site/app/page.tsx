@@ -284,19 +284,19 @@ export default function Home() {
         <div className="uw-caustic" aria-hidden="true" />
         <div className="uw-swimmers" aria-hidden="true">
           <svg className="uw-swim uw-lane-1" viewBox="0 0 240 60" preserveAspectRatio="xMidYMid meet">
-            <use href="#silShark" />
+            <use href="#silShadowLong" />
           </svg>
-          <svg className="uw-swim uw-lane-2 uw-reverse" viewBox="0 0 100 70" preserveAspectRatio="xMidYMid meet">
-            <use href="#silROV" />
+          <svg className="uw-swim uw-lane-2 uw-reverse" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid meet">
+            <use href="#silShadowRound" />
           </svg>
           <svg className="uw-swim uw-lane-3" viewBox="0 0 140 50" preserveAspectRatio="xMidYMid meet">
-            <use href="#silCod" />
+            <use href="#silShadowOblong" />
           </svg>
           <svg className="uw-swim uw-lane-4 uw-reverse" viewBox="0 0 100 32" preserveAspectRatio="xMidYMid meet">
-            <use href="#silMackerel" />
+            <use href="#silShadowNarrow" />
           </svg>
-          <svg className="uw-swim uw-lane-5" viewBox="0 0 120 60" preserveAspectRatio="xMidYMid meet">
-            <use href="#silCormorant" />
+          <svg className="uw-swim uw-lane-5" viewBox="0 0 360 80" preserveAspectRatio="xMidYMid meet">
+            <use href="#silShadowWhale" />
           </svg>
         </div>
         <div className="uw-content mx-auto max-w-[1440px] px-5 md:px-10">

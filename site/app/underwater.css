@@ -13,21 +13,21 @@
   isolation: isolate;
 
   /* tunable knobs (override per zone) */
-  /* Desaturated mid-tide blue. The original bundle used a near-black one stop
-     deeper than --ink, but in our dark scheme the depth gradient is already
-     near-black at the bottom, so darker silhouettes vanished into the
-     gradient. Lighter fill reads as fish catching ambient light from above.
-     Tokenize later if a palette swatch lands in this range (R 60-90, G 90-130,
-     B 120-160); none of --ink/--ocean/--ocean-2/--tide currently do. */
-  --uw-fill:        #4a6f8c;
-  --uw-opacity:     0.12;        /* default visibility (range: 0.06–0.18) */
+  /* Pivoted from fish silhouettes to abstract shadow shapes (creatures
+     passing overhead, casting voids on the viewer below). True black on a
+     near-black gradient reads as "absence of light" rather than as a same-
+     color blur, so the opacity range shifts up vs. the silhouette technique:
+        floor 0.15, default 0.22, ceiling 0.32.
+     Per-zone overrides below already scaled to this new range. */
+  --uw-fill:        #000000;
+  --uw-opacity:     0.22;        /* default visibility (range: 0.15–0.32) */
   --uw-caustic:     0.08;        /* shimmer band opacity */
 
-  --uw-duration-1:  90s;         /* basking shark, deepest, slowest */
-  --uw-duration-2:  72s;         /* ROV, deep */
-  --uw-duration-3:  60s;         /* cod, mid */
-  --uw-duration-4:  78s;         /* mackerel, mid-shallow */
-  --uw-duration-5:  84s;         /* cormorant, surface */
+  --uw-duration-1:  95s;         /* large elongated, deepest, slowest */
+  --uw-duration-2:  70s;         /* round blob, mid-deep, R→L */
+  --uw-duration-3:  62s;         /* mid oblong, mid */
+  --uw-duration-4:  80s;         /* small narrow, mid-shallow, R→L */
+  --uw-duration-5:  110s;        /* very long, near surface, slowest */
 }
 
 .underwater > .uw-content {
@@ -109,52 +109,53 @@
 /* ---------- per-lane placement, scale, speed -------------------- */
 
 .uw-lane-1 {
-  /* basking shark — far back, deep, slowest */
-  top: 62%;
+  /* large elongated shadow — deepest */
+  top: 65%;
   width: 280px;
   height: auto;
-  opacity: calc(var(--uw-opacity) * 0.85);
+  opacity: calc(var(--uw-opacity) * 1.0);
   animation-duration: var(--uw-duration-1);
-  animation-delay: -20s;
+  animation-delay: -22s;
 }
 
 .uw-lane-2 {
-  /* ROV — deep, right-to-left */
+  /* round blob — mid-deep, right-to-left */
   top: 78%;
-  width: 90px;
+  width: 70px;
   height: auto;
-  opacity: calc(var(--uw-opacity) * 1.1);
+  opacity: calc(var(--uw-opacity) * 0.85);
   animation-duration: var(--uw-duration-2);
-  animation-delay: -45s;
+  animation-delay: -40s;
 }
 
 .uw-lane-3 {
-  /* cod — mid */
+  /* mid oblong — mid */
   top: 38%;
   width: 130px;
   height: auto;
+  opacity: calc(var(--uw-opacity) * 0.95);
   animation-duration: var(--uw-duration-3);
-  animation-delay: -8s;
+  animation-delay: -10s;
 }
 
 .uw-lane-4 {
-  /* mackerel — mid-shallow, R→L */
+  /* small narrow — mid-shallow, R→L */
   top: 22%;
   width: 80px;
   height: auto;
-  opacity: calc(var(--uw-opacity) * 0.95);
+  opacity: calc(var(--uw-opacity) * 0.75);
   animation-duration: var(--uw-duration-4);
   animation-delay: -55s;
 }
 
 .uw-lane-5 {
-  /* cormorant — surface */
-  top: 8%;
-  width: 100px;
+  /* very long whale-scale shadow — near surface, slowest, faintest */
+  top: 10%;
+  width: 360px;
   height: auto;
-  opacity: calc(var(--uw-opacity) * 0.7);
+  opacity: calc(var(--uw-opacity) * 0.65);
   animation-duration: var(--uw-duration-5);
-  animation-delay: -30s;
+  animation-delay: -35s;
 }
 
 
@@ -166,10 +167,12 @@
   to   { transform: translateX(115vw) translateY(0); }
 }
 
+/* Shadows have no front/back so the RL keyframes no longer mirror the
+   shape — they just translate in the opposite direction. */
 @keyframes uwDriftRL {
-  from { transform: translateX(115vw) translateY(0)  scaleX(-1); }
-  50%  { transform: translateX(50vw)  translateY(4px) scaleX(-1); }
-  to   { transform: translateX(-15vw) translateY(0)  scaleX(-1); }
+  from { transform: translateX(115vw) translateY(0); }
+  50%  { transform: translateX(50vw)  translateY(4px); }
+  to   { transform: translateX(-15vw) translateY(0); }
 }
 
 
@@ -201,11 +204,11 @@
   .uw-caustic {
     animation: none !important;
   }
-  /* park each swimmer somewhere off-edge so they don't draw the eye */
+  /* park each shadow somewhere off-edge so they don't draw the eye */
   .uw-lane-1 { transform: translateX(70vw); }
-  .uw-lane-2 { transform: translateX(20vw) scaleX(-1); }
+  .uw-lane-2 { transform: translateX(20vw); }
   .uw-lane-3 { transform: translateX(45vw); }
-  .uw-lane-4 { transform: translateX(82vw) scaleX(-1); }
+  .uw-lane-4 { transform: translateX(82vw); }
   .uw-lane-5 { transform: translateX(15vw); }
 }
 
@@ -214,10 +217,12 @@
    PER-ZONE OVERRIDES (Phases 2–3, ready in advance)
    ================================================================== */
 
-.underwater[data-zone="mid"]      { --uw-opacity: 0.10; }
-.underwater[data-zone="wreck"]    { --uw-opacity: 0.14; --uw-caustic: 0.04; }
-.underwater[data-zone="surface"]  { --uw-opacity: 0.10; --uw-caustic: 0.12; }
-.underwater[data-zone="kelp"]     { --uw-opacity: 0.12; --uw-caustic: 0.06; }
-.underwater[data-zone="abyss"]    { --uw-opacity: 0.08; --uw-caustic: 0; }
-.underwater[data-zone="lookup"]   { --uw-opacity: 0.16; --uw-caustic: 0.16; }
-.underwater[data-zone="empty"]    { --uw-opacity: 0.09; --uw-caustic: 0.02; }
+/* Opacities scaled to the shadow technique's 0.15–0.32 range. Original
+   silhouette-era values (0.08–0.16) sat below the new floor. */
+.underwater[data-zone="mid"]      { --uw-opacity: 0.18; }
+.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; }
+.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; }
+.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; }
+.underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0; }
+.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; }
+.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; }
