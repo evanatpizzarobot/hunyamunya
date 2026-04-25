@@ -59,7 +59,7 @@ export default function AboutPage() {
         </p>
 
         <p>
-          We work slow. We put out records we actually want to put out. We like physical media, clean mastering, real liner notes, and artwork you can hold in your hands. We&rsquo;ve never chased trends and we&rsquo;ve never faked engagement.
+          We work slow. We put out records we actually want to put out. We like physical media, clean mastering, and artwork you can hold in your hands.
         </p>
 
         <p>
