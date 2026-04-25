@@ -71,25 +71,25 @@ export default function RootLayout({
             registers as a void rather than a same-color blur. */}
         <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
           <defs>
-            {/* large elongated shadow — lane 1, deepest */}
+            {/* lane 1 — dolphin/tuna profile: elongated body with subtle dorsal hump */}
             <symbol id="silShadowLong" viewBox="0 0 240 60">
-              <path d="M0 30 Q 18 8, 60 5 Q 130 0, 200 9 Q 228 13, 240 30 Q 228 47, 200 53 Q 130 60, 60 53 Q 18 50, 0 30 Z" />
+              <path d="M0 32 Q 16 16, 58 12 Q 100 6, 140 10 Q 158 2, 174 7 Q 200 14, 222 22 Q 238 28, 240 32 Q 232 46, 198 50 Q 130 56, 60 50 Q 16 46, 0 32 Z" />
             </symbol>
-            {/* round blob — lane 2, mid-deep */}
-            <symbol id="silShadowRound" viewBox="0 0 80 80">
-              <path d="M40 4 Q 70 6, 76 36 Q 78 60, 50 76 Q 22 78, 8 56 Q 0 30, 18 12 Q 28 4, 40 4 Z" />
+            {/* lane 2 — manta ray: wide wings, narrow body */}
+            <symbol id="silShadowRound" viewBox="0 0 100 60">
+              <path d="M50 12 Q 78 14, 96 26 Q 98 34, 86 44 Q 70 52, 56 52 Q 50 54, 50 56 Q 50 54, 44 52 Q 30 52, 14 44 Q 2 34, 4 26 Q 22 14, 50 12 Z" />
             </symbol>
-            {/* mid oblong — lane 3, mid */}
+            {/* lane 3 — head-heavy grouper: asymmetric, fatter on the left */}
             <symbol id="silShadowOblong" viewBox="0 0 140 50">
-              <path d="M0 25 Q 14 4, 50 6 Q 100 8, 130 17 Q 142 22, 140 28 Q 138 36, 120 42 Q 80 49, 40 46 Q 12 44, 0 25 Z" />
+              <path d="M0 25 Q 6 6, 32 4 Q 66 2, 96 8 Q 118 12, 132 22 Q 138 26, 134 32 Q 122 40, 96 42 Q 60 44, 30 40 Q 8 36, 0 25 Z" />
             </symbol>
-            {/* small narrow — lane 4, mid-shallow */}
-            <symbol id="silShadowNarrow" viewBox="0 0 100 32">
-              <path d="M0 16 Q 12 4, 40 5 Q 70 7, 92 13 Q 100 16, 92 22 Q 70 28, 40 27 Q 12 26, 0 16 Z" />
+            {/* lane 4 — eel: very long, thin, slight body wave */}
+            <symbol id="silShadowNarrow" viewBox="0 0 120 24">
+              <path d="M0 12 Q 14 4, 38 5 Q 62 3, 86 8 Q 104 6, 116 12 Q 120 13, 116 16 Q 100 21, 78 19 Q 50 22, 28 20 Q 10 18, 0 12 Z" />
             </symbol>
-            {/* very long whale-scale shadow — lane 5, near surface, slowest */}
+            {/* lane 5 — humpback whale: massive, slight back hump and tail taper */}
             <symbol id="silShadowWhale" viewBox="0 0 360 80">
-              <path d="M0 40 Q 30 10, 100 7 Q 200 3, 290 17 Q 340 23, 358 38 Q 360 40, 358 44 Q 340 56, 290 63 Q 200 70, 100 67 Q 30 64, 0 40 Z" />
+              <path d="M0 40 Q 22 18, 70 12 Q 140 6, 210 10 Q 244 4, 274 13 Q 320 22, 356 36 Q 360 40, 356 44 Q 332 58, 286 64 Q 200 70, 100 66 Q 28 62, 0 40 Z" />
             </symbol>
           </defs>
         </svg>

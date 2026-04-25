@@ -286,13 +286,13 @@ export default function Home() {
           <svg className="uw-swim uw-lane-1" viewBox="0 0 240 60" preserveAspectRatio="xMidYMid meet">
             <use href="#silShadowLong" />
           </svg>
-          <svg className="uw-swim uw-lane-2 uw-reverse" viewBox="0 0 80 80" preserveAspectRatio="xMidYMid meet">
+          <svg className="uw-swim uw-lane-2 uw-reverse" viewBox="0 0 100 60" preserveAspectRatio="xMidYMid meet">
             <use href="#silShadowRound" />
           </svg>
           <svg className="uw-swim uw-lane-3" viewBox="0 0 140 50" preserveAspectRatio="xMidYMid meet">
             <use href="#silShadowOblong" />
           </svg>
-          <svg className="uw-swim uw-lane-4 uw-reverse" viewBox="0 0 100 32" preserveAspectRatio="xMidYMid meet">
+          <svg className="uw-swim uw-lane-4 uw-reverse" viewBox="0 0 120 24" preserveAspectRatio="xMidYMid meet">
             <use href="#silShadowNarrow" />
           </svg>
           <svg className="uw-swim uw-lane-5" viewBox="0 0 360 80" preserveAspectRatio="xMidYMid meet">
