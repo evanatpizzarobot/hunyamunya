@@ -5,10 +5,11 @@ import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd, LABEL_NAME } from "@/lib/jsonld";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 
-// Abyss zone: one giant slow shadow far below. Reads as the whale you
-// can't quite see — appropriate for the founder-voice page.
+// Abyss zone: one giant slow shadow far below + one small fast surface
+// drift so something is always crossing during a long article read.
 const ABOUT_LANES: LaneConfig[] = [
-  { shape: "whale", direction: "lr", top: "55%", width: 360, duration: 140, delay: -50, opacityMod: 0.7 },
+  { shape: "whale",  direction: "lr", top: "70%", width: 400, duration: 150, delay: -50, opacityMod: 0.7 },
+  { shape: "narrow", direction: "rl", top: "25%", width: 75,  duration: 80,  delay: -20, opacityMod: 0.6 },
 ];
 
 export function generateMetadata(): Metadata {

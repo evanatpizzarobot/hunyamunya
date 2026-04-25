@@ -113,9 +113,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
-// Surface zone, single drift. Detail-page calm.
+// Surface zone: bigger oblong deeper + small narrow shallow. Two
+// lanes so a long release page never feels empty while reading.
 const RELEASE_LANES: LaneConfig[] = [
-  { shape: "oblong", direction: "lr", top: "55%", width: 110, duration: 70, delay: -10, opacityMod: 0.9 },
+  { shape: "oblong", direction: "lr", top: "70%", width: 130, duration: 75, delay: -10, opacityMod: 0.9 },
+  { shape: "narrow", direction: "rl", top: "25%", width: 75,  duration: 55, delay: -25, opacityMod: 0.75 },
 ];
 
 export default async function ReleasePage({ params }: { params: Promise<Params> }) {

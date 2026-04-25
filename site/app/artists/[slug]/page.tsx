@@ -87,10 +87,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 }
 
-// Surface zone: a single drift, brighter caustic. Detail pages get a
-// quieter layer so the focus stays on the article content.
+// Surface zone: bigger oblong deeper + small narrow shallow. Detail
+// pages get a quieter layer so the focus stays on the article content,
+// but two lanes guarantee something is always crossing.
 const ARTIST_LANES: LaneConfig[] = [
-  { shape: "oblong", direction: "lr", top: "55%", width: 110, duration: 70, delay: -10, opacityMod: 0.9 },
+  { shape: "oblong", direction: "lr", top: "70%", width: 130, duration: 75, delay: -10, opacityMod: 0.9 },
+  { shape: "narrow", direction: "rl", top: "25%", width: 75,  duration: 55, delay: -25, opacityMod: 0.75 },
 ];
 
 export default async function ArtistPage({ params }: { params: Promise<Params> }) {

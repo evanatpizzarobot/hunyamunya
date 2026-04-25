@@ -8,9 +8,11 @@ import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd, newsJsonLd } from "@/lib/jsonld";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 
-// Surface zone, single drift. Detail-page calm.
+// Surface zone: deeper narrow + a slower oblong shallower. Two lanes
+// so a long article never feels empty mid-read.
 const NEWS_DETAIL_LANES: LaneConfig[] = [
-  { shape: "narrow", direction: "lr", top: "60%", width: 80, duration: 65, delay: -15, opacityMod: 0.85 },
+  { shape: "narrow", direction: "lr", top: "75%", width: 90,  duration: 65, delay: -15, opacityMod: 0.85 },
+  { shape: "oblong", direction: "rl", top: "25%", width: 100, duration: 80, delay: -30, opacityMod: 0.7 },
 ];
 
 type Params = { year: string; slug: string };
