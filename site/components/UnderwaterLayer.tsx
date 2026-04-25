@@ -80,9 +80,11 @@ export interface UnderwaterLayerProps {
 }
 
 export function UnderwaterLayer({ zone, lanes, flushTop, children }: UnderwaterLayerProps) {
+  // -mb-8 is unconditional: every route's wrapper sits above the same footer,
+  // and <main>'s py-8 left a 32px black strip below the layer on every page.
   return (
     <div
-      className={`underwater relative w-screen${flushTop ? " -mt-8" : ""}`}
+      className={`underwater relative w-screen -mb-8${flushTop ? " -mt-8" : ""}`}
       data-zone={zone}
       style={{ marginLeft: "calc(50% - 50vw)" }}
     >
