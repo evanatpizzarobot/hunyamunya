@@ -56,9 +56,18 @@ export type LaneConfig = {
   delay: number;
   /** 0.6–1.1 typical. Multiplies the zone's --uw-opacity per lane. Defaults to 1.0. */
   opacityMod?: number;
+  /** Vertical bob amplitude in px at the midpoint of the drift. Negative = up,
+   *  positive = down. Omit to let the lane index pick a varied default. */
+  bob?: number;
   /** Hide on viewports under 768px. Use to thin the lane count on mobile. */
   mobileHide?: boolean;
 };
+
+/** Default bob amplitudes cycled by lane index so each lane visibly rides
+ *  a different swell without the page config needing to specify. Mixed
+ *  magnitudes keep the layer from feeling like one shared waveform. */
+const DEFAULT_BOBS_LR = [-14, -22, -10, -18, -26, -12];
+const DEFAULT_BOBS_RL = [10, 16, 8, 20, 12, 6];
 
 export interface UnderwaterLayerProps {
   zone: Zone;
@@ -75,12 +84,13 @@ export function UnderwaterLayer({ zone, lanes, children }: UnderwaterLayerProps)
     >
       <div className="uw-depth" aria-hidden="true" />
       <div className="uw-caustic" aria-hidden="true" />
-      <div className="uw-rays" aria-hidden="true" />
       <div className="uw-swimmers" aria-hidden="true">
         {lanes.map((lane, i) => {
           const ref = SHAPE_REFS[lane.shape];
           const reverse = lane.direction === "rl";
           const opacityMod = lane.opacityMod ?? 1.0;
+          const defaultBobs = reverse ? DEFAULT_BOBS_RL : DEFAULT_BOBS_LR;
+          const bob = lane.bob ?? defaultBobs[i % defaultBobs.length];
           const style: CSSProperties = {
             top: lane.top,
             width: `${lane.width}px`,
@@ -89,6 +99,8 @@ export function UnderwaterLayer({ zone, lanes, children }: UnderwaterLayerProps)
             opacity: `calc(var(--uw-opacity) * ${opacityMod})`,
             // Custom property consumed by .uw-swim's animation-duration calc.
             ["--uw-base-duration" as string]: `${lane.duration}s`,
+            // Custom property consumed by the keyframes' translateY() midpoint.
+            ["--uw-bob" as string]: `${bob}px`,
           };
           const className = [
             "uw-swim",

@@ -24,7 +24,6 @@
   --uw-fill:           #000000;
   --uw-opacity:        0.22;        /* default visibility (0.15–0.32) */
   --uw-caustic:        0.08;        /* shimmer band opacity */
-  --uw-rays:           0.06;        /* sun-shaft opacity (zero in abyss) */
   --uw-mobile-factor:  1;           /* desktop: 1; mobile: 1.4 (slower drift) */
 }
 
@@ -78,42 +77,6 @@
 }
 
 
-/* ---------- light shafts (sun cutting through the surface) ------ */
-/* Wide, soft-edged, near-vertical bands of slightly lighter water that
-   drift sideways on a 100s cycle. Masked to fade out toward the middle
-   of the zone (light doesn't reach deeper). Per-zone --uw-rays controls
-   intensity: 0 in the abyss, higher under the lookup zone. */
-
-.uw-rays {
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 65%;
-  z-index: 1;
-  pointer-events: none;
-  opacity: var(--uw-rays);
-  background:
-    repeating-linear-gradient(
-      92deg,
-      transparent 0px,
-      transparent 320px,
-      rgba(200, 220, 240, 0.18) 340px,
-      rgba(200, 220, 240, 0.28) 350px,
-      rgba(200, 220, 240, 0.18) 360px,
-      transparent 380px,
-      transparent 720px
-    );
-  -webkit-mask-image: linear-gradient(180deg, black 0%, black 32%, transparent 100%);
-          mask-image: linear-gradient(180deg, black 0%, black 32%, transparent 100%);
-  mix-blend-mode: screen;
-  animation: uwRays 100s linear infinite;
-}
-
-@keyframes uwRays {
-  from { background-position: 0 0; }
-  to   { background-position: 240px 0; }
-}
-
-
 /* ---------- swimmer container ----------------------------------- */
 
 .uw-swimmers {
@@ -146,9 +109,12 @@
 
 /* ---------- drift keyframes ------------------------------------- */
 
+/* Vertical bob amplitude is per-lane via --uw-bob (set inline by the
+   component). Larger values = the shadow seems to ride a deeper swell.
+   Defaults give ±14px / ±10px (LR / RL) in case the var isn't set. */
 @keyframes uwDriftLR {
   from { transform: translateX(-15vw) translateY(0); }
-  50%  { transform: translateX(50vw)  translateY(-6px); }
+  50%  { transform: translateX(50vw)  translateY(var(--uw-bob, -14px)); }
   to   { transform: translateX(115vw) translateY(0); }
 }
 
@@ -156,7 +122,7 @@
    shape — they just translate in the opposite direction. */
 @keyframes uwDriftRL {
   from { transform: translateX(115vw) translateY(0); }
-  50%  { transform: translateX(50vw)  translateY(4px); }
+  50%  { transform: translateX(50vw)  translateY(var(--uw-bob, 10px)); }
   to   { transform: translateX(-15vw) translateY(0); }
 }
 
@@ -173,8 +139,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .uw-swim,
-  .uw-caustic,
-  .uw-rays {
+  .uw-caustic {
     animation: none !important;
   }
   /* Park each shadow at a fixed off-edge x position so they don't draw
@@ -191,14 +156,12 @@
    PER-ZONE OVERRIDES
    ================================================================== */
 
-/* Opacities scaled to the shadow technique's 0.15–0.32 range.
-   --uw-rays: 0 means no light reaches that depth; higher means more
-   sun penetration (lookup is "looking up at hulls", abyss is total dark). */
-.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; --uw-rays: 0.04; }
-.underwater[data-zone="mid"]      { --uw-opacity: 0.18; --uw-rays: 0.035; }
-.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; --uw-rays: 0.02; }
-.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; --uw-rays: 0.07; }
-.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; --uw-rays: 0.03; }
-.underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0;    --uw-rays: 0;    }
-.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; --uw-rays: 0.08; }
-.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; --uw-rays: 0.03; }
+/* Opacities scaled to the shadow technique's 0.15–0.32 range. */
+.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; }
+.underwater[data-zone="mid"]      { --uw-opacity: 0.18; }
+.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; }
+.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; }
+.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; }
+.underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0; }
+.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; }
+.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; }
