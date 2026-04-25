@@ -24,7 +24,6 @@
   --uw-fill:           #000000;
   --uw-opacity:        0.22;        /* default visibility (0.15–0.32) */
   --uw-caustic:        0.08;        /* shimmer band opacity */
-  --uw-motes:          0.06;        /* suspended particulate opacity */
   --uw-thermo:         0.05;        /* thermocline band opacity */
   --uw-bubble:         1;           /* bubble visibility (0 disables) */
   --uw-mobile-factor:  1;           /* desktop: 1; mobile: 1.4 (slower drift) */
@@ -152,38 +151,6 @@
 }
 
 
-/* ---------- dust motes (suspended particulate) ------------------ */
-/* Tiled pattern of tiny pinpricks, drifting upward at ~90s per tile
-   so it reads as marine snow / suspended particulate rather than as
-   stars. Per-zone --uw-motes controls intensity (lower in abyss,
-   higher under surface/lookup zones where light reaches them). */
-
-.uw-motes {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: var(--uw-motes);
-  background-image:
-    radial-gradient(circle at 12% 20%, rgba(220, 235, 250, 0.95) 0px, rgba(220, 235, 250, 0.95) 1px, transparent 1.6px),
-    radial-gradient(circle at 28% 60%, rgba(220, 235, 250, 0.95) 0px, rgba(220, 235, 250, 0.95) 1px, transparent 1.6px),
-    radial-gradient(circle at 45% 35%, rgba(220, 235, 250, 0.95) 0px, rgba(220, 235, 250, 0.95) 1px, transparent 1.6px),
-    radial-gradient(circle at 60% 80%, rgba(220, 235, 250, 0.95) 0px, rgba(220, 235, 250, 0.95) 1px, transparent 1.6px),
-    radial-gradient(circle at 75% 15%, rgba(220, 235, 250, 0.95) 0px, rgba(220, 235, 250, 0.95) 1px, transparent 1.6px),
-    radial-gradient(circle at 88% 50%, rgba(220, 235, 250, 0.95) 0px, rgba(220, 235, 250, 0.95) 1px, transparent 1.6px),
-    radial-gradient(circle at 38% 75%, rgba(220, 235, 250, 0.95) 0px, rgba(220, 235, 250, 0.95) 1px, transparent 1.6px);
-  background-size: 480px 480px;
-  background-repeat: repeat;
-  mix-blend-mode: screen;
-  animation: uwMotes 90s linear infinite;
-}
-
-@keyframes uwMotes {
-  from { background-position: 0 0; }
-  to   { background-position: 0 -480px; }
-}
-
-
 /* ---------- swimmer container ----------------------------------- */
 
 .uw-swimmers {
@@ -247,7 +214,6 @@
 @media (prefers-reduced-motion: reduce) {
   .uw-swim,
   .uw-caustic,
-  .uw-motes,
   .uw-thermocline,
   .uw-bubble {
     animation: none !important;
@@ -272,11 +238,11 @@
 /* Opacities scaled to the shadow technique's 0.15–0.32 range.
    --uw-motes is lower in abyss (less particulate visible at depth)
    and higher near the surface where light reaches the dust. */
-.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; --uw-motes: 0.06; --uw-thermo: 0.05; --uw-bubble: 1;   }
-.underwater[data-zone="mid"]      { --uw-opacity: 0.18; --uw-motes: 0.06; --uw-thermo: 0.05; --uw-bubble: 1;   }
-.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; --uw-motes: 0.05; --uw-thermo: 0.06; --uw-bubble: 0.8; }
-.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; --uw-motes: 0.07; --uw-thermo: 0.04; --uw-bubble: 1;   }
-.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; --uw-motes: 0.05; --uw-thermo: 0.05; --uw-bubble: 1;   }
-.underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0;    --uw-motes: 0.03; --uw-thermo: 0.03; --uw-bubble: 0;   }
-.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; --uw-motes: 0.08; --uw-thermo: 0.04; --uw-bubble: 0;   }
-.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; --uw-motes: 0.04; --uw-thermo: 0.04; --uw-bubble: 1;   }
+.underwater[data-zone="shallow"]  { --uw-opacity: 0.22; --uw-thermo: 0.05; --uw-bubble: 1;   }
+.underwater[data-zone="mid"]      { --uw-opacity: 0.18; --uw-thermo: 0.05; --uw-bubble: 1;   }
+.underwater[data-zone="wreck"]    { --uw-opacity: 0.26; --uw-caustic: 0.04; --uw-thermo: 0.06; --uw-bubble: 0.8; }
+.underwater[data-zone="surface"]  { --uw-opacity: 0.18; --uw-caustic: 0.12; --uw-thermo: 0.04; --uw-bubble: 1;   }
+.underwater[data-zone="kelp"]     { --uw-opacity: 0.22; --uw-caustic: 0.06; --uw-thermo: 0.05; --uw-bubble: 1;   }
+.underwater[data-zone="abyss"]    { --uw-opacity: 0.15; --uw-caustic: 0;    --uw-thermo: 0.03; --uw-bubble: 0;   }
+.underwater[data-zone="lookup"]   { --uw-opacity: 0.30; --uw-caustic: 0.16; --uw-thermo: 0.04; --uw-bubble: 0;   }
+.underwater[data-zone="empty"]    { --uw-opacity: 0.17; --uw-caustic: 0.02; --uw-thermo: 0.04; --uw-bubble: 1;   }
