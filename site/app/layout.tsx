@@ -71,25 +71,33 @@ export default function RootLayout({
             registers as a void rather than a same-color blur. */}
         <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
           <defs>
-            {/* lane 1 — dolphin/tuna profile: elongated body with subtle dorsal hump */}
+            {/* lane 1 — whale-form: asymmetric body with a tail-end taper.
+                Reads as a large creature in profile, never literal. */}
             <symbol id="silShadowLong" viewBox="0 0 240 60">
-              <path d="M0 32 Q 16 16, 58 12 Q 100 6, 140 10 Q 158 2, 174 7 Q 200 14, 222 22 Q 238 28, 240 32 Q 232 46, 198 50 Q 130 56, 60 50 Q 16 46, 0 32 Z" />
+              <path d="M0 32 Q 12 14, 50 10 Q 112 4, 176 12 Q 214 18, 234 26 L 240 32 L 234 38 Q 218 44, 198 48 Q 130 56, 60 50 Q 14 46, 0 32 Z" />
             </symbol>
-            {/* lane 2 — manta ray: wide wings, narrow body */}
+            {/* lane 2 — jellyfish-form: round dome with five small notches
+                along the bottom, evoking a soft skirt without committing
+                to tentacles or anatomy. */}
             <symbol id="silShadowRound" viewBox="0 0 100 60">
-              <path d="M50 12 Q 78 14, 96 26 Q 98 34, 86 44 Q 70 52, 56 52 Q 50 54, 50 56 Q 50 54, 44 52 Q 30 52, 14 44 Q 2 34, 4 26 Q 22 14, 50 12 Z" />
+              <path d="M50 6 Q 90 6, 96 30 Q 96 44, 88 52 Q 80 50, 72 52 Q 64 50, 56 52 Q 48 50, 40 52 Q 32 50, 24 52 Q 16 50, 12 52 Q 4 44, 4 30 Q 10 6, 50 6 Z" />
             </symbol>
-            {/* lane 3 — head-heavy grouper: asymmetric, fatter on the left */}
+            {/* lane 3 — lemon-form: both ends tapered, smooth midline.
+                Single creature in profile, fish-like in the abstract. */}
             <symbol id="silShadowOblong" viewBox="0 0 140 50">
-              <path d="M0 25 Q 6 6, 32 4 Q 66 2, 96 8 Q 118 12, 132 22 Q 138 26, 134 32 Q 122 40, 96 42 Q 60 44, 30 40 Q 8 36, 0 25 Z" />
+              <path d="M0 25 Q 30 6, 70 6 Q 110 6, 140 25 Q 110 44, 70 44 Q 30 44, 0 25 Z" />
             </symbol>
-            {/* lane 4 — eel: very long, thin, slight body wave */}
+            {/* lane 4 — school-form: two close narrow ovals at slight
+                offset and different vertical positions. Reads as a small
+                cluster moving together rather than one shape. */}
             <symbol id="silShadowNarrow" viewBox="0 0 120 24">
-              <path d="M0 12 Q 14 4, 38 5 Q 62 3, 86 8 Q 104 6, 116 12 Q 120 13, 116 16 Q 100 21, 78 19 Q 50 22, 28 20 Q 10 18, 0 12 Z" />
+              <path d="M2 10 Q 14 4, 36 5 Q 60 4, 78 8 Q 86 10, 78 13 Q 60 16, 36 14 Q 14 14, 2 10 Z M28 17 Q 42 14, 64 16 Q 88 17, 102 20 Q 110 22, 100 24 Q 86 24, 64 22 Q 42 22, 28 17 Z" />
             </symbol>
-            {/* lane 5 — humpback whale: massive, slight back hump and tail taper */}
+            {/* lane 5 — manta-form: wide near the middle, tapered at both
+                extremes. Reads as something flat and enormous gliding past,
+                like a ray or a school passing as one body. */}
             <symbol id="silShadowWhale" viewBox="0 0 360 80">
-              <path d="M0 40 Q 22 18, 70 12 Q 140 6, 210 10 Q 244 4, 274 13 Q 320 22, 356 36 Q 360 40, 356 44 Q 332 58, 286 64 Q 200 70, 100 66 Q 28 62, 0 40 Z" />
+              <path d="M2 40 Q 60 30, 120 20 Q 180 8, 240 20 Q 300 30, 358 40 Q 300 50, 240 60 Q 180 72, 120 60 Q 60 50, 2 40 Z" />
             </symbol>
           </defs>
         </svg>
