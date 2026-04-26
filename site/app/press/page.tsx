@@ -8,10 +8,10 @@ import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 
 // Lookup zone: looking up at hulls passing overhead. Higher opacity
 // override (--uw-opacity 0.30) gives a more solid, looming presence.
-// Two slow shadows near the surface, no deeper drifters.
+// One jellyfish pulsing up the column, one slow hull near the surface.
 const PRESS_LANES: LaneConfig[] = [
-  { shape: "round", direction: "lr", top: "8%",  width: 90,  duration: 95, delay: -25, opacityMod: 1.0 },
-  { shape: "long",  direction: "rl", top: "16%", width: 220, duration: 130, delay: -55, opacityMod: 0.85, mobileHide: true },
+  { shape: "round", direction: "bt", left: "70%", width: 90,  duration: 95,  delay: -25, opacityMod: 1.0 },
+  { shape: "long",  direction: "rl", top: "16%",  width: 220, duration: 130, delay: -55, opacityMod: 0.85, mobileHide: true },
 ];
 
 function formatThousands(n: number): string {

@@ -5,11 +5,12 @@ import { breadcrumbJsonLd, contactPageJsonLd } from "@/lib/jsonld";
 import { ContactEmail } from "@/components/ContactEmail";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 
-// Empty zone: deep jellyfish-form + small fast surface drift so the
-// "send us a message" page never feels static while you scroll.
+// Empty zone: jellyfish-form pulsing up the column + a small fast
+// surface drift so the "send us a message" page never feels static
+// while you scroll.
 const CONTACT_LANES: LaneConfig[] = [
-  { shape: "round",  direction: "lr", top: "65%", width: 90, duration: 110, delay: -30, opacityMod: 1.0 },
-  { shape: "narrow", direction: "rl", top: "30%", width: 70, duration: 90,  delay: -45, opacityMod: 0.7 },
+  { shape: "round",  direction: "bt", left: "30%", width: 90, duration: 110, delay: -30, opacityMod: 1.0 },
+  { shape: "narrow", direction: "rl", top: "30%",  width: 70, duration: 90,  delay: -45, opacityMod: 0.7 },
 ];
 
 export function generateMetadata(): Metadata {

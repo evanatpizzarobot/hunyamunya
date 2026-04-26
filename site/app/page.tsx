@@ -30,7 +30,7 @@ export function generateMetadata(): Metadata {
 // position on small viewports.
 const HOME_LANES: LaneConfig[] = [
   { shape: "long",   direction: "lr", top: "65%", width: 280, duration: 95,  delay: -22, opacityMod: 1.0 },
-  { shape: "round",  direction: "rl", top: "78%", width: 70,  duration: 70,  delay: -40, opacityMod: 0.85, mobileHide: true },
+  { shape: "round",  direction: "bt", left: "82%", width: 70,  duration: 70,  delay: -40, opacityMod: 0.85, mobileHide: true },
   { shape: "oblong", direction: "lr", top: "38%", width: 130, duration: 62,  delay: -10, opacityMod: 0.95 },
   { shape: "narrow", direction: "rl", top: "22%", width: 80,  duration: 80,  delay: -55, opacityMod: 0.75 },
   { shape: "whale",  direction: "lr", top: "10%", width: 360, duration: 110, delay: -35, opacityMod: 0.65, mobileHide: true },

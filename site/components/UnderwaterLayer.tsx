@@ -30,7 +30,7 @@ type Zone =
   | "lookup"   // press — looking up at hulls (more solid)
   | "empty";   // contact — single faint drifter
 
-type Direction = "lr" | "rl";
+type Direction = "lr" | "rl" | "bt" | "tb";
 
 type Shape = "long" | "round" | "oblong" | "narrow" | "whale";
 
@@ -44,10 +44,16 @@ const SHAPE_REFS: Record<Shape, { id: string; viewBox: string }> = {
 
 export type LaneConfig = {
   shape: Shape;
-  /** "lr" (default) or "rl" — left-to-right or right-to-left drift. */
+  /** "lr" (default), "rl", "bt" (bottom-to-top), or "tb" (top-to-bottom).
+   *  Horizontal lanes (lr/rl) drift across the viewport; vertical lanes
+   *  (bt/tb) drift up or down through it (used for jellyfish-form). */
   direction?: Direction;
-  /** CSS top value, e.g. "30%" or "65%". Position from top of the wrapper. */
-  top: string;
+  /** CSS top value for horizontal lanes (lr/rl), e.g. "30%". Ignored on
+   *  vertical lanes — use `left` instead to set the horizontal column. */
+  top?: string;
+  /** CSS left value for vertical lanes (bt/tb), e.g. "20%" or "70%".
+   *  Ignored on horizontal lanes. */
+  left?: string;
   /** Rendered SVG width in px. Height auto-derives from viewBox aspect. */
   width: number;
   /** Drift cycle in seconds (desktop). Mobile multiplies by --uw-mobile-factor. */
@@ -97,24 +103,33 @@ export function UnderwaterLayer({ zone, lanes, flushTop, children }: UnderwaterL
       <div className="uw-swimmers" aria-hidden="true">
         {lanes.map((lane, i) => {
           const ref = SHAPE_REFS[lane.shape];
-          const reverse = lane.direction === "rl";
+          const direction = lane.direction ?? "lr";
+          const isVertical = direction === "bt" || direction === "tb";
           const opacityMod = lane.opacityMod ?? 1.0;
-          const defaultBobs = reverse ? DEFAULT_BOBS_RL : DEFAULT_BOBS_LR;
+          const defaultBobs = direction === "rl" ? DEFAULT_BOBS_RL : DEFAULT_BOBS_LR;
           const bob = lane.bob ?? defaultBobs[i % defaultBobs.length];
           const style: CSSProperties = {
-            top: lane.top,
+            // Horizontal lanes anchor by `top`; vertical lanes anchor at
+            // 50% of the wrapper height and use `left` for the column,
+            // then translate ±110vh around that anchor.
+            ...(isVertical ? { top: "50%", left: lane.left } : { top: lane.top }),
             width: `${lane.width}px`,
             height: "auto",
             animationDelay: `${lane.delay}s`,
             opacity: `calc(var(--uw-opacity) * ${opacityMod})`,
             // Custom property consumed by .uw-swim's animation-duration calc.
             ["--uw-base-duration" as string]: `${lane.duration}s`,
-            // Custom property consumed by the keyframes' translateY() midpoint.
+            // Horizontal lanes use --uw-bob as a vertical wobble; vertical
+            // lanes reuse the same var as a horizontal sway midway through.
             ["--uw-bob" as string]: `${bob}px`,
           };
+          const directionClass =
+            direction === "rl" ? "uw-reverse" :
+            direction === "bt" ? "uw-vert-bt" :
+            direction === "tb" ? "uw-vert-tb" : "";
           const className = [
             "uw-swim",
-            reverse ? "uw-reverse" : "",
+            directionClass,
             lane.mobileHide ? "uw-mobile-hide" : "",
           ]
             .filter(Boolean)

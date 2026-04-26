@@ -180,6 +180,12 @@
   animation-name: uwDriftRL;
 }
 
+/* Vertical drift lanes (bt = bottom-to-top, tb = top-to-bottom). Used for
+   the jellyfish-form so it pulses up or sinks down the column instead of
+   gliding sideways. `left` is set inline; `top` is unused on these. */
+.uw-swim.uw-vert-bt { animation-name: uwDriftBT; }
+.uw-swim.uw-vert-tb { animation-name: uwDriftTB; }
+
 
 /* ---------- drift keyframes ------------------------------------- */
 
@@ -198,6 +204,23 @@
   from { transform: translateX(115vw) translateY(0); }
   50%  { transform: translateX(50vw)  translateY(var(--uw-bob, 10px)); }
   to   { transform: translateX(-15vw) translateY(0); }
+}
+
+/* Vertical drift: anchored at top: 50% of the wrapper, the shape
+   translates ±110vh around that midline so it cleanly enters/exits the
+   viewport regardless of wrapper height. --uw-bob is reused as a small
+   horizontal sway at midpoint so the path doesn't read as a perfectly
+   straight rise/fall. */
+@keyframes uwDriftBT {
+  from { transform: translateY(110vh)  translateX(0); }
+  50%  { transform: translateY(0)      translateX(var(--uw-bob, -8px)); }
+  to   { transform: translateY(-110vh) translateX(0); }
+}
+
+@keyframes uwDriftTB {
+  from { transform: translateY(-110vh) translateX(0); }
+  50%  { transform: translateY(0)      translateX(var(--uw-bob, 8px)); }
+  to   { transform: translateY(110vh)  translateX(0); }
 }
 
 
