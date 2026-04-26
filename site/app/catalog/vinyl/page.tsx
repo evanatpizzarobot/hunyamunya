@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllReleases } from "@/lib/content";
+import { getAllReleases, compareReleasesForCatalog } from "@/lib/content";
 import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
@@ -25,7 +25,7 @@ export function generateMetadata(): Metadata {
 export default function VinylCatalog() {
   const releases = getAllReleases()
     .filter((r) => r.data.format.some((f) => f.startsWith("vinyl")))
-    .sort((a, b) => b.year - a.year);
+    .sort(compareReleasesForCatalog);
 
   return (
     <>

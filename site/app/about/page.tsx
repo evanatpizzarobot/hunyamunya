@@ -16,7 +16,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("About"),
     description:
-      "Hunya Munya Records is an independent label and publisher. Started in the early 2000s between Seattle and Vancouver with CDR promos in 2002 and 2003, HMR001 released in 2004, Hunya Munya Publishing running 2005 to 2007, based in Los Angeles since 2008/2009. Progressive house, breaks, and tech house in the early years; ambient, chillout, and cinematic electronic from 2010 onward. Home to Rykard, Darius Kohanim, Distant Fragment, and more.",
+      "Hunya Munya Records is an independent label and publisher. Started in the early 2000s between Seattle and Vancouver with CDR promos starting in 2002, HMR001 released in 2003, Hunya Munya Publishing running 2005 to 2007, based in Los Angeles since 2008/2009. Progressive house, breaks, and tech house in the early years; ambient, chillout, and cinematic electronic from 2010 onward. Home to Rykard, Darius Kohanim, Distant Fragment, and more.",
     path: "/about",
   });
 }

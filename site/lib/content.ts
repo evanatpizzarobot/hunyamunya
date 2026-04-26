@@ -127,6 +127,16 @@ export function getAllReleases(): ReleaseDoc[] {
   });
 }
 
+// Catalog ordering: newest year first; within a year, higher catalog number
+// first so the earliest cat# (e.g. HMR001) lands at the very bottom of the
+// page even when it shares a year with a sibling release.
+export function compareReleasesForCatalog(a: ReleaseDoc, b: ReleaseDoc): number {
+  if (b.year !== a.year) return b.year - a.year;
+  const aCat = a.data.catalog_number ?? "";
+  const bCat = b.data.catalog_number ?? "";
+  return bCat.localeCompare(aCat);
+}
+
 export function getReleaseByCatnoSlug(catnoSlug: string): ReleaseDoc | null {
   // Cheap linear scan; catalog is small (tens of releases) so this is fine.
   return getAllReleases().find((r) => r.catnoSlug === catnoSlug) ?? null;

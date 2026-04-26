@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllReleases } from "@/lib/content";
+import { getAllReleases, compareReleasesForCatalog } from "@/lib/content";
 import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
@@ -19,13 +19,13 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Catalog"),
     description:
-      "Hunya Munya Records release catalog. 38 limited vinyl, CD, and digital releases since 2002 across Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, Progressive House, and cinematic electronic. From HMR001 (2004) through HMR010 NCO (2025).",
+      "Hunya Munya Records release catalog. 38 limited vinyl, CD, and digital releases since 2002 across Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, Progressive House, and cinematic electronic. From HMR001 (2003) through HMR010 NCO (2025).",
     path: "/catalog",
   });
 }
 
 export default function CatalogIndex() {
-  const releases = getAllReleases().sort((a, b) => b.year - a.year);
+  const releases = getAllReleases().sort(compareReleasesForCatalog);
 
   return (
     <>
