@@ -23,7 +23,9 @@ export function generateMetadata(): Metadata {
 }
 
 function displayArtists(r: ReleaseDoc): string {
-  return r.resolvedArtists
+  const primaries = r.resolvedArtists.filter((a) => a.role === "primary");
+  const billed = primaries.length > 0 ? primaries : r.resolvedArtists.slice(0, 1);
+  return billed
     .map((a) => a.name ?? getArtistBySlug(a.slug)?.data.name ?? a.slug)
     .join(" & ");
 }
