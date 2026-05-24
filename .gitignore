@@ -63,3 +63,18 @@ site/test-results/
 
 # Claude Code per-user overrides (project-wide settings.json is fine to commit)
 .claude/settings.local.json
+
+# Local-only docs and specs (Pizza Robot Studios public-repo rule)
+*.md
+*.markdown
+CLAUDE.md
+README.md
+NOTES.md
+ROADMAP.md
+CHANGELOG.md
+specs/
+spec/
+docs/
+design/
+plans/
+.claude/
