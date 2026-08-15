@@ -108,35 +108,49 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
   if (!doc) notFound();
   const releases = getReleasesByArtistSlug(slug).sort((a, b) => b.year - a.year);
 
-  // The cover shown beside the portrait. Several releases still fall back to
-  // the artist's own photo for cover_image, and pairing that with the portrait
-  // would show the same picture twice, so those are skipped. Such a page keeps
-  // showing the portrait alone and gains a cover automatically once real art
-  // lands. `featured_release` (catalog number or slug) overrides the pick.
-  const ownPhotos = new Set(
-    [doc.data.portrait, doc.data.hero_image].filter(Boolean) as string[],
-  );
-  const withRealArt = releases.filter(
-    (r) => r.data.cover_image && !ownPhotos.has(r.data.cover_image),
-  );
-  // Releases the artist is actually billed on come first. A remix credit can be
-  // the newest thing in their discography while its cover belongs to somebody
-  // else entirely, which would put a stranger's photo next to their portrait.
-  const isBilled = (r: (typeof withRealArt)[number]) =>
-    r.resolvedArtists.some((a) => a.slug === slug && a.role === "primary");
-  const preferred = [
-    ...withRealArt.filter(isBilled),
-    ...withRealArt.filter((r) => !isBilled(r)),
-  ];
-  const pinned = doc.data.featured_release?.toLowerCase();
-  const featuredCover =
-    (pinned
-      ? preferred.find(
-          (r) =>
-            r.data.catalog_number?.toLowerCase() === pinned ||
-            r.data.slug.toLowerCase() === pinned,
-        )
-      : undefined) ?? preferred[0];
+  // The discography sits directly under the portrait rather than at the foot of
+  // the page. On artists with a long bio it was below the fold entirely, so
+  // their releases read as missing even when every one of them was rendered.
+  const discography =
+    releases.length > 0 ? (
+      <section className="mt-6" aria-label={`${doc.data.name} releases`}>
+        <h2 className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+          Releases
+        </h2>
+        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+          {releases.map((r) => (
+            <li key={r.catnoSlug}>
+              <Link
+                href={r.urlPath}
+                className="group flex items-center gap-3 border border-neutral-800 p-3 text-sm hover:border-neutral-600 hover:bg-neutral-900"
+              >
+                <span className="block h-14 w-14 shrink-0 overflow-hidden bg-neutral-950">
+                  {r.data.cover_image ? (
+                    <img
+                      src={r.data.cover_image}
+                      alt=""
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-950 p-1 text-center font-mono text-[8px] uppercase leading-tight tracking-wider text-neutral-600">
+                      {r.data.catalog_number ?? r.data.title}
+                    </span>
+                  )}
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-serif text-neutral-50">{r.data.title}</span>
+                  <span className="block text-xs text-neutral-500">
+                    {r.data.catalog_number ? `${r.data.catalog_number} · ` : ""}
+                    {r.year} · {r.data.format.join(", ")}
+                  </span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : null;
 
   return (
     <>
@@ -158,42 +172,18 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
         <header className="mb-10">
           <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>
 
-          {doc.data.portrait || featuredCover ? (
-            <div className="mt-5 flex flex-wrap items-start gap-4">
-              {doc.data.portrait ? (
-                <figure className="w-full max-w-sm overflow-hidden border border-neutral-800 sm:flex-1 sm:basis-64">
-                  <img
-                    src={doc.data.portrait}
-                    alt={doc.data.name}
-                    className="block h-auto w-full"
-                    loading="eager"
-                  />
-                </figure>
-              ) : null}
-
-              {featuredCover ? (
-                <figure className="w-full max-w-sm sm:flex-1 sm:basis-64">
-                  <Link
-                    href={featuredCover.urlPath}
-                    className="group block overflow-hidden border border-neutral-800 transition-colors hover:border-neutral-500"
-                  >
-                    <img
-                      src={featuredCover.data.cover_image!}
-                      alt={`${featuredCover.data.title} cover`}
-                      className="block aspect-square h-auto w-full object-cover transition-transform group-hover:scale-[1.02]"
-                      loading="eager"
-                    />
-                  </Link>
-                  <figcaption className="mt-2 text-xs text-neutral-500">
-                    {featuredCover.data.catalog_number
-                      ? `${featuredCover.data.catalog_number} · `
-                      : ""}
-                    {featuredCover.data.title}
-                  </figcaption>
-                </figure>
-              ) : null}
-            </div>
+          {doc.data.portrait ? (
+            <figure className="mt-5 max-w-sm overflow-hidden border border-neutral-800">
+              <img
+                src={doc.data.portrait}
+                alt={doc.data.name}
+                className="block h-auto w-full"
+                loading="eager"
+              />
+            </figure>
           ) : null}
+
+          {discography}
 
           {(() => {
             const intro = doc.data.intro;
@@ -335,44 +325,6 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
             </section>
           );
         })()}
-
-        {releases.length > 0 ? (
-          <section className="mt-12 border-t border-neutral-800 pt-8">
-            <h2 className="font-serif text-2xl text-neutral-100">Discography</h2>
-            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-              {releases.map((r) => (
-                <li key={r.catnoSlug}>
-                  <Link
-                    href={r.urlPath}
-                    className="group flex items-center gap-3 border border-neutral-800 p-3 text-sm hover:border-neutral-600 hover:bg-neutral-900"
-                  >
-                    <span className="block h-14 w-14 shrink-0 overflow-hidden bg-neutral-950">
-                      {r.data.cover_image ? (
-                        <img
-                          src={r.data.cover_image}
-                          alt=""
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-950 p-1 text-center font-mono text-[8px] uppercase leading-tight tracking-wider text-neutral-600">
-                          {r.data.catalog_number ?? r.data.title}
-                        </span>
-                      )}
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block font-serif text-neutral-50">{r.data.title}</span>
-                      <span className="block text-xs text-neutral-500">
-                        {r.data.catalog_number ? `${r.data.catalog_number} · ` : ""}
-                        {r.year} · {r.data.format.join(", ")}
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
 
         {doc.data.links && Object.keys(doc.data.links).length > 0 ? (
           <section className="mt-12 border-t border-neutral-800 pt-8">
