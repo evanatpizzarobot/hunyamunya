@@ -117,9 +117,11 @@ export const track = z.object({
   duration: z.string().optional(),
   credits: z.string().optional(),
   isrc: z.string().optional(),
-  // Vinyl side marker (A / B / C / D) when applicable. Display helper uses it
-  // to group tracks on multi-disc releases; on CD/digital it stays unset.
-  side: z.string().max(2).optional(),
+  // Tracklist group marker. A single letter (A / B / C / D) renders as
+  // "Side A" for vinyl; any other value renders verbatim as its own heading,
+  // which is how digital-only bonus mixes ("Digital") sit below the vinyl
+  // sides. Stays unset on a release that needs no grouping at all.
+  side: z.string().max(16).optional(),
 });
 
 export const proofPoint = z.object({

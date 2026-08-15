@@ -8,6 +8,8 @@ import {
   getAllReleases,
   getArtistBySlug,
   getReleaseByCatnoSlug,
+  type NormalizedArtistRef,
+  type ReleaseDoc,
 } from "@/lib/content";
 import type { Release } from "@/lib/schema";
 import { buildMetadata, releaseTitle } from "@/lib/seo";
@@ -62,13 +64,19 @@ function Tracklist({ tracks }: { tracks: Release["tracklist"] }) {
     if (!bySide.has(key)) bySide.set(key, []);
     bySide.get(key)!.push(t);
   }
+  // A bare letter is a vinyl side and gets the "Side B" prefix. Anything else
+  // is a named group ("Digital") and stands on its own, so a 12" that picked
+  // up digital-only bonus mixes reads correctly without implying they were
+  // ever cut to wax. Map insertion order keeps those groups where the
+  // frontmatter put them, below the vinyl sides.
+  const headingFor = (side: string) => (/^[A-D]$/i.test(side) ? `Side ${side.toUpperCase()}` : side);
   return (
     <div className="mt-4 space-y-5 text-sm">
       {Array.from(bySide.entries()).map(([side, items]) => (
         <div key={side}>
           {side ? (
             <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
-              Side {side}
+              {headingFor(side)}
             </p>
           ) : null}
           <ol className="mt-2">
@@ -92,11 +100,21 @@ export function generateStaticParams(): Params[] {
   return getAllReleases().map((r) => ({ catnoSlug: r.catnoSlug }));
 }
 
+// A release is billed to its primary artist only, the same rule the catalog
+// and discography grids use. Remixers stay credited on the page, just not in
+// the byline: "Flicker" is a Boom Jinx record whether or not four people
+// touched it. Falls back to the first credit when no role is marked primary,
+// which covers the older frontmatter shape.
+function billedArtists(r: ReleaseDoc): NormalizedArtistRef[] {
+  const primaries = r.resolvedArtists.filter((a) => a.role === "primary");
+  return primaries.length > 0 ? primaries : r.resolvedArtists.slice(0, 1);
+}
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { catnoSlug } = await params;
   const r = getReleaseByCatnoSlug(catnoSlug);
   if (!r) return {};
-  const displayArtists = r.resolvedArtists
+  const displayArtists = billedArtists(r)
     .map((a) => a.name ?? getArtistBySlug(a.slug)?.data.name ?? a.slug)
     .join(" & ");
   const title = r.data.seoTitle ?? releaseTitle(r.data.title, displayArtists, r.data.catalog_number);
@@ -124,14 +142,19 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
   const { catnoSlug } = await params;
   const r = getReleaseByCatnoSlug(catnoSlug);
   if (!r) notFound();
-  const resolvedArtists = r.resolvedArtists.map((a) => {
+  const linkable = (a: NormalizedArtistRef) => {
     const doc = getArtistBySlug(a.slug);
     return {
       slug: a.slug,
       name: a.name ?? doc?.data.name ?? a.slug,
       exists: Boolean(doc),
     };
-  });
+  };
+  const resolvedArtists = billedArtists(r).map(linkable);
+  // Everyone who is not billed on the byline still gets a credit line of their
+  // own below it, so a remixer is one click from the release they worked on.
+  const billedSlugs = new Set(billedArtists(r).map((a) => a.slug));
+  const remixers = r.resolvedArtists.filter((a) => !billedSlugs.has(a.slug)).map(linkable);
   const primaryArtistDoc = getArtistBySlug(r.resolvedArtists[0]?.slug ?? r.data.artist);
 
   return (
@@ -169,6 +192,25 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
                 </span>
               ))}
             </p>
+            {remixers.length > 0 ? (
+              <p className="mt-2 text-sm text-neutral-400">
+                <span className="font-mono text-xs uppercase tracking-wider text-neutral-500">
+                  Remixes by
+                </span>{" "}
+                {remixers.map((a, i) => (
+                  <span key={a.slug}>
+                    {i > 0 ? <span className="text-neutral-600">, </span> : null}
+                    {a.exists ? (
+                      <Link href={`/artists/${a.slug}`} className="underline-offset-4 hover:underline">
+                        {a.name}
+                      </Link>
+                    ) : (
+                      <span>{a.name}</span>
+                    )}
+                  </span>
+                ))}
+              </p>
+            ) : null}
             <div className="mt-4 flex flex-wrap gap-2 text-xs">
               {r.data.status === "draft" ? (
                 <span className="inline-block border border-amber-700 bg-amber-950 px-2 py-0.5 uppercase tracking-wider text-amber-200">
