@@ -183,8 +183,6 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
             </figure>
           ) : null}
 
-          {discography}
-
           {(() => {
             const intro = doc.data.intro;
             const h1 = intro?.heading_line_1;
@@ -276,6 +274,8 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
               </section>
             );
           })()}
+
+          {discography}
         </header>
 
         <div className="prose prose-invert prose-neutral max-w-3xl">
