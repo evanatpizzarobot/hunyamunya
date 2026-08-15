@@ -20,6 +20,13 @@ function youtubeEmbedFrom(url: string): string | null {
   return m ? `https://www.youtube-nocookie.com/embed/${m[1]}` : null;
 }
 
+function spotifyEmbedFrom(url: string): string | null {
+  const m = url.match(
+    /open\.spotify\.com\/(?:embed\/)?(album|track|playlist|artist|episode|show)\/([A-Za-z0-9]+)/,
+  );
+  return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : null;
+}
+
 // Converts `*asterisk-wrapped*` runs in a plaintext shortBio into italic
 // <em> elements so release titles and press names read as properly emphasized
 // inside the Highlights pill. Everything else passes through as text.
@@ -101,6 +108,36 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
   if (!doc) notFound();
   const releases = getReleasesByArtistSlug(slug).sort((a, b) => b.year - a.year);
 
+  // The cover shown beside the portrait. Several releases still fall back to
+  // the artist's own photo for cover_image, and pairing that with the portrait
+  // would show the same picture twice, so those are skipped. Such a page keeps
+  // showing the portrait alone and gains a cover automatically once real art
+  // lands. `featured_release` (catalog number or slug) overrides the pick.
+  const ownPhotos = new Set(
+    [doc.data.portrait, doc.data.hero_image].filter(Boolean) as string[],
+  );
+  const withRealArt = releases.filter(
+    (r) => r.data.cover_image && !ownPhotos.has(r.data.cover_image),
+  );
+  // Releases the artist is actually billed on come first. A remix credit can be
+  // the newest thing in their discography while its cover belongs to somebody
+  // else entirely, which would put a stranger's photo next to their portrait.
+  const isBilled = (r: (typeof withRealArt)[number]) =>
+    r.resolvedArtists.some((a) => a.slug === slug && a.role === "primary");
+  const preferred = [
+    ...withRealArt.filter(isBilled),
+    ...withRealArt.filter((r) => !isBilled(r)),
+  ];
+  const pinned = doc.data.featured_release?.toLowerCase();
+  const featuredCover =
+    (pinned
+      ? preferred.find(
+          (r) =>
+            r.data.catalog_number?.toLowerCase() === pinned ||
+            r.data.slug.toLowerCase() === pinned,
+        )
+      : undefined) ?? preferred[0];
+
   return (
     <>
       <SEO
@@ -121,15 +158,41 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
         <header className="mb-10">
           <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>
 
-          {doc.data.portrait ? (
-            <figure className="mt-5 max-w-sm overflow-hidden border border-neutral-800">
-              <img
-                src={doc.data.portrait}
-                alt={doc.data.name}
-                className="block h-auto w-full"
-                loading="eager"
-              />
-            </figure>
+          {doc.data.portrait || featuredCover ? (
+            <div className="mt-5 flex flex-wrap items-start gap-4">
+              {doc.data.portrait ? (
+                <figure className="w-full max-w-sm overflow-hidden border border-neutral-800 sm:flex-1 sm:basis-64">
+                  <img
+                    src={doc.data.portrait}
+                    alt={doc.data.name}
+                    className="block h-auto w-full"
+                    loading="eager"
+                  />
+                </figure>
+              ) : null}
+
+              {featuredCover ? (
+                <figure className="w-full max-w-sm sm:flex-1 sm:basis-64">
+                  <Link
+                    href={featuredCover.urlPath}
+                    className="group block overflow-hidden border border-neutral-800 transition-colors hover:border-neutral-500"
+                  >
+                    <img
+                      src={featuredCover.data.cover_image!}
+                      alt={`${featuredCover.data.title} cover`}
+                      className="block aspect-square h-auto w-full object-cover transition-transform group-hover:scale-[1.02]"
+                      loading="eager"
+                    />
+                  </Link>
+                  <figcaption className="mt-2 text-xs text-neutral-500">
+                    {featuredCover.data.catalog_number
+                      ? `${featuredCover.data.catalog_number} · `
+                      : ""}
+                    {featuredCover.data.title}
+                  </figcaption>
+                </figure>
+              ) : null}
+            </div>
           ) : null}
 
           {(() => {
@@ -229,21 +292,49 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
           <MDXRemote source={doc.body} components={mdxComponents} />
         </div>
 
-        {doc.data.featured_video && youtubeEmbedFrom(doc.data.featured_video) ? (
-          <section className="mt-12 border-t border-neutral-800 pt-8">
-            <h2 className="font-serif text-2xl text-neutral-100">Listen</h2>
-            <div className="mt-4 aspect-video w-full max-w-3xl overflow-hidden border border-neutral-800 bg-black">
-              <iframe
-                src={youtubeEmbedFrom(doc.data.featured_video)!}
-                title={`${doc.data.name}, featured track`}
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="h-full w-full"
-              />
-            </div>
-          </section>
-        ) : null}
+        {(() => {
+          const spotifySrc = doc.data.spotify_playlist
+            ? spotifyEmbedFrom(doc.data.spotify_playlist)
+            : null;
+          const youtubeSrc = doc.data.featured_video
+            ? youtubeEmbedFrom(doc.data.featured_video)
+            : null;
+          if (!spotifySrc && !youtubeSrc) return null;
+
+          return (
+            <section className="mt-12 border-t border-neutral-800 pt-8">
+              <h2 className="font-serif text-2xl text-neutral-100">Listen</h2>
+
+              {spotifySrc ? (
+                <div className="mt-4 w-full max-w-3xl overflow-hidden rounded-xl">
+                  <iframe
+                    src={spotifySrc}
+                    title={`${doc.data.name} on Spotify`}
+                    width="100%"
+                    height={352}
+                    loading="lazy"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    className="block border-0"
+                  />
+                </div>
+              ) : null}
+
+              {youtubeSrc ? (
+                <div className="mt-4 aspect-video w-full max-w-3xl overflow-hidden border border-neutral-800 bg-black">
+                  <iframe
+                    src={youtubeSrc}
+                    title={`${doc.data.name}, featured track`}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="h-full w-full"
+                  />
+                </div>
+              ) : null}
+            </section>
+          );
+        })()}
 
         {releases.length > 0 ? (
           <section className="mt-12 border-t border-neutral-800 pt-8">

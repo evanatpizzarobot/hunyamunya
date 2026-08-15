@@ -54,7 +54,14 @@ export const artistSchema = z.object({
   // from each WP artist page embed during the 2026-04-22 export; kept curated
   // so Evan can swap in a better track without a full re-import.
   featured_video: z.string().url().optional(),
+  // A Spotify playlist (or album/artist) URL for this artist, shown above the
+  // YouTube embed in the Listen section. Any open.spotify.com link works; it
+  // gets normalised to the /embed/ form at render time.
+  spotify_playlist: z.string().url().optional(),
   press_quotes: z.array(pressQuote).default([]),
+  // Catalog number or release slug whose cover art represents this artist at
+  // the top of their page. Falls back to their newest release that has real
+  // cover art (one that is not just their portrait reused).
   featured_release: z.string().optional(),
   palette_override: z
     .object({
