@@ -253,12 +253,28 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
                 <li key={r.catnoSlug}>
                   <Link
                     href={r.urlPath}
-                    className="block border border-neutral-800 p-3 text-sm hover:border-neutral-600 hover:bg-neutral-900"
+                    className="group flex items-center gap-3 border border-neutral-800 p-3 text-sm hover:border-neutral-600 hover:bg-neutral-900"
                   >
-                    <span className="block font-serif text-neutral-50">{r.data.title}</span>
-                    <span className="block text-xs text-neutral-500">
-                      {r.data.catalog_number ? `${r.data.catalog_number} · ` : ""}
-                      {r.year} · {r.data.format.join(", ")}
+                    <span className="block h-14 w-14 shrink-0 overflow-hidden bg-neutral-950">
+                      {r.data.cover_image ? (
+                        <img
+                          src={r.data.cover_image}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-950 p-1 text-center font-mono text-[8px] uppercase leading-tight tracking-wider text-neutral-600">
+                          {r.data.catalog_number ?? r.data.title}
+                        </span>
+                      )}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block font-serif text-neutral-50">{r.data.title}</span>
+                      <span className="block text-xs text-neutral-500">
+                        {r.data.catalog_number ? `${r.data.catalog_number} · ` : ""}
+                        {r.year} · {r.data.format.join(", ")}
+                      </span>
                     </span>
                   </Link>
                 </li>
