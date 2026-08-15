@@ -17,6 +17,10 @@ import { websiteJsonLd } from "@/lib/jsonld";
 export function generateMetadata(): Metadata {
   return buildMetadata({
     title: homeTitle(),
+    // Home leads with the label instead of trailing it, so it opts out of the
+    // layout's suffix template rather than reading "... · Hunya Munya Records"
+    // twice over.
+    titleIsAbsolute: true,
     description:
       "Hunya Munya Records is an LA-based independent electronic music label and publisher, founded 2002. Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, and Progressive across 38 releases since 2002. Home to Rykard (25M+ streams, BBC Radio, KCRW), Darius Kohanim, Habersham, Distant Fragment, and Blue Room Project. Limited 12\" vinyl, CD, and digital. Sync and licensing for Film, TV, and Radio.",
     path: "/",
