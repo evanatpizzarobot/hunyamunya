@@ -15,6 +15,12 @@ type BuildArgs = {
   titleIsAbsolute?: boolean;
   description?: string;
   path?: string;
+  /**
+   * Suppresses the canonical tag. Only the 404 needs this: with no path, the
+   * canonical would otherwise resolve to the site root and tell crawlers that
+   * every junk URL is the home page.
+   */
+  noCanonical?: boolean;
   ogImage?: string;
   ogType?: "website" | "article" | "music.album";
   index?: boolean;
@@ -64,7 +70,7 @@ export function buildMetadata(opts: BuildArgs): Metadata {
     ...titleField,
     description: opts.description,
     metadataBase: new URL(SITE_URL),
-    alternates: { canonical: url },
+    ...(opts.noCanonical ? {} : { alternates: { canonical: url } }),
     robots: {
       index: opts.index ?? true,
       follow: opts.follow ?? true,
