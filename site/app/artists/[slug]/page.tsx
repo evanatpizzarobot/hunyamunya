@@ -5,6 +5,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxComponents } from "@/components/mdx-components";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 import {
+  archiveCoverFor,
   getAllArtists,
   getArtistBySlug,
   getReleasesByArtistSlug,
@@ -125,9 +126,9 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
                 className="group flex items-center gap-3 border border-neutral-800 p-3 text-sm hover:border-neutral-600 hover:bg-neutral-900"
               >
                 <span className="block h-14 w-14 shrink-0 overflow-hidden bg-neutral-950">
-                  {r.data.cover_image ? (
+                  {archiveCoverFor(r) ? (
                     <img
-                      src={r.data.cover_image}
+                      src={archiveCoverFor(r)}
                       alt=""
                       className="h-full w-full object-cover"
                       loading="lazy"

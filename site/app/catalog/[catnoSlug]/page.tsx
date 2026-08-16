@@ -96,6 +96,17 @@ function Tracklist({ tracks }: { tracks: Release["tracklist"] }) {
   );
 }
 
+// Heading for the sleeve photo that sits below the hero art. HMR001-009 now
+// carry two images: the 2026 art the stores show, and the record as it was
+// actually pressed. Naming the format keeps the second one from reading as a
+// stray duplicate of the first.
+function pressingHeading(format: Release["format"]): string {
+  if (format.includes("vinyl-12")) return 'Original 12" pressing';
+  if (format.includes("vinyl-7")) return 'Original 7" pressing';
+  if (format.includes("vinyl-lp")) return "Original LP pressing";
+  return "Original pressing";
+}
+
 export function generateStaticParams(): Params[] {
   return getAllReleases().map((r) => ({ catnoSlug: r.catnoSlug }));
 }
@@ -264,6 +275,26 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
             </figure>
           ) : null}
         </section>
+
+        {r.data.vinyl_image ? (
+          <section className="mt-12 border-t border-neutral-800 pt-8">
+            <h2 className="font-serif text-2xl text-neutral-100">
+              {pressingHeading(r.data.format)}
+            </h2>
+            <figure className="mt-4 max-w-sm">
+              <img
+                src={r.data.vinyl_image}
+                alt={`${r.data.title}, original vinyl pressing`}
+                className="block h-auto w-full border border-neutral-800"
+                loading="lazy"
+              />
+              <figcaption className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+                {r.data.catalog_number ? `${r.data.catalog_number} · ` : ""}
+                {r.year} pressing
+              </figcaption>
+            </figure>
+          </section>
+        ) : null}
 
         {r.data.tracklist.length > 0 ? (
           <section className="mt-12 border-t border-neutral-800 pt-8">

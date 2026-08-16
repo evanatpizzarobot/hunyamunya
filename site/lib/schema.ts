@@ -181,6 +181,12 @@ export const releaseSchema = z.object({
   price_usd: z.number().optional(),
   sold_out: z.boolean().default(false),
   cover_image: mediaUrl.optional(),
+  // Photo of the physical pressing, kept alongside `cover_image` on the older
+  // vinyl catalog. HMR001-009 were re-arted in 2026 for streaming, but the
+  // 12" sleeve is the historical record: the release page shows the new art up
+  // top and this below it, while the discography and artist pages keep showing
+  // the physical record. Unset on releases that never had a pressing.
+  vinyl_image: mediaUrl.optional(),
   gallery: z.array(mediaUrl).default([]),
   embeds: z
     .object({

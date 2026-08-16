@@ -137,6 +137,15 @@ export function compareReleasesForCatalog(a: ReleaseDoc, b: ReleaseDoc): number 
   return bCat.localeCompare(aCat);
 }
 
+// The image for archive-facing views: the discography and the release lists on
+// artist pages, where the point is the record as it was pressed. HMR001-009 got
+// new digital art in 2026 for the streaming stores, and that art is what
+// `cover_image` now holds, so those views ask for the sleeve photo first and
+// only fall back to the cover when a release never had a physical pressing.
+export function archiveCoverFor(r: ReleaseDoc): string | undefined {
+  return r.data.vinyl_image ?? r.data.cover_image;
+}
+
 export function getReleaseByCatnoSlug(catnoSlug: string): ReleaseDoc | null {
   // Cheap linear scan; catalog is small (tens of releases) so this is fine.
   return getAllReleases().find((r) => r.catnoSlug === catnoSlug) ?? null;

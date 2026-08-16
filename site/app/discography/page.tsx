@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllReleases, getArtistBySlug, type ReleaseDoc } from "@/lib/content";
+import { archiveCoverFor, getAllReleases, getArtistBySlug, type ReleaseDoc } from "@/lib/content";
 import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
@@ -40,7 +40,7 @@ function byCatalogAsc(a: ReleaseDoc, b: ReleaseDoc): number {
 }
 
 function DiscographyCard({ r }: { r: ReleaseDoc }) {
-  const cover = r.data.cover_image;
+  const cover = archiveCoverFor(r);
   return (
     <li>
       <Link
