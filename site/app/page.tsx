@@ -6,6 +6,7 @@ import { CountUp } from "@/components/home/CountUp";
 import { HeroParallax } from "@/components/home/HeroParallax";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 import { SEO } from "@/components/SEO";
+import { spotifyEmbedFrom } from "@/components/SpotifyPlayer";
 import { buildMetadata, homeTitle } from "@/lib/seo";
 import { websiteJsonLd } from "@/lib/jsonld";
 
@@ -39,11 +40,6 @@ const HOME_LANES: LaneConfig[] = [
   { shape: "narrow", direction: "rl", top: "22%", width: 80,  duration: 80,  delay: -55, opacityMod: 0.75 },
   { shape: "whale",  direction: "lr", top: "10%", width: 360, duration: 110, delay: -35, opacityMod: 0.65, mobileHide: true },
 ];
-
-function spotifyEmbedFrom(url: string): string | null {
-  const m = url.match(/open\.spotify\.com\/(?:embed\/)?(album|track|playlist|artist|episode|show)\/([A-Za-z0-9]+)/);
-  return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : null;
-}
 
 // Home-page catalog preview sort. Starts as year-descending, then collapses
 // multi-volume series that share a catalog-number root (currently HMB005a/b/c/d,

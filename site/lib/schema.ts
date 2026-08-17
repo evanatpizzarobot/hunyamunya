@@ -54,10 +54,13 @@ export const artistSchema = z.object({
   // from each WP artist page embed during the 2026-04-22 export; kept curated
   // so Evan can swap in a better track without a full re-import.
   featured_video: z.string().url().optional(),
-  // A Spotify playlist (or album/artist) URL for this artist, shown above the
-  // YouTube embed in the Listen section. Any open.spotify.com link works; it
-  // gets normalised to the /embed/ form at render time.
-  spotify_playlist: z.string().url().optional(),
+  // Explicit Spotify embed for this artist, shown above the YouTube embed in
+  // the Listen section. Any open.spotify.com link works (artist profile,
+  // album, playlist); it gets normalised to the /embed/ form at render time.
+  // Left unset, the artist page falls back to their featured release, then to
+  // their newest release that has a Spotify link. Set this on the artists with
+  // several releases, where auto-picking one would be arbitrary.
+  spotify_embed: z.string().url().optional(),
   press_quotes: z.array(pressQuote).default([]),
   // Catalog number or release slug whose cover art represents this artist at
   // the top of their page. Falls back to their newest release that has real

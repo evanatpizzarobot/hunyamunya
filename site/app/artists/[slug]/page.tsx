@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxComponents } from "@/components/mdx-components";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
+import SpotifyPlayer from "@/components/SpotifyPlayer";
 import {
   archiveCoverFor,
   getAllArtists,
@@ -19,13 +20,6 @@ type Params = { slug: string };
 function youtubeEmbedFrom(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
   return m ? `https://www.youtube-nocookie.com/embed/${m[1]}` : null;
-}
-
-function spotifyEmbedFrom(url: string): string | null {
-  const m = url.match(
-    /open\.spotify\.com\/(?:embed\/)?(album|track|playlist|artist|episode|show)\/([A-Za-z0-9]+)/,
-  );
-  return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : null;
 }
 
 // Converts `*asterisk-wrapped*` runs in a plaintext shortBio into italic
@@ -108,6 +102,27 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
   const doc = getArtistBySlug(slug);
   if (!doc) notFound();
   const releases = getReleasesByArtistSlug(slug).sort((a, b) => b.year - a.year);
+
+  // The Listen player prefers an explicit `spotify_embed` (an artist profile or
+  // curated playlist, set on artists with several releases where auto-picking
+  // one would be arbitrary). Failing that it borrows from the catalog: the
+  // featured release if that has a Spotify link, otherwise the newest release
+  // that does. Artists with a single release therefore need no frontmatter at
+  // all, and every artist page lights up as release links land.
+  const spotifyFallback = doc.data.spotify_embed
+    ? null
+    : (releases.find(
+        (r) =>
+          Boolean(r.data.embeds.spotify) &&
+          (r.data.catalog_number === doc.data.featured_release ||
+            r.data.slug === doc.data.featured_release),
+      ) ?? releases.find((r) => Boolean(r.data.embeds.spotify)));
+  const spotifyUrl = doc.data.spotify_embed ?? spotifyFallback?.data.embeds.spotify ?? null;
+  // Name the record when it was auto-picked, so it is clear which of their
+  // releases is playing. An explicit embed speaks for itself.
+  const spotifyCaption = spotifyFallback
+    ? [spotifyFallback.data.catalog_number, spotifyFallback.data.title].filter(Boolean).join(" · ")
+    : undefined;
 
   // The discography sits directly under the portrait rather than at the foot of
   // the page. On artists with a long bio it was below the fold entirely, so
@@ -284,32 +299,21 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
         </div>
 
         {(() => {
-          const spotifySrc = doc.data.spotify_playlist
-            ? spotifyEmbedFrom(doc.data.spotify_playlist)
-            : null;
           const youtubeSrc = doc.data.featured_video
             ? youtubeEmbedFrom(doc.data.featured_video)
             : null;
-          if (!spotifySrc && !youtubeSrc) return null;
+          if (!spotifyUrl && !youtubeSrc) return null;
 
           return (
             <section className="mt-12 border-t border-neutral-800 pt-8">
               <h2 className="font-serif text-2xl text-neutral-100">Listen</h2>
 
-              {spotifySrc ? (
-                <div className="mt-4 w-full max-w-3xl overflow-hidden rounded-xl">
-                  <iframe
-                    src={spotifySrc}
-                    title={`${doc.data.name} on Spotify`}
-                    width="100%"
-                    height={352}
-                    loading="lazy"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    allowFullScreen
-                    className="block border-0"
-                  />
-                </div>
-              ) : null}
+              <SpotifyPlayer
+                url={spotifyUrl}
+                title={`${doc.data.name} on Spotify`}
+                caption={spotifyCaption}
+                className="mt-4 max-w-3xl"
+              />
 
               {youtubeSrc ? (
                 <div className="mt-4 aspect-video w-full max-w-3xl overflow-hidden border border-neutral-800 bg-black">
