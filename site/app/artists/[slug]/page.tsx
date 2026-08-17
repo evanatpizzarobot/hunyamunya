@@ -103,12 +103,14 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
   if (!doc) notFound();
   const releases = getReleasesByArtistSlug(slug).sort((a, b) => b.year - a.year);
 
-  // The Listen player prefers an explicit `spotify_embed` (an artist profile or
-  // curated playlist, set on artists with several releases where auto-picking
-  // one would be arbitrary). Failing that it borrows from the catalog: the
-  // featured release if that has a Spotify link, otherwise the newest release
-  // that does. Artists with a single release therefore need no frontmatter at
-  // all, and every artist page lights up as release links land.
+  // One player per artist, always. Stacking a player per release was tried and
+  // reverted: Spotify themes each embed from that release's cover art, and the
+  // iframe is cross-origin so the colour cannot be overridden, which turned an
+  // artist with four releases into four clashing colour blocks down the page.
+  // An artist with a deep catalog therefore needs an explicit `spotify_embed`,
+  // an artist profile or a curated playlist, to be represented by more than one
+  // record. Without one the page falls back to a single release: the featured
+  // one if it has a Spotify link, otherwise the newest that does.
   const spotifyFallback = doc.data.spotify_embed
     ? null
     : (releases.find(
@@ -199,7 +201,7 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
             </figure>
           ) : null}
 
-          {/* Player sits directly under the portrait, stacking with it as one
+          {/* Players sit directly under the portrait, stacking with it as one
               block, so an artist is audible before any scrolling. */}
           <SpotifyPlayer
             url={spotifyUrl}
