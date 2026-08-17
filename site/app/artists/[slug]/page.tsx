@@ -291,6 +291,12 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
                 <div className="ai-accent" />
                 <div className="ai-top">
                   <span className="ai-kicker">Profile · HMR</span>
+                  {doc.data.tier === "anchor" ? (
+                    <>
+                      <span className="ai-dot" aria-hidden="true" />
+                      <span className="ai-kicker ai-kicker-accent">Anchor artist</span>
+                    </>
+                  ) : null}
                   {estYear ? (
                     <>
                       <span className="ai-dot" aria-hidden="true" />
@@ -342,6 +348,26 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
               </section>
             );
           })()}
+
+          {/* Stations that have played this artist. Sits under the profile
+              block because it is evidence for the claims made there. */}
+          {doc.data.radio_support.length > 0 ? (
+            <section className="mt-2" aria-label={`${doc.data.name} radio support`}>
+              <h2 className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+                Radio support
+              </h2>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {doc.data.radio_support.map((station) => (
+                  <span
+                    key={station}
+                    className="rounded-full border border-neutral-700 bg-neutral-900/60 px-3 py-1 text-xs text-neutral-300"
+                  >
+                    {station}
+                  </span>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           {discography}
 

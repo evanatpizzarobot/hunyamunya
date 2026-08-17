@@ -79,6 +79,10 @@ export const artistSchema = z.object({
   // optional; page template falls back to shortBio + genres + computed year
   // when any piece is missing. `blurb_html` accepts trusted inline HTML
   // (<strong>, <em>) from frontmatter.
+  // Stations that have played this artist, shown as chips under the profile
+  // block. Kept separate from press_quotes because these are attributions
+  // without a quote attached.
+  radio_support: z.array(z.string()).default([]),
   intro: z
     .object({
       heading_line_1: z.string().optional(),

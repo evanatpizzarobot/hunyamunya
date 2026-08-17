@@ -430,6 +430,9 @@ body {
   margin-bottom: 20px;
 }
 .ai-kicker { display: inline-flex; align-items: center; }
+/* Marks the label's anchor artist. Only the accent colour separates it from
+   the neighbouring kickers, so it reads as emphasis rather than a badge. */
+.ai-kicker-accent { color: var(--accent); }
 .ai-dot {
   width: 4px; height: 4px;
   background: var(--accent);
