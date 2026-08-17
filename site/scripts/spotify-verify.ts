@@ -91,6 +91,34 @@ function collect(): { file: string; field: string; url: string }[] {
   return out;
 }
 
+// Artists carrying a profile URL in `links.spotify` but no active
+// `spotify_embed`. These are almost always profiles that were correct but
+// served an empty top-tracks list because the catalog had only just gone live,
+// so they were parked rather than shipped. Spotify computes that data over the
+// following days, so this pass reports the moment one becomes usable and can be
+// promoted to `spotify_embed`.
+function collectCandidates(): { file: string; slug: string; url: string }[] {
+  const out: { file: string; slug: string; url: string }[] = [];
+  const dir = path.join(CONTENT, "artists");
+  if (!fs.existsSync(dir)) return out;
+  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(".mdx"))) {
+    const body = fs.readFileSync(path.join(dir, f), "utf8");
+    const fm = body.split(/^---$/m)[1] ?? "";
+    // An active embed means there is nothing to promote.
+    if (/^spotify_embed:\s*'?https:/m.test(fm)) continue;
+    let block = "";
+    for (const line of fm.split("\n")) {
+      const top = line.match(/^([A-Za-z_]+):/);
+      if (top) block = top[1];
+      const hit = line.match(/^\s*spotify:\s*'?(https:\/\/open\.spotify\.com\/\S+?)'?\s*$/);
+      if (hit && block === "links") {
+        out.push({ file: `artists/${f}`, slug: f.replace(/\.mdx$/, ""), url: hit[1] });
+      }
+    }
+  }
+  return out;
+}
+
 async function main() {
   const found = collect();
   const rows: Row[] = [];
@@ -121,6 +149,30 @@ async function main() {
     console.log(`${unknown.length} could not be reached after retries (rerun to confirm):`);
     for (const r of unknown) console.log(`  ${r.file} (${r.field}): ${r.url}`);
   }
+
+  // Parked profiles: report any that have started returning tracks.
+  const candidates = collectCandidates();
+  if (candidates.length > 0) {
+    console.log(`\n=== PARKED ARTIST PROFILES (${candidates.length}) ===`);
+    const ready: typeof candidates = [];
+    for (const c of candidates) {
+      const parsed = embedUrl(c.url);
+      if (!parsed) continue;
+      const r = await probe(parsed.kind, parsed.id);
+      const usable = (r.tracks ?? 0) > 0;
+      if (usable) ready.push(c);
+      console.log(
+        `  ${(usable ? "READY" : "still empty").padEnd(12)} ${String(r.tracks ?? "-").padStart(3)} tracks  ${c.slug.padEnd(20)} ${c.url}`,
+      );
+    }
+    if (ready.length > 0) {
+      console.log(`\n${ready.length} profile(s) now usable. Promote to spotify_embed:`);
+      for (const c of ready) console.log(`  ${c.file}  ->  spotify_embed: '${c.url}'`);
+    } else {
+      console.log("\nNone ready yet. Spotify is still computing top-tracks data; recheck later.");
+    }
+  }
+
   if (bad.length > 0) process.exitCode = 1;
 }
 
