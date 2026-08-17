@@ -187,29 +187,70 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
       />
       <UnderwaterLayer zone="surface" lanes={ARTIST_LANES} flushTop>
       <article>
-        <header className="mb-10">
+        <header>
           <h1 className="font-serif text-5xl text-neutral-50">{doc.data.name}</h1>
+        </header>
 
-          {doc.data.portrait ? (
-            <figure className="mt-5 max-w-sm overflow-hidden border border-neutral-800">
-              <img
-                src={doc.data.portrait}
-                alt={doc.data.name}
-                className="block h-auto w-full"
-                loading="eager"
-              />
-            </figure>
-          ) : null}
+        {/* Two columns from lg up, one column below it in the same order. The
+            page used to be a single narrow column inside a 1440px container,
+            so most of the width sat empty at every scroll position on a wide
+            screen. */}
+        <div className="mt-6 lg:grid lg:grid-cols-[340px_minmax(0,1fr)] lg:items-start lg:gap-12">
+          {/* Identity rail: who they are and how to hear them. Sticky so the
+              player stays reachable while the reading column scrolls. */}
+          <aside className="lg:sticky lg:top-24">
+            {doc.data.portrait ? (
+              <figure className="max-w-sm overflow-hidden border border-neutral-800 lg:max-w-none">
+                <img
+                  src={doc.data.portrait}
+                  alt={doc.data.name}
+                  className="block h-auto w-full"
+                  loading="eager"
+                />
+              </figure>
+            ) : null}
 
-          {/* Players sit directly under the portrait, stacking with it as one
-              block, so an artist is audible before any scrolling. */}
-          <SpotifyPlayer
-            url={spotifyUrl}
-            title={`${doc.data.name} on Spotify`}
-            caption={spotifyCaption}
-            className="mt-4 max-w-sm"
-          />
+            {/* Player sits directly under the portrait, stacking with it as one
+                block, so an artist is audible before any scrolling. */}
+            <SpotifyPlayer
+              url={spotifyUrl}
+              title={`${doc.data.name} on Spotify`}
+              caption={spotifyCaption}
+              className="mt-4 max-w-sm lg:max-w-none"
+            />
 
+            {doc.data.links && Object.keys(doc.data.links).length > 0 ? (
+              <div className="mt-6">
+                <h2 className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+                  Elsewhere
+                </h2>
+                <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-neutral-300">
+                  {Object.entries(doc.data.links).map(([k, v]) => {
+                    if (!v) return null;
+                    let label = k;
+                    try {
+                      label = new URL(v).hostname.replace(/^www\./, "");
+                    } catch {}
+                    return (
+                      <li key={k}>
+                        <a
+                          href={v}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline-offset-4 hover:text-neutral-50 hover:underline"
+                        >
+                          {label}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+          </aside>
+
+          {/* Reading column: profile, releases, biography, video. */}
+          <div className="mt-10 lg:mt-0">
           {(() => {
             const intro = doc.data.intro;
             const h1 = intro?.heading_line_1;
@@ -303,11 +344,10 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
           })()}
 
           {discography}
-        </header>
 
-        <div className="prose prose-invert prose-neutral max-w-3xl">
-          <MDXRemote source={doc.body} components={mdxComponents} />
-        </div>
+          <div className="prose prose-invert prose-neutral mt-10 max-w-3xl">
+            <MDXRemote source={doc.body} components={mdxComponents} />
+          </div>
 
         {(() => {
           const youtubeSrc = doc.data.featured_video
@@ -334,33 +374,8 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
             </section>
           );
         })()}
-
-        {doc.data.links && Object.keys(doc.data.links).length > 0 ? (
-          <section className="mt-12 border-t border-neutral-800 pt-8">
-            <h2 className="font-serif text-2xl text-neutral-100">Elsewhere</h2>
-            <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-neutral-300">
-              {Object.entries(doc.data.links).map(([k, v]) => {
-                if (!v) return null;
-                let label = k;
-                try {
-                  label = new URL(v).hostname.replace(/^www\./, "");
-                } catch {}
-                return (
-                  <li key={k}>
-                    <a
-                      href={v}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline-offset-4 hover:text-neutral-50 hover:underline"
-                    >
-                      {label}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        ) : null}
+          </div>
+        </div>
       </article>
       </UnderwaterLayer>
     </>
