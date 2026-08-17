@@ -8,6 +8,7 @@
 // Run: npx tsx scripts/spotify-verify.ts
 import fs from "node:fs";
 import path from "node:path";
+import { embedUrl, probe } from "./lib/spotify-probe";
 
 type Row = {
   file: string;
@@ -20,47 +21,6 @@ type Row = {
 };
 
 const CONTENT = path.join(process.cwd(), "content");
-
-function embedUrl(url: string): { kind: string; id: string } | null {
-  const m = url.match(
-    /open\.spotify\.com\/(?:embed\/)?(album|track|playlist|artist|episode|show)\/([A-Za-z0-9]+)/,
-  );
-  return m ? { kind: m[1], id: m[2] } : null;
-}
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-// Pulls the entity out of the embed page's __NEXT_DATA__ blob. `trackList` is
-// what the widget renders, so an empty one means an empty player.
-//
-// Spotify throttles rapid sequential requests, and a throttled response looks
-// exactly like an empty tracklist, so retry with backoff before believing a
-// zero. `tracks: null` means the probe never got a usable answer, which is not
-// the same finding as a confirmed empty player.
-async function probe(kind: string, id: string, attempts = 3) {
-  let last = { http: 0, name: null as string | null, tracks: null as number | null };
-  for (let i = 0; i < attempts; i++) {
-    if (i > 0) await sleep(500 * 2 ** i);
-    try {
-      const res = await fetch(`https://open.spotify.com/embed/${kind}/${id}`, {
-        headers: { "User-Agent": "Mozilla/5.0" },
-      });
-      last = { http: res.status, name: null, tracks: null };
-      if (!res.ok) continue;
-      const html = await res.text();
-      const m = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
-      if (!m) continue;
-      const entity = JSON.parse(m[1])?.props?.pageProps?.state?.data?.entity;
-      const tracks = Array.isArray(entity?.trackList) ? entity.trackList.length : null;
-      last = { http: res.status, name: entity?.name ?? null, tracks };
-      // A real zero is stable, so only trust it once retries are exhausted.
-      if (tracks !== null && tracks > 0) return last;
-    } catch {
-      // Network hiccup; fall through to the next attempt.
-    }
-  }
-  return last;
-}
 
 // Only the fields that actually render an iframe: `embeds.spotify` on releases
 // and top-level `spotify_embed` on artists. `links.spotify` and `buy.spotify`
