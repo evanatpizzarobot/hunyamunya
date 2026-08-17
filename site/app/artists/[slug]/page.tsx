@@ -199,6 +199,15 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
             </figure>
           ) : null}
 
+          {/* Player sits directly under the portrait, stacking with it as one
+              block, so an artist is audible before any scrolling. */}
+          <SpotifyPlayer
+            url={spotifyUrl}
+            title={`${doc.data.name} on Spotify`}
+            caption={spotifyCaption}
+            className="mt-4 max-w-sm"
+          />
+
           {(() => {
             const intro = doc.data.intro;
             const h1 = intro?.heading_line_1;
@@ -302,18 +311,11 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
           const youtubeSrc = doc.data.featured_video
             ? youtubeEmbedFrom(doc.data.featured_video)
             : null;
-          if (!spotifyUrl && !youtubeSrc) return null;
+          if (!youtubeSrc) return null;
 
           return (
             <section className="mt-12 border-t border-neutral-800 pt-8">
-              <h2 className="font-serif text-2xl text-neutral-100">Listen</h2>
-
-              <SpotifyPlayer
-                url={spotifyUrl}
-                title={`${doc.data.name} on Spotify`}
-                caption={spotifyCaption}
-                className="mt-4 max-w-3xl"
-              />
+              <h2 className="font-serif text-2xl text-neutral-100">Watch</h2>
 
               {youtubeSrc ? (
                 <div className="mt-4 aspect-video w-full max-w-3xl overflow-hidden border border-neutral-800 bg-black">
