@@ -83,6 +83,18 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
           set -eu
+          # Two passes on purpose.
+          #
+          # Pass 1 mirrors everything except the hashed build assets, so a page
+          # removed from the site actually disappears. rsync also protects
+          # excluded paths from --delete, which is what keeps pass 2's files
+          # alive.
+          #
+          # Pass 2 adds the new hashed assets without deleting the old ones. A
+          # browser tab still running the previous build asks for that build's
+          # exact CSS and chunk filenames, and deleting them is what leaves a
+          # visitor staring at an unstyled page until they hard-refresh. The
+          # filenames carry a content hash, so old and new can never collide.
           rsync -avz --delete \
             --chmod=D0755,F0644 \
             --exclude '.git*' \
@@ -91,9 +103,32 @@ jobs:
             --exclude 'gd' \
             --exclude 'gd.txt' \
             --exclude 'api/' \
+            --exclude '_next/static/' \
             -e "ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=accept-new" \
             site/out/ \
             "$SSH_USER@$SSH_HOST:/var/www/hunyamunya/"
+
+          rsync -avz \
+            --chmod=D0755,F0644 \
+            -e "ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=accept-new" \
+            site/out/_next/static/ \
+            "$SSH_USER@$SSH_HOST:/var/www/hunyamunya/_next/static/"
+
+      - name: Prune build assets older than 14 days
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          set -eu
+          # Old builds stay reachable so open tabs survive a deploy, but not
+          # forever. Two weeks is far longer than any tab anyone leaves sitting,
+          # and this runs after the sync so the current build is never a
+          # candidate. Pruning must never fail the deploy.
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=accept-new \
+            "$SSH_USER@$SSH_HOST" \
+            "find /var/www/hunyamunya/_next/static -type f -mtime +14 -delete; \
+             find /var/www/hunyamunya/_next/static -mindepth 1 -type d -empty -delete; \
+             true"
 
       - name: Reload nginx to pick up redirect snippet changes
         env:

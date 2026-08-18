@@ -34,3 +34,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Verification builds run with NEXT_DIST_DIR so they cannot clobber the dev server
+.next-verify/
