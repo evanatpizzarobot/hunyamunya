@@ -78,3 +78,6 @@ docs/
 design/
 plans/
 .claude/
+
+# playwright MCP session artifacts (screenshots, page snapshots, console logs)
+.playwright-mcp/
