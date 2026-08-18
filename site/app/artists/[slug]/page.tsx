@@ -247,6 +247,22 @@ export default async function ArtistPage({ params }: { params: Promise<Params> }
                 </ul>
               </div>
             ) : null}
+
+            {/* Only artists with a kit get this; everyone else routes through
+                the press email on /press. */}
+            {doc.data.press_kit ? (
+              <div className="mt-6">
+                <h2 className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+                  For media
+                </h2>
+                <Link
+                  href={doc.data.press_kit}
+                  className="mt-3 inline-block text-sm text-neutral-300 underline-offset-4 hover:text-neutral-50 hover:underline"
+                >
+                  Press kit &rarr;
+                </Link>
+              </div>
+            ) : null}
           </aside>
 
           {/* Reading column: profile, releases, biography, video. */}

@@ -48,6 +48,10 @@ export const artistSchema = z.object({
     })
     .partial()
     .default({}),
+  // Path to this artist's press kit, when one exists. Only artists with real
+  // press demand get a kit; everyone else routes through the press email, so
+  // this stays absent rather than defaulting to a page that is not there.
+  press_kit: z.string().optional(),
   hero_image: mediaUrl.optional(),
   portrait: mediaUrl.optional(),
   // A single YouTube video representing this artist's track on HMR. Scraped
