@@ -28,6 +28,17 @@ const CONTENT = path.join(process.cwd(), "content");
 // a perfectly good link to send someone, so those are not checked.
 function collect(): { file: string; field: string; url: string }[] {
   const out: { file: string; field: string; url: string }[] = [];
+  // Label playlists render as embeds on the home page and /catalog, so a blank
+  // player there is front-page breakage. Cheap line scan like the one below;
+  // the file is tiny and the `spotify:` key only appears on playlist entries.
+  const playlistsFile = path.join(CONTENT, "playlists.yml");
+  if (fs.existsSync(playlistsFile)) {
+    for (const line of fs.readFileSync(playlistsFile, "utf8").split("\n")) {
+      if (/^\s*#/.test(line)) continue;
+      const hit = line.match(/^\s*spotify:\s*'?(https:\/\/open\.spotify\.com\/\S+?)'?\s*$/);
+      if (hit) out.push({ file: "playlists.yml", field: "spotify", url: hit[1] });
+    }
+  }
   for (const dir of ["releases", "artists"]) {
     const full = path.join(CONTENT, dir);
     if (!fs.existsSync(full)) continue;

@@ -13,4 +13,7 @@
 #     - title: The Complete Catalog
 #       description: Every Hunya Munya release since 2002, in order.
 #       spotify: https://open.spotify.com/playlist/XXXXXXXXXXXXXXXXXXXXXX
-playlists: []
+playlists:
+  - title: The Complete Catalog
+    description: Every Hunya Munya Records release in chronological order, from HMR001 in 2003 to today. Twenty-four years of Ambient, Downtempo, Chillout, Breakbeat, IDM, Tech House, and Progressive, front to back.
+    spotify: https://open.spotify.com/playlist/3jPkb1Mpwy5nIihdFzQhxL
