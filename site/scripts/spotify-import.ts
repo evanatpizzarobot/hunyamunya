@@ -11,7 +11,10 @@
 // actually required.
 //
 // Nothing is guessed. A title that matches no release, or more than one, is
-// reported and skipped rather than written to the closest thing. Every link
+// reported and skipped rather than written to the closest thing. The one bit of
+// give: distributors drop the format suffix the catalog keeps ("The Reminisce"
+// for "The Reminisce EP"), so an exact miss retries without a trailing
+// EP/LP/Single, still only accepting a single hit, and says so in the output. Every link
 // that does get written is then probed to confirm the embed returns tracks,
 // because a valid Spotify link can still render a blank player.
 //
@@ -24,6 +27,11 @@ import path from "node:path";
 import { embedUrl, normalizeTitle, probe } from "./lib/spotify-probe";
 
 const RELEASES = path.join(process.cwd(), "content", "releases");
+
+// Fallback form only, applied to an already-normalised title.
+function stripFormatSuffix(s: string): string {
+  return s.replace(/\s+(ep|lp|single)$/, "").trim();
+}
 
 type Entry = { title: string; upc?: string; albumId: string; url: string };
 type ReleaseFile = { file: string; full: string; title: string; catno?: string; existing?: string };
@@ -134,7 +142,7 @@ async function main() {
   console.log(`Parsed ${entries.length} entries against ${releases.length} releases.\n`);
   for (const s of skipped) console.log(`  UNPARSED  ${s}`);
 
-  const applied: { entry: Entry; rel: ReleaseFile }[] = [];
+  const applied: { entry: Entry; rel: ReleaseFile; loose: boolean }[] = [];
   const unmatched: Entry[] = [];
   const ambiguous: { entry: Entry; hits: ReleaseFile[] }[] = [];
   const unchanged: { entry: Entry; rel: ReleaseFile }[] = [];
@@ -142,7 +150,13 @@ async function main() {
 
   for (const e of entries) {
     const want = normalizeTitle(e.title);
-    const hits = releases.filter((r) => normalizeTitle(r.title) === want);
+    let hits = releases.filter((r) => normalizeTitle(r.title) === want);
+    let loose = false;
+    if (hits.length === 0) {
+      const bare = stripFormatSuffix(want);
+      hits = releases.filter((r) => stripFormatSuffix(normalizeTitle(r.title)) === bare);
+      loose = hits.length > 0;
+    }
     if (hits.length === 0) {
       unmatched.push(e);
       continue;
@@ -160,7 +174,7 @@ async function main() {
       conflicts.push({ entry: e, rel });
       continue;
     }
-    applied.push({ entry: e, rel });
+    applied.push({ entry: e, rel, loose });
   }
 
   for (const { entry, rel } of applied) {
@@ -174,6 +188,14 @@ async function main() {
   for (const { entry, hits } of ambiguous)
     console.log(`  AMBIGUOUS  "${entry.title}" matches ${hits.length}: ${hits.map((h) => h.catno ?? h.file).join(", ")}  (skipped)`);
   for (const e of unmatched) console.log(`  NO MATCH   "${e.title}"  ${e.url}  (skipped)`);
+
+  const looseHits = applied.filter((a) => a.loose);
+  if (looseHits.length > 0) {
+    console.log(`
+${looseHits.length} matched only after ignoring a trailing EP/LP/Single:`);
+    for (const { entry, rel } of looseHits)
+      console.log(`  "${entry.title}" -> "${rel.title}" (${rel.catno ?? rel.file})`);
+  }
 
   // Confirm the links that were written actually produce a playable embed.
   if (applied.length > 0) {
