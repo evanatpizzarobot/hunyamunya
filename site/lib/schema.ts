@@ -209,6 +209,25 @@ export const releaseSchema = z.object({
     })
     .partial()
     .default({}),
+  // Direct DSP links for the "Listen on" block and the MusicAlbum sameAs
+  // array. `embeds` stays the source for players; this block is for outbound
+  // links to the same release on each store. Anything missing here falls back
+  // to the matching `embeds` URL (spotify, apple, youtube, soundcloud) and to
+  // `buy.pandora`, so the older frontmatter keeps working untouched.
+  streaming: z
+    .object({
+      spotify: z.string().url().optional(),
+      apple: z.string().url().optional(),
+      amazon: z.string().url().optional(),
+      tidal: z.string().url().optional(),
+      pandora: z.string().url().optional(),
+      deezer: z.string().url().optional(),
+      youtube: z.string().url().optional(),
+      soundcloud: z.string().url().optional(),
+      beatport: z.string().url().optional(),
+    })
+    .partial()
+    .default({}),
   buy: z
     .object({
       bandcamp: z.string().url().optional(),
@@ -253,6 +272,22 @@ export const newsSchema = z.object({
   seo: seoBlock,
 });
 export type News = z.infer<typeof newsSchema>;
+
+// Label playlists (content/playlists.yml). Official HMR-curated playlists on
+// the label's own Spotify account, surfaced on the home page and /catalog.
+// The file ships with an empty list; sections render nothing until a playlist
+// exists and its URL is added.
+export const labelPlaylistSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  spotify: z.string().url(),
+  show_on: z.array(z.enum(["home", "catalog"])).default(["home", "catalog"]),
+});
+export type LabelPlaylist = z.infer<typeof labelPlaylistSchema>;
+
+export const playlistsFileSchema = z.object({
+  playlists: z.array(labelPlaylistSchema).default([]),
+});
 
 export const heroMedia = z.object({
   type: z.enum(["image", "video", "loop"]),

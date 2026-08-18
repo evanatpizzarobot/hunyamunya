@@ -1,0 +1,16 @@
+# Official Hunya Munya Records playlists, curated on the label's own Spotify
+# account. Shown on the home page and /catalog; an empty list renders nothing.
+#
+# Each entry:
+#   title:       Heading shown above the embed.
+#   description: Optional one-liner under the heading.
+#   spotify:     Any open.spotify.com/playlist/... link. Verify with
+#                scripts/spotify-verify.ts before shipping.
+#   show_on:     Optional list of [home, catalog]. Defaults to both.
+#
+# Example:
+#   playlists:
+#     - title: The Complete Catalog
+#       description: Every Hunya Munya release since 2002, in order.
+#       spotify: https://open.spotify.com/playlist/XXXXXXXXXXXXXXXXXXXXXX
+playlists: []

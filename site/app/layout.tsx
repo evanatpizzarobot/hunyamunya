@@ -60,6 +60,12 @@ export default function RootLayout({
     >
       <head>
         <meta name="theme-color" content="#0a0a0a" />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={`${LABEL_NAME} · News & Releases`}
+          href="/feed.xml"
+        />
       </head>
       <body className="antialiased text-neutral-100">
         <AmbientBackground />

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllArtists, getAllNews, getAllReleases, getCurrentCampaign } from "@/lib/content";
+import { getAllArtists, getAllNews, getAllReleases, getCurrentCampaign, getLabelPlaylists } from "@/lib/content";
 import { Reveal } from "@/components/home/Reveal";
 import { CountUp } from "@/components/home/CountUp";
 import { HeroParallax } from "@/components/home/HeroParallax";
@@ -67,6 +67,7 @@ export default function Home() {
   });
   const artists = getAllArtists();
   const news = getAllNews().slice(0, 5);
+  const labelPlaylists = getLabelPlaylists("home");
   const campaign = getCurrentCampaign();
   const active = campaign.active ?? null;
 
@@ -460,6 +461,67 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* ===================== §03b LABEL PLAYLISTS ===================== */}
+      {/* Official HMR playlists from content/playlists.yml. Hidden until the
+          first playlist URL lands there, so this ships dark and lights up the
+          moment the Spotify side exists. */}
+      {labelPlaylists.length > 0 ? (
+        <section className="border-t border-rule py-24 md:py-32">
+          <div className="mb-14 flex flex-col items-center gap-5 text-center">
+            <div className="flex items-center gap-3 text-[11px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
+              <span className="block h-px w-[18px] bg-[color:var(--hm-accent)]" />
+              Playlists
+            </div>
+            <Reveal as="h2" className="text-[clamp(28px,3.6vw,52px)] font-normal leading-none" delay={0}>
+              <span style={{ letterSpacing: "-0.015em" }}>
+                Twenty-four years,
+                <br />
+                one press of play.
+              </span>
+            </Reveal>
+          </div>
+          <div className="flex flex-col gap-16">
+            {labelPlaylists.map((p) => {
+              const embed = spotifyEmbedFrom(p.spotify);
+              if (!embed) return null;
+              return (
+                <div key={p.spotify}>
+                  <div className="mb-6 flex flex-col items-center gap-3 text-center">
+                    <h3 className="text-xl text-paper md:text-2xl">{p.title}</h3>
+                    {p.description ? (
+                      <p className="max-w-[52ch] text-sm italic leading-relaxed text-paper-dim">
+                        {p.description}
+                      </p>
+                    ) : null}
+                    <a
+                      href={p.spotify}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="border-b border-paper/25 pb-0.5 text-[11px] uppercase text-paper-dim transition-colors hover:border-[color:var(--hm-accent)] hover:text-[color:var(--hm-accent)]"
+                      style={{ letterSpacing: "0.18em" }}
+                    >
+                      Follow on Spotify ↗
+                    </a>
+                  </div>
+                  <Reveal className="overflow-hidden rounded-xl border border-rule-strong">
+                    <iframe
+                      src={embed}
+                      title={`${p.title} Spotify playlist`}
+                      width="100%"
+                      height={352}
+                      loading="lazy"
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      allowFullScreen
+                      className="block w-full border-0"
+                    />
+                  </Reveal>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
 
       {/* ===================== §04 ROSTER PREVIEW ===================== */}
       <section className="border-t border-rule py-24 md:py-32">

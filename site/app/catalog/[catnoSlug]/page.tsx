@@ -5,6 +5,8 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxComponents } from "@/components/mdx-components";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 import SpotifyPlayer from "@/components/SpotifyPlayer";
+import { PlatformLinks } from "@/components/PlatformLinks";
+import { buyLinksFor, streamingLinksFor } from "@/lib/streaming";
 import {
   getAllReleases,
   getArtistBySlug,
@@ -163,6 +165,8 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
   const billedSlugs = new Set(billedArtists(r).map((a) => a.slug));
   const remixers = r.resolvedArtists.filter((a) => !billedSlugs.has(a.slug)).map(linkable);
   const primaryArtistDoc = getArtistBySlug(r.resolvedArtists[0]?.slug ?? r.data.artist);
+  const streamingLinks = streamingLinksFor(r.data);
+  const buyLinks = buyLinksFor(r.data);
 
   return (
     <>
@@ -263,6 +267,20 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
               title={`${r.data.title}, Spotify player`}
               className="mt-6 max-w-2xl"
             />
+            {/* Direct DSP links under the player, so a Tidal or Amazon
+                listener is one click away instead of hunting the footer. */}
+            {streamingLinks.length > 0 ? (
+              <div className="mt-5 max-w-2xl">
+                <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+                  Listen on
+                </p>
+                <PlatformLinks
+                  links={streamingLinks}
+                  ariaLabel={`Listen to ${r.data.title} on streaming platforms`}
+                  className="mt-2"
+                />
+              </div>
+            ) : null}
             <div className="prose prose-invert prose-neutral mt-6 max-w-none">
               <MDXRemote source={r.body} components={mdxComponents} />
             </div>
@@ -358,25 +376,33 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
           </section>
         ) : null}
 
-        {Object.keys(r.data.buy).length > 0 || Object.keys(r.data.embeds).length > 0 ? (
+        {streamingLinks.length > 0 || buyLinks.length > 0 ? (
           <section className="mt-12 border-t border-neutral-800 pt-8">
             <h2 className="font-serif text-2xl text-neutral-100">Listen &amp; buy</h2>
-            <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-neutral-300">
-              {Object.entries({ ...r.data.embeds, ...r.data.buy }).map(([k, v]) =>
-                v ? (
-                  <li key={k}>
-                    <a
-                      href={v}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline-offset-4 hover:text-neutral-50 hover:underline"
-                    >
-                      {k}
-                    </a>
-                  </li>
-                ) : null,
-              )}
-            </ul>
+            {streamingLinks.length > 0 ? (
+              <div className="mt-4">
+                <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+                  Stream
+                </p>
+                <PlatformLinks
+                  links={streamingLinks}
+                  ariaLabel={`Stream ${r.data.title}`}
+                  className="mt-2"
+                />
+              </div>
+            ) : null}
+            {buyLinks.length > 0 ? (
+              <div className="mt-5">
+                <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+                  Buy
+                </p>
+                <PlatformLinks
+                  links={buyLinks}
+                  ariaLabel={`Buy ${r.data.title}`}
+                  className="mt-2"
+                />
+              </div>
+            ) : null}
           </section>
         ) : null}
       </article>

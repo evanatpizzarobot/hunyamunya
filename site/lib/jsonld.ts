@@ -3,6 +3,7 @@
 // component JSON.stringify's whatever gets passed in.
 
 import type { Artist, News, Release } from "./schema";
+import { streamingLinksFor } from "./streaming";
 
 export const SITE_URL = "https://hunyamunyarecords.com";
 export const LABEL_NAME = "Hunya Munya Records";
@@ -155,6 +156,16 @@ export function releaseJsonLd(release: Release, artist: Artist | null) {
   }
   if (release.cover_image) out.image = absolute(release.cover_image);
   if (release.genres.length) out.genre = release.genres;
+  // Tie the album entity to the same release on each store, so search engines
+  // connect the catalog page to its Spotify/Apple/etc. counterparts. Bandcamp
+  // and Discogs point at the same release too, just on shop-shaped sites.
+  const sameAs = [
+    ...streamingLinksFor(release).map((l) => l.url),
+    ...[release.buy.bandcamp, release.buy.discogs].filter(
+      (u): u is string => Boolean(u),
+    ),
+  ];
+  if (sameAs.length) out.sameAs = sameAs;
   return out;
 }
 

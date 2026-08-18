@@ -13,8 +13,10 @@ import {
   artistSchema,
   Campaign,
   campaignSchema,
+  LabelPlaylist,
   News,
   newsSchema,
+  playlistsFileSchema,
   Release,
   releaseSchema,
 } from "./schema";
@@ -181,6 +183,26 @@ export function getAllNews(): NewsDoc[] {
 
 export function getNewsBySlug(year: number, slug: string): NewsDoc | null {
   return getAllNews().find((n) => n.year === year && n.data.slug === slug) ?? null;
+}
+
+// ---- Label playlists ----------------------------------------------------
+
+// Official label playlists from content/playlists.yml. Missing file or empty
+// list both mean "no playlists yet", so pages can map over the result and
+// naturally render nothing until Evan adds the first Spotify URL.
+export function getLabelPlaylists(placement?: "home" | "catalog"): LabelPlaylist[] {
+  const path = join(CONTENT_ROOT, "playlists.yml");
+  if (!existsSync(path)) return [];
+  const data = YAML.parse(readFileSync(path, "utf8"));
+  const parsed = playlistsFileSchema.safeParse(data ?? {});
+  if (!parsed.success) {
+    const errors = parsed.error.issues
+      .map((i) => `  ${i.path.join(".") || "(root)"}: ${i.message}`)
+      .join("\n");
+    throw new Error(`Schema validation failed for ${path}:\n${errors}`);
+  }
+  const all = parsed.data.playlists;
+  return placement ? all.filter((p) => p.show_on.includes(placement)) : all;
 }
 
 // ---- Campaign -----------------------------------------------------------

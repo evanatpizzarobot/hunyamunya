@@ -57,11 +57,16 @@ export function Footer() {
                   Spotify ↗
                 </a>
               </li>
+              <li>
+                <a href="/feed.xml" className="transition-colors duration-300 hover:text-[color:var(--hm-accent)]">
+                  RSS
+                </a>
+              </li>
             </ul>
           </div>
         </div>
         <div className="flex items-end justify-between gap-6 text-[10px] uppercase text-muted" style={{ letterSpacing: "0.2em" }}>
-          <span>© 2002—{new Date().getFullYear()} · Hunya Munya Records</span>
+          <span>© 2002-{new Date().getFullYear()} · Hunya Munya Records</span>
           <div className="flex flex-col items-end gap-4">
             <img
               src="/logo.gif"

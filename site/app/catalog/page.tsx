@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllReleases, compareReleasesForCatalog } from "@/lib/content";
+import { getAllReleases, getLabelPlaylists, compareReleasesForCatalog } from "@/lib/content";
+import SpotifyPlayer from "@/components/SpotifyPlayer";
 import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
@@ -26,6 +27,7 @@ export function generateMetadata(): Metadata {
 
 export default function CatalogIndex() {
   const releases = getAllReleases().sort(compareReleasesForCatalog);
+  const playlists = getLabelPlaylists("catalog");
 
   return (
     <>
@@ -62,6 +64,36 @@ export default function CatalogIndex() {
         </nav>
       </header>
       <CatalogGrid releases={releases} />
+      {/* Official label playlists (content/playlists.yml). Renders nothing
+          until the first playlist URL is added there. */}
+      {playlists.length > 0 ? (
+        <section className="mt-16 border-t border-neutral-800 pt-10">
+          <h2 className="font-serif text-2xl text-neutral-100">Listen to the catalog</h2>
+          <div className="mt-6 flex flex-col gap-10">
+            {playlists.map((p) => (
+              <div key={p.spotify} className="max-w-3xl">
+                <h3 className="text-lg text-neutral-100">{p.title}</h3>
+                {p.description ? (
+                  <p className="mt-1 text-sm text-neutral-400">{p.description}</p>
+                ) : null}
+                <SpotifyPlayer
+                  url={p.spotify}
+                  title={`${p.title} Spotify playlist`}
+                  className="mt-4"
+                />
+                <a
+                  href={p.spotify}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-block font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-500 transition-colors hover:text-neutral-200"
+                >
+                  Follow on Spotify ↗
+                </a>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
       </UnderwaterLayer>
     </>
   );
