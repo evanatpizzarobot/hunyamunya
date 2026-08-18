@@ -38,10 +38,16 @@ const LABEL_GENRES = [
 ];
 
 // Confirmed external profiles for the LABEL (not individual artists). Keep
-// this list to entries that point at the Hunya Munya entity itself.
+// this list to entries that point at the Hunya Munya entity itself. The two
+// Discogs pages are the vinyl-era label and its digital imprint; Discogs
+// models HM Digital as a sub-label with HMR as parent, and both belong to
+// this one org entity. MusicBrainz label id confirmed 2026-08-18.
 const LABEL_SAME_AS = [
   "https://ra.co/labels/385",
   "https://www.allmusic.com/artist/hunya-munya-mn0002854507",
+  "https://www.discogs.com/label/17736-Hunya-Munya-Records",
+  "https://www.discogs.com/label/79509-Hunya-Munya-Digital",
+  "https://musicbrainz.org/label/19259b9b-fce6-406d-94a1-8f2949feb58d",
 ];
 
 export function orgSchema() {
@@ -50,7 +56,7 @@ export function orgSchema() {
     "@type": "MusicLabel",
     "@id": ORG_ID,
     name: LABEL_NAME,
-    alternateName: ["Hunya Munya", "HMR"],
+    alternateName: ["Hunya Munya", "HMR", "Hunya Munya Digital", "HM Digital"],
     url: SITE_URL,
     logo: `${SITE_URL}/logo.png`, // 900x600, transparent PNG sourced from hm_transparent.gif
     image: `${SITE_URL}/logo.png`,
