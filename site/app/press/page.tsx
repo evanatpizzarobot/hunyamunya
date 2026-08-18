@@ -25,7 +25,7 @@ export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Press"),
     description:
-      "Press coverage and broadcast support for Hunya Munya Records: BBC Radio 1, 3, and 6 Music, KCRW, KEXP, KALX, BBC Bristol, CBC Radio 2, Fourculture, I Heart Noise, Darkfloor, and more.",
+      "Press coverage and broadcast support for Hunya Munya Records: BBC 6 Music, KCRW, KEXP, KALX, BBC Bristol, CBC Radio 2, Fourculture, I Heart Noise, Darkfloor, and more.",
     path: "/press",
   });
 }
@@ -113,30 +113,6 @@ const PRESS_QUOTES: Quote[] = [
 ];
 
 const STATIONS: Station[] = [
-  {
-    name: "BBC Radio 1",
-    location: "UK, national",
-    sourcePath: "/news/2010/rykard-accepted-into-pandora-radio",
-    plays: [
-      {
-        date: "2010",
-        artist: "Rykard",
-        note: "Arrive the Radio Beacon release window",
-      },
-    ],
-  },
-  {
-    name: "BBC Radio 3",
-    location: "UK, national",
-    sourcePath: "/news/2010/rykard-accepted-into-pandora-radio",
-    plays: [
-      {
-        date: "2010",
-        artist: "Rykard",
-        note: "Arrive the Radio Beacon release window",
-      },
-    ],
-  },
   {
     name: "BBC Radio 6 Music",
     location: "UK, national",
@@ -375,8 +351,8 @@ export default function PressPage() {
         </h1>
         <p className="mt-5 max-w-[62ch] font-serif text-[20px] italic leading-[1.5] text-paper-dim">
           Selected press coverage and broadcast support for Hunya Munya Records and its artists.
-          Rykard&rsquo;s catalog has been played across BBC Radio 1, 3, and 6 Music,
-          KCRW, KEXP, KALX, BBC Bristol, and CBC Radio 2, with &ldquo;North Cormorant
+          Rykard&rsquo;s catalog has been played across BBC 6 Music, KCRW, KEXP,
+          KALX, BBC Bristol, and CBC Radio 2, with &ldquo;North Cormorant
           Obscurity&rdquo; surpassing 25 million streams. For press inquiries, review
           copies, or interview requests, reach us at{" "}
           <a
