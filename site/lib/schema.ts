@@ -44,6 +44,7 @@ export const artistSchema = z.object({
       apple: z.string().url().optional(),
       instagram: z.string().url().optional(),
       discogs: z.string().url().optional(),
+      musicbrainz: z.string().url().optional(),
       contact: z.string().optional(),
     })
     .partial()

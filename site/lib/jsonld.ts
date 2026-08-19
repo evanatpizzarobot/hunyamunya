@@ -106,6 +106,7 @@ export function artistJsonLd(artist: Artist, relatedReleases: Release[]) {
   if (l.apple) sameAs.push(l.apple);
   if (l.instagram) sameAs.push(l.instagram);
   if (l.discogs) sameAs.push(l.discogs);
+  if (l.musicbrainz) sameAs.push(l.musicbrainz);
 
   return {
     "@context": "https://schema.org",
