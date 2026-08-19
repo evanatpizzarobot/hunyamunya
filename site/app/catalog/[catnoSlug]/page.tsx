@@ -8,9 +8,11 @@ import SpotifyPlayer from "@/components/SpotifyPlayer";
 import { PlatformLinks } from "@/components/PlatformLinks";
 import { buyLinksFor, streamingLinksFor } from "@/lib/streaming";
 import {
+  formatReleaseDate,
   getAllReleases,
   getArtistBySlug,
   getReleaseByCatnoSlug,
+  isUpcoming,
   type NormalizedArtistRef,
   type ReleaseDoc,
 } from "@/lib/content";
@@ -127,10 +129,16 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     .map((a) => a.name ?? getArtistBySlug(a.slug)?.data.name ?? a.slug)
     .join(" & ");
   const title = r.data.seoTitle ?? releaseTitle(r.data.title, displayArtists, r.data.catalog_number);
+  const releasePhrase =
+    isUpcoming(r) && r.data.release_date
+      ? `coming ${formatReleaseDate(r.data.release_date)}`
+      : isUpcoming(r)
+        ? "coming soon"
+        : `released ${r.year}`;
   const description =
     r.data.metaDescription ??
     r.data.seo?.description ??
-    `${r.data.title} by ${displayArtists}${r.data.catalog_number ? ` (${r.data.catalog_number})` : ""}, released ${r.year} on Hunya Munya Records.`;
+    `${r.data.title} by ${displayArtists}${r.data.catalog_number ? ` (${r.data.catalog_number})` : ""}, ${releasePhrase} on Hunya Munya Records.`;
   return buildMetadata({
     title,
     description,
@@ -165,8 +173,11 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
   const billedSlugs = new Set(billedArtists(r).map((a) => a.slug));
   const remixers = r.resolvedArtists.filter((a) => !billedSlugs.has(a.slug)).map(linkable);
   const primaryArtistDoc = getArtistBySlug(r.resolvedArtists[0]?.slug ?? r.data.artist);
+  const upcoming = isUpcoming(r);
   const streamingLinks = streamingLinksFor(r.data);
-  const buyLinks = buyLinksFor(r.data);
+  // Buy chips stay off pre-release; nothing is purchasable yet and the page's
+  // one job is collecting pre-saves.
+  const buyLinks = upcoming ? [] : buyLinksFor(r.data);
 
   return (
     <>
@@ -228,6 +239,13 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
                   Draft: actively being worked on
                 </span>
               ) : null}
+              {upcoming ? (
+                <span className="inline-block border border-sky-700 bg-sky-950 px-2 py-0.5 uppercase tracking-wider text-sky-200">
+                  {r.data.release_date
+                    ? `Coming ${formatReleaseDate(r.data.release_date)}`
+                    : "Coming soon"}
+                </span>
+              ) : null}
               {r.data.sold_out || r.data.status === "oop" ? (
                 <span className="inline-block border border-rose-800 bg-rose-950 px-2 py-0.5 uppercase tracking-wider text-rose-200">
                   Sold out
@@ -243,7 +261,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
                   {r.data.rpm} RPM
                 </span>
               ) : null}
-              {typeof r.data.price_usd === "number" && !r.data.sold_out && r.data.status !== "oop" ? (
+              {typeof r.data.price_usd === "number" && !r.data.sold_out && r.data.status !== "oop" && !upcoming ? (
                 r.data.buy.shopify ? (
                   <a
                     href={r.data.buy.shopify}
@@ -260,6 +278,20 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
                 )
               ) : null}
             </div>
+            {/* Pre-release primary CTA. The page's one conversion goal before
+                release day; renders only while upcoming and only when a
+                pre-save link exists in frontmatter. */}
+            {upcoming && r.data.presave ? (
+              <a
+                href={r.data.presave}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex items-center gap-2.5 border border-emerald-600 bg-emerald-950 px-6 py-3 text-xs font-medium uppercase tracking-wider text-emerald-200 transition-colors hover:bg-emerald-900 hover:text-emerald-100"
+              >
+                <span>Pre-save on Spotify</span>
+                <span aria-hidden="true">→</span>
+              </a>
+            ) : null}
             {/* Player sits directly under the release badges so it is visible
                 without scrolling, with the cover art alongside it. */}
             <SpotifyPlayer

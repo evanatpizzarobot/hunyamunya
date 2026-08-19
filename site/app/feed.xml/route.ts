@@ -1,7 +1,7 @@
 // RSS 2.0 feed of news posts and release announcements. Statically generated
 // at build time (the site is output: "export") and served as /feed.xml.
 
-import { getAllArtists, getAllNews, getAllReleases } from "@/lib/content";
+import { getAllArtists, getAllNews, getAllReleases, isUpcoming } from "@/lib/content";
 import { LABEL_NAME, SITE_URL } from "@/lib/jsonld";
 
 export const dynamic = "force-static";
@@ -36,8 +36,16 @@ export async function GET() {
       n.data.excerpt ?? n.data.metaDescription ?? `${n.data.title}, from ${LABEL_NAME}.`,
   }));
 
+  // `upcoming` releases whose date has passed count as published (the
+  // frontmatter may not be flipped yet); genuinely future ones stay out, since
+  // a future pubDate confuses feed readers.
   const releaseItems: FeedItem[] = getAllReleases()
-    .filter((r) => r.data.status === "published" && r.data.release_date)
+    .filter(
+      (r) =>
+        (r.data.status === "published" || r.data.status === "upcoming") &&
+        r.data.release_date &&
+        !isUpcoming(r),
+    )
     .map((r) => {
       const by = r.resolvedArtists
         .filter((a) => a.role === "primary")

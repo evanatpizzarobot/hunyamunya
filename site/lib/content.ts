@@ -157,6 +157,29 @@ export function getReleasesByArtistSlug(artistSlug: string): ReleaseDoc[] {
   return getAllReleases().filter((r) => r.resolvedArtists.some((a) => a.slug === artistSlug));
 }
 
+// Pre-release gate, evaluated at build time (the site is a static export, so
+// "today" is the day of the deploy). A release marked `upcoming` whose date
+// has passed renders as published without a frontmatter edit; the release-day
+// deploy is what flips the page. No release_date means still upcoming.
+export function isUpcoming(r: ReleaseDoc): boolean {
+  if (r.data.status !== "upcoming") return false;
+  if (!r.data.release_date) return true;
+  const today = new Date().toISOString().slice(0, 10);
+  return r.data.release_date > today;
+}
+
+// "2026-11-07" -> "November 7, 2026" without going through Date, which would
+// shift the day across time zones.
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+export function formatReleaseDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map((n) => parseInt(n, 10));
+  if (!y || !m || !d) return iso;
+  return `${MONTHS[m - 1]} ${d}, ${y}`;
+}
+
 // ---- News ---------------------------------------------------------------
 
 function newsYearFromDoc(data: News, path: string): number {

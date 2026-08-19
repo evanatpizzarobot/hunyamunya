@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReleaseDoc } from "@/lib/content";
-import { getArtistBySlug } from "@/lib/content";
+import { getArtistBySlug, isUpcoming } from "@/lib/content";
 
 function displayArtists(r: ReleaseDoc): string {
   const primaries = r.resolvedArtists.filter((a) => a.role === "primary");
@@ -48,6 +48,9 @@ export function CatalogGrid({ releases }: { releases: ReleaseDoc[] }) {
               <div className="p-3">
                 <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">
                   {r.data.catalog_number ? `${r.data.catalog_number} · ${r.year}` : `${r.year}`}
+                  {isUpcoming(r) ? (
+                    <span className="ml-2 text-sky-300">Coming soon</span>
+                  ) : null}
                 </p>
                 <p className="mt-1 font-serif text-base leading-snug text-neutral-50">{r.data.title}</p>
                 <p className="text-xs text-neutral-400">{displayArtists(r)}</p>

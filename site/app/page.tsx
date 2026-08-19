@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllArtists, getAllNews, getAllReleases, getCurrentCampaign, getLabelPlaylists } from "@/lib/content";
+import { formatReleaseDate, getAllArtists, getAllNews, getAllReleases, getCurrentCampaign, getLabelPlaylists } from "@/lib/content";
 import { Reveal } from "@/components/home/Reveal";
 import { CountUp } from "@/components/home/CountUp";
 import { HeroParallax } from "@/components/home/HeroParallax";
@@ -79,6 +79,23 @@ export default function Home() {
   const featuredArtistDoc = artists.find((a) => a.data.slug === featuredArtistSlug);
   const featuredArtistName = featuredArtistDoc?.data.name ?? featuredArtistSlug;
   const featuredSpotify = featured.data.embeds?.spotify ?? null;
+
+  // Pre-release campaign mode: the hero eyebrow trades "Out Now" for the
+  // release date, and the primary CTA defaults to the release's pre-save link
+  // when the campaign yml does not name its own CTA.
+  const preRelease = active?.type === "pre-release";
+  const heroEyebrow = preRelease
+    ? featured.data.release_date
+      ? `Coming ${formatReleaseDate(featured.data.release_date)}`
+      : "Coming Soon"
+    : "Out Now";
+  const defaultPrimaryCta =
+    preRelease && featured.data.presave
+      ? { label: "Pre-save on Spotify", href: featured.data.presave }
+      : { label: "Listen & buy", href: featured.urlPath };
+  const defaultTagline = preRelease
+    ? "Coming soon from Hunya Munya Records."
+    : "Now available from Hunya Munya Records.";
 
   const [featuredTitleMain, ...featuredTitleRest] = featured.data.title.split(" (");
   const featuredTitleSuffix = featuredTitleRest.length
@@ -210,7 +227,7 @@ export default function Home() {
                   style={{ letterSpacing: "0.24em" }}
                 >
                   <span className="block h-px w-6 bg-current" />
-                  Out Now · {featured.data.catalog_number ?? featured.catnoSlug.toUpperCase()}
+                  {heroEyebrow} · {featured.data.catalog_number ?? featured.catnoSlug.toUpperCase()}
                 </span>
               </Reveal>
               <Reveal delay={1}>
@@ -234,17 +251,17 @@ export default function Home() {
               </Reveal>
               <Reveal delay={2}>
                 <p className="mt-7 max-w-[34ch] text-lg italic leading-relaxed text-paper-dim md:text-xl">
-                  {active?.tagline ?? "Now available from Hunya Munya Records."}
+                  {active?.tagline ?? defaultTagline}
                 </p>
               </Reveal>
               <Reveal delay={3}>
                 <div className="mt-9 flex flex-wrap gap-3">
                   <Link
-                    href={active?.cta_primary?.href ?? featured.urlPath}
+                    href={active?.cta_primary?.href ?? defaultPrimaryCta.href}
                     className="inline-flex items-center gap-2.5 border border-paper bg-paper px-6 py-3.5 text-xs font-medium uppercase text-ink transition-all duration-300 hover:border-[color:var(--hm-accent)] hover:bg-[color:var(--hm-accent)] hover:text-ink"
                     style={{ letterSpacing: "0.14em" }}
                   >
-                    <span>{active?.cta_primary?.label ?? "Listen & buy"}</span>
+                    <span>{active?.cta_primary?.label ?? defaultPrimaryCta.label}</span>
                     <span>→</span>
                   </Link>
                   <Link

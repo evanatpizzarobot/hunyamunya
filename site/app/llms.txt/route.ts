@@ -7,6 +7,7 @@ import {
   getAllArtists,
   getAllNews,
   getAllReleases,
+  isUpcoming,
 } from "@/lib/content";
 import { LABEL_NAME, SITE_URL } from "@/lib/jsonld";
 
@@ -31,7 +32,8 @@ export async function GET() {
       .map((x) => x.name ?? artistName(x.slug))
       .join(" & ");
     const catno = r.data.catalog_number ? `${r.data.catalog_number}, ` : "";
-    return `- [${by} · ${r.data.title}](${SITE_URL}${r.urlPath}) (${catno}${r.year})`;
+    const upcoming = isUpcoming(r) ? ", upcoming" : "";
+    return `- [${by} · ${r.data.title}](${SITE_URL}${r.urlPath}) (${catno}${r.year}${upcoming})`;
   });
 
   const newsLines = news.map(

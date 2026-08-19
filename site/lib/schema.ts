@@ -241,7 +241,16 @@ export const releaseSchema = z.object({
     .default({}),
   press_quotes: z.array(pressQuote).default([]),
   sync_available: z.boolean().default(false),
-  status: z.enum(["draft", "published", "archived", "oop"]).default("draft"),
+  // Pre-save link (distributor smart link or Spotify pre-save URL) for
+  // releases in `upcoming` status. Rendered as the release page's primary CTA
+  // and as the home hero's default primary CTA during a pre-release campaign.
+  presave: z.string().url().optional(),
+  // `upcoming` = announced but not yet released. The page renders in
+  // pre-release mode (Coming <date>, pre-save CTA, no buy chips) until
+  // release_date passes, at which point builds render it as a normal
+  // published release automatically; flip the frontmatter to `published`
+  // whenever convenient after that.
+  status: z.enum(["draft", "upcoming", "published", "archived", "oop"]).default("draft"),
   featured: z.boolean().default(false),
   proof_points: z.array(proofPoint).default([]),
   related_news: z.array(z.string()).default([]),

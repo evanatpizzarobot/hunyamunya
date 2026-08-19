@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllArtists, getAllNews, getAllReleases } from "@/lib/content";
+import { getAllArtists, getAllNews, getAllReleases, isUpcoming } from "@/lib/content";
 import { SITE_URL } from "@/lib/jsonld";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -29,9 +29,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const releaseRoutes: MetadataRoute.Sitemap = getAllReleases().map((r) => ({
     url: `${SITE_URL}${r.urlPath}`,
-    lastModified: r.data.release_date ? new Date(r.data.release_date) : now,
-    changeFrequency: "monthly",
-    priority: r.data.featured ? 0.9 : 0.8,
+    // A future release_date would emit a future lastModified, which crawlers
+    // treat as bogus; pre-release pages use build time instead.
+    lastModified: r.data.release_date && !isUpcoming(r) ? new Date(r.data.release_date) : now,
+    changeFrequency: isUpcoming(r) ? "weekly" : "monthly",
+    priority: r.data.featured || isUpcoming(r) ? 0.9 : 0.8,
   }));
 
   const newsRoutes: MetadataRoute.Sitemap = getAllNews().map((n) => ({
