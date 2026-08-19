@@ -23,7 +23,10 @@ const LABEL_NAME = "Hunya Munya Records";
 // Titles already present on MusicBrainz as of 2026-08-18 (label releases plus
 // Rykard release groups). Matched loosely; these get listed for manual review
 // instead of seeded, so we never create duplicates.
-const ALREADY_ON_MB = [
+// Run through the same norm() as catalog titles at compare time; keeping the
+// raw strings here previously let "Arrive The Radio Beacon" slip past the
+// guard (norm strips "the", the list entry kept it) and seed a duplicate.
+const ALREADY_ON_MB_RAW = [
   "arrive the radio beacon",
   "halcyon days",
   "luminosity",
@@ -69,9 +72,10 @@ const FORMAT_MAP: Record<string, string> = {
 };
 
 function main() {
+  const alreadyOnMb = ALREADY_ON_MB_RAW.map(norm);
   const releases = getAllReleases().filter((r) => r.data.status !== "draft");
-  const toSeed = releases.filter((r) => !ALREADY_ON_MB.includes(norm(r.data.title)));
-  const existing = releases.filter((r) => ALREADY_ON_MB.includes(norm(r.data.title)));
+  const toSeed = releases.filter((r) => !alreadyOnMb.includes(norm(r.data.title)));
+  const existing = releases.filter((r) => alreadyOnMb.includes(norm(r.data.title)));
 
   const forms = toSeed
     .map((r, idx) => {
