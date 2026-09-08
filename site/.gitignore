@@ -35,5 +35,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Verification builds run with NEXT_DIST_DIR so they cannot clobber the dev server
-.next-verify/
+# Verification builds run with NEXT_DIST_DIR so they cannot clobber the dev
+# server. Glob rather than one entry per name: each of these is a full ~140 MB
+# export, and this is a public repo, so a stray NEXT_DIST_DIR value must never
+# become committable.
+.next-*/

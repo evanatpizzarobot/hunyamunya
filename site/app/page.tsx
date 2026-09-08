@@ -461,7 +461,7 @@ export default function Home() {
               style={{ gridTemplateColumns: "64px 2fr 3fr 1fr 80px 100px", letterSpacing: "0.02em" }}
             >
               <span className="text-[11px] text-muted" style={{ letterSpacing: "0.1em" }}>
-                {r.data.catalog_number ?? "—"}
+                {r.data.catalog_number ?? "·"}
               </span>
               <span className="uppercase" style={{ letterSpacing: "0.08em" }}>
                 {artistName(r)}
@@ -582,7 +582,7 @@ export default function Home() {
                   {a.data.name}
                 </div>
                 <div className="flex justify-between text-[10px] uppercase text-muted" style={{ letterSpacing: "0.18em" }}>
-                  <span>{a.data.yearsActive ? `Since ${a.data.yearsActive.split(/[–-]/)[0]}` : "On label"}</span>
+                  <span>{a.data.yearsActive ? `Since ${a.data.yearsActive.split("-")[0]}` : "On label"}</span>
                   <span>{released} rel.</span>
                 </div>
                 <span

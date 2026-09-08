@@ -10,9 +10,9 @@ export const LABEL_NAME = "Hunya Munya Records";
 export const ORG_ID = `${SITE_URL}/#organization`;
 
 // Genres the label has released across its 24-year catalog. Surfaced on the
-// MusicLabel JSON-LD's `genre` array so search engines can associate the
+// Organization JSON-LD's `genre` array so search engines can associate the
 // org entity with these terms without depending on per-page text alone.
-// Pulled from the union of release/artist `genres` frontmatter — keep in sync
+// Pulled from the union of release/artist `genres` frontmatter. Keep in sync
 // when a release introduces a genre that isn't already on this list.
 const LABEL_GENRES = [
   "Electronic",
@@ -48,12 +48,22 @@ const LABEL_SAME_AS = [
   "https://www.discogs.com/label/17736-Hunya-Munya-Records",
   "https://www.discogs.com/label/79509-Hunya-Munya-Digital",
   "https://musicbrainz.org/label/19259b9b-fce6-406d-94a1-8f2949feb58d",
+  // Deliberately NOT listing the Complete Catalog Spotify playlist here.
+  // sameAs means "a page that unambiguously identifies this item", and a
+  // playlist page identifies a playlist, not the label. Spotify exposes no
+  // label entity to point at, so the org simply has no Spotify sameAs. The
+  // footer links to the playlist, which is the right place for it.
 ];
 
 export function orgSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "MusicLabel",
+    // Organization, not MusicLabel. schema.org has never defined MusicLabel,
+    // so the whole brand node failed to resolve: the logo, email, foundingDate
+    // and the sameAs profiles below were hanging off a class Google cannot map,
+    // and every recordLabel / publisher reference to @id resolved to nothing.
+    "@type": "Organization",
+    additionalType: "https://www.wikidata.org/wiki/Q18127",
     "@id": ORG_ID,
     name: LABEL_NAME,
     alternateName: ["Hunya Munya", "HMR", "Hunya Munya Digital", "HM Digital"],
@@ -75,7 +85,7 @@ export function orgSchema() {
   };
 }
 
-// WebSite entity — gives search engines a clean root entity for the site
+// WebSite entity. Gives search engines a clean root entity for the site
 // (separate from the org). Not adding `potentialAction` SearchAction yet
 // because Google requires a working search endpoint for it and we don't
 // have one. WebSite alone still helps disambiguate the brand entity.
@@ -129,6 +139,39 @@ function catnoSlug(r: Release): string {
   return r.catalog_number ? `${r.catalog_number.toLowerCase()}-${r.slug}` : r.slug;
 }
 
+// schema.org offers four MusicAlbumReleaseType values and this catalog is not
+// all albums: it is mostly singles and EPs. Read the label's own naming first
+// ("... EP", "... Single"), which is the most reliable signal we have.
+//
+// The fallback counts DISTINCT COMPOSITIONS, not rows. The dominant shape here
+// is one track pressed with its remixes, where row count says nothing about
+// release type: HMR004 is seven versions of "Circular" and HMR006 is four of
+// "Flicker", and counting rows would file those as an album and an EP while
+// filing the identical product with two mixes as a single. Stripping the
+// trailing "(Some Mix)" collapses each of those back to one composition, so
+// the nine-record vinyl run lands on SingleRelease as a family instead of
+// scattering across all three values.
+function distinctCompositions(release: Release): number {
+  const base = release.tracklist.map((t) =>
+    t.title
+      .toLowerCase()
+      .replace(/\s*[([][^)\]]*[)\]]\s*$/, "")
+      .trim(),
+  );
+  return new Set(base.filter(Boolean)).size;
+}
+
+function albumReleaseTypeFor(release: Release): string {
+  const title = release.title.toLowerCase();
+  if (/\bep\b/.test(title)) return "https://schema.org/EPRelease";
+  if (/\bsingle\b/.test(title)) return "https://schema.org/SingleRelease";
+  const n = distinctCompositions(release);
+  if (n === 0) return "https://schema.org/AlbumRelease";
+  if (n <= 2) return "https://schema.org/SingleRelease";
+  if (n <= 6) return "https://schema.org/EPRelease";
+  return "https://schema.org/AlbumRelease";
+}
+
 export function releaseJsonLd(release: Release, artist: Artist | null) {
   const out: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -136,7 +179,7 @@ export function releaseJsonLd(release: Release, artist: Artist | null) {
     name: release.title,
     url: `${SITE_URL}/catalog/${catnoSlug(release)}`,
     recordLabel: { "@id": ORG_ID },
-    albumReleaseType: "AlbumRelease",
+    albumReleaseType: albumReleaseTypeFor(release),
   };
   if (artist) {
     out.byArtist = {
@@ -173,6 +216,30 @@ export function releaseJsonLd(release: Release, artist: Artist | null) {
     ),
   ];
   if (sameAs.length) out.sameAs = sameAs;
+  // A purchasable physical release also gets an Offer, attached to the album
+  // entity rather than emitted as a second standalone Product node. Two nodes
+  // for one SKU on one page compete with each other; nesting keeps a single
+  // subject. Only shipped when there is a price and somewhere to spend it.
+  const offerUrl = release.buy.shopify ?? release.buy.bandcamp;
+  if (
+    typeof release.price_usd === "number" &&
+    offerUrl &&
+    release.status !== "upcoming" &&
+    release.status !== "draft"
+  ) {
+    const soldOut = release.sold_out || release.status === "oop";
+    out.offers = {
+      "@type": "Offer",
+      url: offerUrl,
+      price: release.price_usd.toFixed(2),
+      priceCurrency: "USD",
+      availability: soldOut
+        ? "https://schema.org/SoldOut"
+        : "https://schema.org/InStock",
+      itemCondition: "https://schema.org/NewCondition",
+      seller: { "@id": ORG_ID },
+    };
+  }
   return out;
 }
 

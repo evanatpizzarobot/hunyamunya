@@ -15,12 +15,11 @@ links:
   spotify: 'https://open.spotify.com/artist/3o5H6gud83N76zRJeXNSHC'
 hero_image: /media/legacy/2025/08/Darius-Kohanim.jpg
 portrait: /media/legacy/2025/08/Darius-Kohanim.jpg
-# spotify_embed is deliberately unset. His artist profile resolves fine but has
-# no monthly listeners yet, so Spotify serves it with an empty top-tracks list
-# and the embed renders as a blank player. The page falls back to an album
-# embed until the profile picks up listening data. Verify with:
-#   npx tsx scripts/spotify-verify.ts
-# spotify_embed: 'https://open.spotify.com/artist/3o5H6gud83N76zRJeXNSHC'
+# Promoted 2026-09-07: the profile was parked here while it had no monthly
+# listeners, since Spotify builds the artist embed from top-tracks popularity
+# and served it blank. scripts/spotify-verify.ts now reports 10 tracks, so the
+# player renders. Re-verify with `npx tsx scripts/spotify-verify.ts`.
+spotify_embed: 'https://open.spotify.com/artist/3o5H6gud83N76zRJeXNSHC'
 press_quotes: []
 menu_label: Artist - Darius Kohanim
 seoTitle: Darius Kohanim

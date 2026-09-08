@@ -14,6 +14,7 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { newsSlugFor } from "./lib/renamed-slugs";
 
 const ROOT = process.cwd();
 const CLASSIFIED_JSON_PATH = resolve(ROOT, "migration/classified.json");
@@ -44,6 +45,7 @@ const PAGE_IDS_TO_CATALOG = new Set([14, 16, 79, 445]);
 const PAGE_ID_PRESS = 247;
 const PAGE_ID_TIM_FRETWELL_ORPHAN = 1052;
 
+
 function slugForArtist(postName: string): string {
   return postName === "catnip-claws-2" ? "catnip-claws" : postName;
 }
@@ -63,6 +65,35 @@ function buildStructuralRedirects(): Redirect[] {
     { kind: "path", from: "^/catalog/hmb002B-the-orange-album/?$", to: "/catalog/hmb002b-the-orange-album", status: 301 },
     { kind: "path", from: "^/artists/catnip-claws-2/?$", to: "/artists/catnip-claws", status: 301 },
     { kind: "path", from: "^/tim-fretwell/?$", to: "/artists/tim-fretwell", status: 301 },
+    // Both historical spellings of the renamed twoism post.
+    //
+    // nginx matches a location regex against the NORMALIZED uri, after it has
+    // decoded %XX. That inverts what each spelling catches, so read carefully
+    // before editing:
+    //
+    //   * The URL the old sitemap and /news index advertised was
+    //     ...twoism%e2%80%99s... . nginx decodes that to the literal curly
+    //     quotes, so the rule that catches it must itself contain the literal
+    //     characters. That is the first rule below.
+    //   * The only address that actually served the page was the double-encoded
+    //     ...twoism%25e2%2580%2599s... . nginx decodes %25 to a literal percent
+    //     sign, so what the regex sees is the text "%e2%80%99". That is the
+    //     second rule below, which is why it is written with single escapes.
+    //
+    // A rule written with double escapes would need a triple-encoded request
+    // and can never fire.
+    {
+      kind: "path",
+      from: "^/news/2011/rykard-track-on-twoism’s-“one-on-twoism-vol-4″/?$",
+      to: "/news/2011/rykard-track-on-twoisms-one-on-twoism-vol-4",
+      status: 301,
+    },
+    {
+      kind: "path",
+      from: "^/news/2011/rykard-track-on-twoism%e2%80%99s-%e2%80%9cone-on-twoism-vol-4%e2%80%b3/?$",
+      to: "/news/2011/rykard-track-on-twoisms-one-on-twoism-vol-4",
+      status: 301,
+    },
     { kind: "path", from: "^/feed/?$", to: "-", status: 410 },
     { kind: "path", from: "^/comments/feed/?$", to: "-", status: 410 },
     { kind: "path", from: "^/feed/rss2?/?$", to: "-", status: 410 },
@@ -78,7 +109,7 @@ function buildQueryRedirectsFromClassified(items: ClassifiedItem[]): Redirect[] 
       redirects.push({
         kind: "query",
         queryValue: `p=${item.post_id}`,
-        to: `/news/${year}/${item.post_name}`,
+        to: `/news/${year}/${newsSlugFor(item.post_name)}`,
         status: 301,
       });
       continue;

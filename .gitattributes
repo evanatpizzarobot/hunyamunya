@@ -1,0 +1,14 @@
+# Shell scripts in scripts/ are executed on the Linux VPS. Git on Windows
+# normally checks files out with CRLF, and bash treats a trailing \r as part of
+# the command, so a CRLF checkout fails with "command not found" on names that
+# look correct on screen. Force LF for anything that runs server side.
+*.sh text eol=lf
+
+# nginx and Apache config fragments are read by servers on Linux too.
+*.conf text eol=lf
+.htaccess text eol=lf
+
+# Deliberately no `* text=auto` rule. Adding one to a repo this far along makes
+# Git re-examine every tracked file and can produce a large whitespace-only
+# diff. The targeted rules above are what actually matter, because those are
+# the files that get executed or parsed on the Linux VPS.

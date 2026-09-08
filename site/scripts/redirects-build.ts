@@ -9,6 +9,7 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { newsSlugFor } from "./lib/renamed-slugs";
 
 const ROOT = process.cwd();
 const CLASSIFIED_JSON_PATH = resolve(ROOT, "migration/classified.json");
@@ -45,6 +46,7 @@ function slugForArtist(postName: string): string {
   return postName === "catnip-claws-2" ? "catnip-claws" : postName;
 }
 
+
 function yearFromPostDate(postDate: string): string {
   const m = postDate.match(/^(\d{4})/);
   if (!m) throw new Error(`cannot extract year from post_date: ${postDate}`);
@@ -67,6 +69,23 @@ function buildStructuralRedirects(): Redirect[] {
     { kind: "path", from: "^catalog/hmb002B-the-orange-album/?$", to: "/catalog/hmb002b-the-orange-album", status: 301 },
     { kind: "path", from: "^artists/catnip-claws-2/?$", to: "/artists/catnip-claws", status: 301 },
     { kind: "path", from: "^tim-fretwell/?$", to: "/artists/tim-fretwell", status: 301 },
+    // Renamed twoism post, same pair of spellings the nginx generator emits.
+    // mod_rewrite matches the decoded path too, so the first rule carries the
+    // literal curly quotes (the URL the old sitemap advertised) and the second
+    // carries the single-escaped text (what a double-encoded request decodes
+    // to). See the longer note in redirects-build-nginx.ts.
+    {
+      kind: "path",
+      from: "^news/2011/rykard-track-on-twoism’s-“one-on-twoism-vol-4″/?$",
+      to: "/news/2011/rykard-track-on-twoisms-one-on-twoism-vol-4",
+      status: 301,
+    },
+    {
+      kind: "path",
+      from: "^news/2011/rykard-track-on-twoism%e2%80%99s-%e2%80%9cone-on-twoism-vol-4%e2%80%b3/?$",
+      to: "/news/2011/rykard-track-on-twoisms-one-on-twoism-vol-4",
+      status: 301,
+    },
     // Feeds go to 410 so Google deindexes (spec §8.4).
     { kind: "path", from: "^feed/?$", to: "-", status: 410 },
     { kind: "path", from: "^comments/feed/?$", to: "-", status: 410 },
@@ -83,7 +102,7 @@ function buildQueryRedirectsFromClassified(items: ClassifiedItem[]): Redirect[] 
       redirects.push({
         kind: "query",
         queryPattern: `^p=${item.post_id}$`,
-        to: `/news/${year}/${item.post_name}`,
+        to: `/news/${year}/${newsSlugFor(item.post_name)}`,
         status: 301,
       });
       continue;
@@ -154,8 +173,10 @@ function emitRule(r: Redirect): string {
   }
   // Query-string match: two lines, RewriteCond + RewriteRule.
   // Trailing `?` on the target strips the incoming query string.
-  // NE flag preserves percent-encoded characters in the target (one news slug
-  // has %e2%80%99 and similar sequences; without NE Apache double-encodes them).
+  // NE flag preserves percent-encoded characters in the target. The one news
+  // slug that carried %e2%80%99 sequences has since been renamed to ASCII (see
+  // RENAMED_NEWS_SLUGS), but NE stays: it costs nothing and any future slug
+  // carrying an escape would be double-encoded by Apache without it.
   return [
     `RewriteCond %{QUERY_STRING} ${r.queryPattern}`,
     `RewriteRule ^/?$ ${r.to}? [R=${r.status},L,NE]`,

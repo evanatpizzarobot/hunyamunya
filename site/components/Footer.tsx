@@ -47,13 +47,18 @@ export function Footer() {
               Elsewhere
             </h5>
             <ul className="flex flex-col gap-2.5 text-[12px] uppercase text-paper-dim" style={{ letterSpacing: "0.04em" }}>
+              {/* These sit under a "Label" column on a 38-artist site, so they
+                  have to be label-level or explicitly attributed. The Spotify
+                  entry points at the label's own Complete Catalog playlist
+                  (content/playlists.yml), not at one artist's profile. The
+                  Bandcamp page is Rykard's, so it says so. */}
               <li>
                 <a href="https://rykard.bandcamp.com" target="_blank" rel="noopener noreferrer" className="transition-colors duration-300 hover:text-[color:var(--hm-accent)]">
-                  Bandcamp ↗
+                  Bandcamp · Rykard ↗
                 </a>
               </li>
               <li>
-                <a href="https://open.spotify.com/artist/1Lv74nSxjs4UMpxaceSclV" target="_blank" rel="noopener noreferrer" className="transition-colors duration-300 hover:text-[color:var(--hm-accent)]">
+                <a href="https://open.spotify.com/playlist/3jPkb1Mpwy5nIihdFzQhxL" target="_blank" rel="noopener noreferrer" className="transition-colors duration-300 hover:text-[color:var(--hm-accent)]">
                   Spotify ↗
                 </a>
               </li>
