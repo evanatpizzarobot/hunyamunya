@@ -154,8 +154,18 @@ jobs:
           BASE="${SMOKE_BASE:-http://$SSH_HOST}"
           echo "smoke base: $BASE"
 
+          # Every fetch follows redirects (-L) and every status check asserts
+          # the FINAL code is 200. The server canonicalizes hosts and paths
+          # (www to apex, trailing slash stripped, .html stripped), so a smoke
+          # test that does not follow redirects grades the redirect instead of
+          # the page. That is not hypothetical: this step accepted a bare 301
+          # as a pass, so pointing SMOKE_BASE at a host that redirects made
+          # every path check pass without ever loading a page, while the
+          # stylesheet check found no CSS in the redirect body, set CSS_PATH
+          # empty, and skipped itself silently.
+
           echo "--- BUILD_ID check ---"
-          LIVE_SHA="$(curl -fsS --max-time 30 -k "$BASE/BUILD_ID.txt" | tr -d '[:space:]')"
+          LIVE_SHA="$(curl -fsSL --max-time 30 -k "$BASE/BUILD_ID.txt" | tr -d '[:space:]')"
           echo "Expected: $GITHUB_SHA"
           echo "Live:     $LIVE_SHA"
           if [ "$LIVE_SHA" != "$GITHUB_SHA" ]; then
@@ -164,21 +174,23 @@ jobs:
           fi
 
           echo "--- HTTP status checks ---"
-          for path in "/" "/catalog" "/artists/rykard" "/news"; do
-            CODE="$(curl -s -k -o /dev/null -w '%{http_code}' "$BASE$path")"
+          for path in "/" "/catalog" "/artists/rykard" "/news" "/catalog/hmr010-nco"; do
+            CODE="$(curl -sL -k -o /dev/null -w '%{http_code}' --max-time 30 "$BASE$path")"
             echo "$CODE  $path"
-            if [ "$CODE" != "200" ] && [ "$CODE" != "301" ]; then
-              echo "::error::$path returned $CODE"
+            if [ "$CODE" != "200" ]; then
+              echo "::error::$path returned $CODE after following redirects"
               exit 1
             fi
           done
 
           echo "--- Asset perms check ---"
-          CSS_PATH="$(curl -fsS -k "$BASE/" | grep -oE '/_next/static/css/[a-f0-9]+\.css' | head -n 1)"
-          if [ -n "$CSS_PATH" ]; then
-            CSS_CODE="$(curl -s -k -o /dev/null -w '%{http_code}' "$BASE$CSS_PATH")"
-            echo "$CSS_CODE  $CSS_PATH"
-            [ "$CSS_CODE" = "200" ] || { echo "::error::stylesheet returned $CSS_CODE"; exit 1; }
+          CSS_PATH="$(curl -fsSL -k --max-time 30 "$BASE/" | grep -oE '/_next/static/css/[a-f0-9]+\.css' | head -n 1)"
+          if [ -z "$CSS_PATH" ]; then
+            echo "::error::no stylesheet found in the homepage HTML"
+            exit 1
           fi
+          CSS_CODE="$(curl -sL -k -o /dev/null -w '%{http_code}' --max-time 30 "$BASE$CSS_PATH")"
+          echo "$CSS_CODE  $CSS_PATH"
+          [ "$CSS_CODE" = "200" ] || { echo "::error::stylesheet returned $CSS_CODE"; exit 1; }
 
           echo "--- All smoke checks passed ---"
