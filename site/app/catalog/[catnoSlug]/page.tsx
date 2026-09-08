@@ -20,6 +20,7 @@ import type { Release } from "@/lib/schema";
 import { buildMetadata, releaseTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd, releaseJsonLd } from "@/lib/jsonld";
+import { NcoLanding } from "@/components/release/NcoLanding";
 
 type Params = { catnoSlug: string };
 
@@ -155,6 +156,16 @@ const RELEASE_LANES: LaneConfig[] = [
   { shape: "narrow", direction: "rl", top: "25%", width: 75,  duration: 55, delay: -25, opacityMod: 0.75 },
 ];
 
+// The NCO landing page runs several times the height of a normal release page,
+// so it gets a third lane to keep the layer from thinning out on the long
+// scroll. Deliberately varied: different shapes, speeds, sizes and depths, no
+// two lanes sharing a rhythm. The round drifts vertically, as it always must.
+const NCO_LANES: LaneConfig[] = [
+  { shape: "whale",  direction: "lr", top: "78%", width: 300, duration: 165, delay: -30, opacityMod: 0.7, mobileHide: true },
+  { shape: "narrow", direction: "rl", top: "22%", width: 80,  duration: 58,  delay: -14, opacityMod: 0.8 },
+  { shape: "round",  direction: "bt", left: "16%", width: 62, duration: 118, delay: -66, opacityMod: 0.85 },
+];
+
 export default async function ReleasePage({ params }: { params: Promise<Params> }) {
   const { catnoSlug } = await params;
   const r = getReleaseByCatnoSlug(catnoSlug);
@@ -191,7 +202,18 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
           releaseJsonLd(r.data, primaryArtistDoc?.data ?? null),
         ]}
       />
-      <UnderwaterLayer zone="surface" lanes={RELEASE_LANES} flushTop>
+      <UnderwaterLayer
+        zone="surface"
+        lanes={r.data.landing_layout === "nco" ? NCO_LANES : RELEASE_LANES}
+        flushTop
+      >
+      {/* A release can opt into a bespoke long-form body while keeping this
+          route's canonical, breadcrumbs, metadata and JSON-LD. One record,
+          one URL: sitemap.ts, feed.xml and llms.txt all enumerate releases by
+          urlPath, so a second route would be invisible to every one of them. */}
+      {r.data.landing_layout === "nco" ? (
+        <NcoLanding release={r} />
+      ) : (
       <article>
         <section className="grid gap-8 md:grid-cols-[minmax(0,1fr)_280px] md:items-start lg:grid-cols-[minmax(0,1fr)_340px]">
           <div>
@@ -438,6 +460,7 @@ export default async function ReleasePage({ params }: { params: Promise<Params> 
           </section>
         ) : null}
       </article>
+      )}
       </UnderwaterLayer>
     </>
   );

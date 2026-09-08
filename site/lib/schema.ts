@@ -256,6 +256,14 @@ export const releaseSchema = z.object({
   proof_points: z.array(proofPoint).default([]),
   related_news: z.array(z.string()).default([]),
   legacy_slug: z.string().optional(),
+  // Opt-in bespoke layout for a release that has earned a long-form page of
+  // its own. Unset (the normal case) renders the standard catalog template.
+  // Set, it names a component under components/release/ that replaces the
+  // template body while generateMetadata, the canonical, the breadcrumbs and
+  // the JSON-LD graph all stay shared. The point is one URL per record: a
+  // second route would be invisible to sitemap.ts, feed.xml and llms.txt,
+  // which all enumerate releases by urlPath.
+  landing_layout: z.enum(["nco"]).optional(),
   // SEO-spec §2.2 top-level fields.
   seoTitle: z.string().optional(),
   metaDescription: z.string().optional(),

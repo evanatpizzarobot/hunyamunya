@@ -44,11 +44,30 @@ buy:
   shopify: 'https://hunyamunya.myshopify.com/products/rykard-nco-12-vinyl?variant=47864116936923'
 press_quotes: []
 sync_available: false
+landing_layout: nco
+# cover_image is the 5000x5000 archive master, which is far too heavy for a
+# share card and over X's 4096px ceiling. Point og at the 1200px derivative
+# that scripts/nco-landing-assets.ts builds for the landing page.
+ogImage: /media/releases/hmr010-nco-front.webp
 status: published
 featured: false
 proof_points: []
 related_news: []
 ---
+{/*
+  NOTE: this body does not render anywhere.
+
+  `landing_layout: nco` above replaces the standard catalog template body with
+  components/release/NcoLanding.tsx, which is the whole point of that key. The
+  prose below is kept because it is the concise description of the record and
+  is the natural source if the landing layout is ever retired, but editing it
+  will not change what ships. Edit the component instead.
+
+  The `gallery` images above are likewise not displayed by the landing layout,
+  which renders its own web-sized derivatives. They stay listed because they
+  are the record's archive images and the press kit draws on the same files.
+*/}
+
 HMR010 is the 15-year vinyl reissue of Rykard's "North Cormorant Obscurity," the underground ambient electronic track from the 2010 debut album *Arrive the Radio Beacon* that went on to surpass 25 million streams. The A-side carries "North Cormorant Obscurity" (3:20) in its definitive form; the B-side carries "Troup Head" (5:33), a companion piece from the same era pressed here for the first time on vinyl.
 
 Pressed by Vinyl Ceremony. Mastered in Los Angeles. 500 copies total, plus 75 white-label promo pressings. Full-color matte sleeve, two randomly assigned sticker designs included with every copy, 45 RPM for headroom.
