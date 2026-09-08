@@ -9,7 +9,22 @@
 #
 #   curl -fsSL https://raw.githubusercontent.com/evanatpizzarobot/hunyamunya/main/site/scripts/vps-nginx-cutover.sh | sudo bash
 #
-# Safe to re-run; writes are idempotent (overwrite, not append).
+# DO NOT RE-RUN THIS ON THE LIVE VPS. It was a one-time cutover and the
+# server block below is now stale in two ways. Because it overwrites rather
+# than appends, running it would silently revert both:
+#
+#   1. certbot rewrote the vhost for TLS (443 listeners, cert paths,
+#      options-ssl-nginx.conf, dhparams). None of that is here, so a re-run
+#      takes the site back to plain http.
+#   2. scripts/vps-canonical-host-patch.sh (2026-09-07) removed www from
+#      server_name, added a www-to-apex redirect vhost, added the
+#      trailing-slash 301, and dropped the `$uri/` term from try_files. The
+#      block below still has the pre-patch server_name and try_files, so a
+#      re-run brings back the www duplicate and the 403s on /catalog/.
+#
+# To change the live config, hand-edit it or write a targeted patch script
+# in the shape of vps-canonical-host-patch.sh: back up, modify, `nginx -t`,
+# roll back on failure.
 
 set -e
 
