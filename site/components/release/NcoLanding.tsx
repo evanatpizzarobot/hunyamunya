@@ -4,6 +4,7 @@ import { PlatformLinks } from "@/components/PlatformLinks";
 import { buyLinksFor, streamingLinksFor } from "@/lib/streaming";
 import { formatReleaseDate, type ReleaseDoc } from "@/lib/content";
 import { PRESS_EMAIL } from "@/lib/press-data";
+import { LABEL_NAME } from "@/lib/jsonld";
 
 /**
  * Long-form landing page for HMR010, "North Cormorant Obscurity".
@@ -243,7 +244,7 @@ export function NcoLanding({ release }: { release: ReleaseDoc }) {
               { term: "Album", detail: "Arrive the Radio Beacon" },
               { term: "Position", detail: "Track 8" },
               { term: "Duration", detail: sideA?.duration ?? "3:20" },
-              { term: "Label", detail: "Hunya Munya" },
+              { term: "Label", detail: LABEL_NAME },
             ]}
           />
         }
