@@ -4,7 +4,6 @@ import { PlatformLinks } from "@/components/PlatformLinks";
 import { buyLinksFor, streamingLinksFor } from "@/lib/streaming";
 import { formatReleaseDate, type ReleaseDoc } from "@/lib/content";
 import { PRESS_EMAIL } from "@/lib/press-data";
-import pandoraStats from "@/data/pandora-stats.json";
 
 /**
  * Long-form landing page for HMR010, "North Cormorant Obscurity".
@@ -25,12 +24,17 @@ import pandoraStats from "@/data/pandora-stats.json";
  * platform and the names belong to real places. Both observable. Do not add a
  * line asserting intent unless he confirms it.
  *
+ * No time-sensitive numbers. This is a static export, so anything that moves
+ * month to month (monthly listeners, copies remaining, current chart position)
+ * freezes at deploy and quietly goes stale on the page. Cumulative and
+ * historical figures are fine, because they do not decay: total streams, the
+ * pressing size, the 2010 release date. If a live number is ever genuinely
+ * needed here it has to come with a mechanism that keeps it honest.
+ *
  * What is derived and what is typed, so the next editor does not have to guess:
  *   derived from frontmatter  price, edition, catalogue number, rpm, both
  *                             sides and their durations, sleeve, mastering,
  *                             pressing, release date, streaming and buy links
- *   derived from data/        the Pandora monthly-listener figure, which a
- *                             workflow refreshes
  *   typed here                the hero copy, the editorial prose, the 2010
  *                             recording sheet, the artist sheet, and the two
  *                             location sheets, none of which exist in the
@@ -173,7 +177,6 @@ export function NcoLanding({ release }: { release: ReleaseDoc }) {
   const buy = soldOut ? [] : buyLinksFor(d);
   const sideA = d.tracklist.find((t) => t.side === "A");
   const sideB = d.tracklist.find((t) => t.side === "B");
-  const pandoraMonthly = pandoraStats.rykard?.monthlyListeners;
 
   // Everything in the record sheet comes from frontmatter so this block and
   // the catalog entry can never disagree about what was pressed.
@@ -255,16 +258,12 @@ export function NcoLanding({ release }: { release: ReleaseDoc }) {
             <em>Arrive the Radio Beacon</em>
           </Link>
           . Slow, tidal electronica from a producer working out of the Lancashire
-          countryside, on a label with no money and no expectations.
+          countryside.
         </p>
         <p>
           It has since passed twenty five million streams, the widest reach of
           anything on the label. Pandora accepted the album in 2010 and has kept
-          it in rotation ever since
-          {typeof pandoraMonthly === "number"
-            ? `, where Rykard still draws around ${Math.round(pandoraMonthly / 1000)},000 listeners a month`
-            : ""}
-          . It found its audience sideways, through
+          it in rotation ever since. It found its audience sideways, through
           algorithms rather than press, and it has never really stopped.
         </p>
         <p>
@@ -295,14 +294,10 @@ export function NcoLanding({ release }: { release: ReleaseDoc }) {
           million barrels, its own and imports from Causeway, Fionn, Otter and
           Eider, sending everything down the Brent System pipeline to Sullom Voe.
         </p>
-        <p>
+        <p className="text-paper">
           It stopped at 07:45 on Saturday 22 June 2024, after forty two years. It
           is now the largest platform ever brought into Lerwick Harbour to be
           taken apart.
-        </p>
-        <p className="text-paper">
-          The track is fourteen years older than the platform&rsquo;s ending. It
-          has outlived the thing it is named for.
         </p>
       </Section>
 
