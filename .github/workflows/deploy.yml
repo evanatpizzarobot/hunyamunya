@@ -189,7 +189,7 @@ jobs:
           done
 
           echo "--- Asset perms check ---"
-          CSS_PATH="$(curl -fsSL -k --max-time 30 "$BASE/" | grep -oE '/_next/static/css/[a-f0-9]+\.css' | head -n 1)"
+          CSS_PATH="$(curl -fsSL -k --max-time 30 "$BASE/" | grep -oE '/_next/static/[A-Za-z0-9_/.-]+\.css' | head -n 1)"
           if [ -z "$CSS_PATH" ]; then
             echo "::error::no stylesheet found in the homepage HTML"
             exit 1
