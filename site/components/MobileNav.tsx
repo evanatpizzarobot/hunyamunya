@@ -26,6 +26,8 @@ export function MobileNav({ items, shopifyUrl }: Props) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // One-shot client flag so the portal never renders during SSR.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {

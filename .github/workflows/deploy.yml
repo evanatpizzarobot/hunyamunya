@@ -40,6 +40,11 @@ jobs:
         working-directory: site
         run: npm ci
 
+      # next build stopped running ESLint in Next 16, so lint runs here.
+      - name: Lint
+        working-directory: site
+        run: npm run lint
+
       - name: Build static export
         working-directory: site
         run: npm run build

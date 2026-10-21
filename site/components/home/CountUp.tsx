@@ -11,6 +11,8 @@ export function CountUp({ target, duration = 1400 }: { target: number; duration?
     const el = ref.current;
     if (!el) return;
     if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      // Reduced motion skips the animation; SSR still has to render 0 first.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setValue(target);
       return;
     }

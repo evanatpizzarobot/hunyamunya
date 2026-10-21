@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 import { getAllArtists, getAllNews, getAllReleases, isUpcoming } from "@/lib/content";
 import { SITE_URL } from "@/lib/jsonld";
 
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
