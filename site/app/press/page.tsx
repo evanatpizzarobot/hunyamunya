@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { buildMetadata, sectionTitle } from "@/lib/seo";
 import { SEO } from "@/components/SEO";
 import { breadcrumbJsonLd } from "@/lib/jsonld";
-import pandoraStats from "@/data/pandora-stats.json";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 import {
   DJ_SUPPORT,
@@ -21,13 +20,6 @@ const PRESS_LANES: LaneConfig[] = [
   { shape: "long",  direction: "rl", top: "16%",  width: 220, duration: 130, delay: -55, opacityMod: 0.85, mobileHide: true },
 ];
 
-function formatThousands(n: number): string {
-  if (n < 1000) return String(n);
-  if (n < 1_000_000) return `${Math.floor(n / 1000)}k`;
-  const m = n / 1_000_000;
-  return `${m >= 10 ? Math.floor(m) : m.toFixed(1).replace(/\.0$/, "")}M`;
-}
-
 export function generateMetadata(): Metadata {
   return buildMetadata({
     title: sectionTitle("Press"),
@@ -39,8 +31,6 @@ export function generateMetadata(): Metadata {
 
 export default function PressPage() {
   const totalStations = STATIONS.length;
-  const rykardMonthly = pandoraStats.rykard?.monthlyListeners ?? 60000;
-  const rykardMonthlyDisplay = formatThousands(rykardMonthly);
 
   return (
     <>
@@ -118,14 +108,13 @@ export default function PressPage() {
             <div
               className="text-[clamp(32px,3.6vw,56px)] leading-none tracking-[-0.02em] tabular-nums text-paper group-hover:text-[color:var(--hm-accent)]"
             >
-              {rykardMonthlyDisplay}
-              <span className="text-muted">+</span>
+              2010
             </div>
             <div
               className="text-[10px] uppercase text-muted"
               style={{ letterSpacing: "0.22em" }}
             >
-              Rykard &middot; Pandora monthly listeners &rarr;
+              Rykard &middot; on Pandora since &rarr;
             </div>
           </a>
         </div>

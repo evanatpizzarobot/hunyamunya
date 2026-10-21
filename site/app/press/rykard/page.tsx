@@ -7,7 +7,6 @@ import { CopyText } from "@/components/CopyText";
 import { UnderwaterLayer, type LaneConfig } from "@/components/UnderwaterLayer";
 import { getArtistBySlug, getReleasesByArtistSlug } from "@/lib/content";
 import { LISTINGS, PRESS_EMAIL, PRESS_QUOTES, STATIONS } from "@/lib/press-data";
-import pandoraStats from "@/data/pandora-stats.json";
 
 const KIT_LANES: LaneConfig[] = [
   { shape: "round", direction: "bt", left: "12%", width: 70,  duration: 110, delay: -18, opacityMod: 0.9 },
@@ -82,7 +81,6 @@ function words(s: string): number {
 export default function RykardPressKitPage() {
   const artist = getArtistBySlug("rykard");
   const releases = getReleasesByArtistSlug("rykard");
-  const monthly = pandoraStats.rykard?.monthlyListeners;
 
   // Only the plays that are actually his. The stations list covers the whole
   // roster, so Catnip & Claws on Radio Norfolk does not belong in his kit.
@@ -335,11 +333,7 @@ export default function RykardPressKitPage() {
             Discography.
           </h2>
           <p className="mb-10 max-w-[62ch] text-[13px] leading-relaxed text-muted">
-            {releases.length} releases on Hunya Munya Records
-            {monthly
-              ? `, ${Math.round(monthly / 1000)}k monthly listeners on Pandora`
-              : ""}
-            .
+            {releases.length} releases on Hunya Munya Records.
           </p>
           <ul className="divide-y divide-rule">
             {releases.map((r) => (
