@@ -55,10 +55,10 @@ const ARTIST_ENRICHMENTS: Record<string, ArtistEnrichment> = {
   rykard: {
     genres: ["Ambient", "Electronic", "Experimental"],
     shortBio:
-      "Rykard (Rick Wearing) is an anchor artist on Hunya Munya Records. A UK-based ambient electronic project from Preston, Lancashire, behind the album 'Arrive the Radio Beacon' and the track 'North Cormorant Obscurity' (25M+ streams). A new album lands in 2026.",
+      "Rykard (Rick Wearing) is an anchor artist on Hunya Munya Records. A UK-based ambient electronic project from Preston, Lancashire, behind the album 'Arrive the Radio Beacon' and the track 'North Cormorant Obscurity' (25M+ streams).",
     seoTitle: "Rykard · Hunya Munya Records",
     metaDescription:
-      "Rykard on Hunya Munya Records. UK-based ambient electronic project behind 'Arrive the Radio Beacon' and 'North Cormorant Obscurity' (25M+ streams), with support from BBC Radio, KCRW, and CBC. New album coming 2026.",
+      "Rykard on Hunya Munya Records. UK-based ambient electronic project behind 'Arrive the Radio Beacon' and 'North Cormorant Obscurity' (25M+ streams), with support from BBC Radio, KCRW, and CBC.",
   },
 };
 
