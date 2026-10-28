@@ -24,11 +24,11 @@ export function generateMetadata(): Metadata {
 
 const BIO_SHORT = `Rykard is the ambient electronic project of Richard Wearing, working from the Lancashire countryside in the north of England. His 2010 debut, Arrive the Radio Beacon, drew support from BBC 6 Music and KCRW, and its centerpiece "North Cormorant Obscurity" has since passed 25 million streams. Three more albums and the four-volume Explorers series have followed on Hunya Munya Records.`;
 
-const BIO_MEDIUM = `Rykard is the ambient electronic project of Richard Wearing, who has recorded from the Lancashire countryside in the north of England since 2010. His debut album, Arrive the Radio Beacon, arrived that year on Hunya Munya Records and travelled a long way for a small record, picking up plays from Tom Robinson on BBC 6 Music, Anne Litt on KCRW, and Morning Becomes Eclectic, along with KEXP, KALX, BBC Radio Bristol, and CBC Radio 2. Its centerpiece, "North Cormorant Obscurity," has since passed 25 million streams.
+const BIO_MEDIUM = `Rykard is the ambient electronic project of Richard Wearing, who has recorded from the Lancashire countryside in the north of England since 2009. His debut album, Arrive the Radio Beacon, arrived in 2010 on Hunya Munya Records and travelled a long way for a small record, picking up plays from Tom Robinson on BBC 6 Music, Anne Litt on KCRW, and Morning Becomes Eclectic, along with KEXP, KALX, BBC Radio Bristol, and CBC Radio 2. Its centerpiece, "North Cormorant Obscurity," has since passed 25 million streams.
 
 The full-lengths Luminosity (2016) and Night Towers (2018) followed, then the four-volume Explorers series between 2019 and 2023. The music draws on nature, science fiction, and long-form atmosphere, built from deep low end, slow melodic fragments, and a great deal of space. In December 2025 the label pressed a fifteen-year anniversary 12" of "North Cormorant Obscurity," re-edited and mastered for vinyl with an unreleased B side, "Troup Head." A new album is in the works.`;
 
-const BIO_LONG = `Rykard is the ambient electronic project of Richard Wearing, who has recorded from the Lancashire countryside in the north of England since 2010. The name is a play on his own, and the work has kept the same unhurried character across fifteen years: cinematic, weather-beaten, built from deep low end, slow melodic fragments, and a great deal of space.
+const BIO_LONG = `Rykard is the ambient electronic project of Richard Wearing, who has recorded from the Lancashire countryside in the north of England since 2009. The name is a play on his own, and the work has kept the same unhurried character from the start: cinematic, weather-beaten, built from deep low end, slow melodic fragments, and a great deal of space.
 
 His debut album, Arrive the Radio Beacon, was released by Hunya Munya Records in March 2010 and travelled a long way for a small record. Tom Robinson played it on BBC 6 Music. Anne Litt played it repeatedly on KCRW through the spring and summer of that year, and it reached Morning Becomes Eclectic in May. KEXP, KALX, BBC Radio Bristol, and CBC Radio 2 followed, and the album was accepted into Pandora. Its centerpiece, "North Cormorant Obscurity," has since passed 25 million streams, the widest reach of anything on the label.
 
@@ -95,7 +95,7 @@ export default function RykardPressKitPage() {
     { term: "Real name", detail: "Richard Wearing" },
     { term: "Based", detail: "Lancashire, England" },
     { term: "Genres", detail: (artist?.data.genres ?? []).join(", ") },
-    { term: "Label", detail: `Hunya Munya Records, since ${artist?.data.intro?.est_year ?? 2010}` },
+    { term: "Label", detail: "Hunya Munya Records, since 2010" },
   ].filter((f) => f.detail);
 
   const linkFields: { label: string; url?: string }[] = [
@@ -227,7 +227,11 @@ export default function RykardPressKitPage() {
           </div>
         </section>
 
-        <section className="grid grid-cols-1 border-b border-rule sm:grid-cols-3">
+        <section
+          className={`grid grid-cols-1 border-b border-rule ${
+            highlights.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"
+          }`}
+        >
           {highlights.map((h, i) => (
             <div
               key={h.label}
